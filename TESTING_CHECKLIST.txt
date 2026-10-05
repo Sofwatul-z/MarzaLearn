@@ -1,0 +1,22 @@
+
+// Checklist testing Phase 8.4.3
+
+1. Login sebagai teacher
+2. Masuk Teacher Panel
+3. Buka Chapter Management
+4. Klik View Detail pada Chapter 1
+5. Pastikan URL berubah:
+
+/teacher/chapters/16
+
+6. Pastikan tampil:
+- Title Chapter
+- Description
+- Semester
+- 6 Learning Steps
+
+7. Ulangi:
+Chapter 2 id 17
+Chapter 3 id 18
+Chapter 4 id 19
+Chapter 5 id 20

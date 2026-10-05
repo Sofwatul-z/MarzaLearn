@@ -1,0 +1,7 @@
+
+Add route:
+
+<Route
+ path="/teacher/chapters/:id"
+ element={<ChapterDetail />}
+/>

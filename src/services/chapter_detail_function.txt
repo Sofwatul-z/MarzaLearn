@@ -1,0 +1,22 @@
+
+export async function getChapterDetail(id) {
+  const { data, error } = await supabase
+    .from("chapters")
+    .select(`
+      *,
+      steps:chapter_steps(*)
+    `)
+    .eq("id", id)
+    .order("step_number", {
+      foreignTable: "chapter_steps",
+      ascending: true
+    })
+    .single();
+
+  if (error) {
+    console.error("Chapter detail error:", error);
+    return null;
+  }
+
+  return data;
+}

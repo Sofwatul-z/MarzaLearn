@@ -1,0 +1,10 @@
+
+// Tambahkan import
+import ChapterDetail from "../pages/teacher/ChapterDetail";
+
+// Tambahkan route di area teacher route:
+
+<Route
+  path="/teacher/chapters/:id"
+  element={<ChapterDetail />}
+/>

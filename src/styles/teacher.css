@@ -1,0 +1,31 @@
+.teacher-page {
+
+    color:#23332e;
+
+}
+
+
+.teacher-page h1,
+.teacher-page h2,
+.teacher-page h3 {
+
+    letter-spacing:-0.03em;
+
+}
+
+
+
+.teacher-page button {
+
+    transition:
+    all .25s ease;
+
+}
+
+
+
+.teacher-page button:hover {
+
+    transform:translateY(-1px);
+
+}

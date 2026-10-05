@@ -1,0 +1,23 @@
+
+Phase 8.4.3
+
+Tujuan:
+- Mengaktifkan route detail chapter
+- Menghubungkan ChapterManagement dengan ChapterDetail
+- Validasi hubungan chapters dan chapter_steps
+
+Alur akhir:
+
+Dashboard
+ |
+Teacher Panel
+ |
+Chapter Management
+ |
+View Detail
+ |
+/teacher/chapters/:id
+ |
+ChapterDetail
+ |
+Supabase chapters + chapter_steps
