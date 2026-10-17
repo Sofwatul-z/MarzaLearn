@@ -100,17 +100,180 @@ export async function getStudentLearningSessions(studentId) {
   });
 }
 
+export async function getStudentProgressRows(studentId) {
+  if (!studentId) return [];
+  return safelyLoad(
+    supabase
+      .from("student_progress")
+      .select("*")
+      .eq("student_id", studentId),
+    "student_progress table"
+  );
+}
+
 export async function getStudentProjectSubmissions(studentId) {
   if (!studentId) return [];
 
-  return safelyLoad(
+  const cloud = await safelyLoad(
     supabase
       .from("project_submissions")
-      .select("chapter_id,status,submitted_at,reviewed_at")
+      .select("*")
       .eq("student_id", studentId)
       .order("submitted_at", { ascending: false }),
     "project submissions"
   );
+
+  let local = [];
+  try {
+    const all = JSON.parse(localStorage.getItem("marzalearn-all-projects") || "[]");
+    local = all.filter((p) => p.student_id === studentId);
+  } catch (e) {}
+
+  const seen = new Set(cloud.map((p) => Number(p.chapter_id)));
+  return [...cloud, ...local.filter((p) => !seen.has(Number(p.chapter_id)))];
+}
+
+export async function submitStudentProject({
+  studentId,
+  chapterId,
+  studentName,
+  className,
+  attendanceNumber,
+  scriptText,
+  videoUrl,
+  checklist = [],
+}) {
+  if (!studentId || !chapterId || !videoUrl) {
+    return { ok: false, error: new Error("Missing required fields") };
+  }
+
+  const payload = {
+    student_id: studentId,
+    chapter_id: Number(chapterId),
+    student_name: studentName || "Student",
+    class_name: className || "XC",
+    attendance_number: attendanceNumber || "01",
+    script_text: scriptText || "",
+    video_url: videoUrl,
+    checklist,
+    status: "submitted",
+    submitted_at: new Date().toISOString(),
+  };
+
+  try {
+    const key = `marzalearn-project:${studentId}:${chapterId}`;
+    localStorage.setItem(key, JSON.stringify(payload));
+
+    const allKey = "marzalearn-all-projects";
+    const existing = JSON.parse(localStorage.getItem(allKey) || "[]");
+    const idx = existing.findIndex(
+      (p) => p.student_id === studentId && Number(p.chapter_id) === Number(chapterId)
+    );
+    if (idx >= 0) existing[idx] = payload;
+    else existing.push(payload);
+    localStorage.setItem(allKey, JSON.stringify(existing));
+  } catch (e) {}
+
+  const { data, error } = await supabase
+    .from("project_submissions")
+    .upsert(payload, { onConflict: "student_id,chapter_id" })
+    .select()
+    .single();
+
+  if (error) {
+    console.warn("Supabase project submission warning (using local fallback):", error);
+    return { ok: true, isLocal: true, data: payload };
+  }
+
+  return { ok: true, data };
+}
+
+export async function getProjectSubmission(studentId, chapterId) {
+  if (!studentId || !chapterId) return null;
+
+  const { data } = await supabase
+    .from("project_submissions")
+    .select("*")
+    .eq("student_id", studentId)
+    .eq("chapter_id", Number(chapterId))
+    .maybeSingle();
+
+  if (data) return data;
+
+  try {
+    const key = `marzalearn-project:${studentId}:${chapterId}`;
+    const raw = localStorage.getItem(key);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+
+  return null;
+}
+
+export async function getAllProjectSubmissions(className = "XC") {
+  const { data } = await supabase
+    .from("project_submissions")
+    .select("*")
+    .order("submitted_at", { ascending: false });
+
+  let list = data || [];
+
+  try {
+    const local = JSON.parse(localStorage.getItem("marzalearn-all-projects") || "[]");
+    const ids = new Set(list.map((p) => `${p.student_id}-${p.chapter_id}`));
+    local.forEach((lp) => {
+      if (!ids.has(`${lp.student_id}-${lp.chapter_id}`)) {
+        list.push(lp);
+      }
+    });
+  } catch (e) {}
+
+  if (className) {
+    list = list.filter(
+      (p) => !p.class_name || p.class_name.toUpperCase() === className.toUpperCase()
+    );
+  }
+  return list;
+}
+
+export async function gradeProjectSubmission({
+  submissionId,
+  studentId,
+  chapterId,
+  score,
+  feedback,
+}) {
+  const payload = {
+    score: Number(score),
+    feedback: feedback || "",
+    status: "reviewed",
+    reviewed_at: new Date().toISOString(),
+  };
+
+  if (submissionId) {
+    await supabase.from("project_submissions").update(payload).eq("id", submissionId);
+  } else if (studentId && chapterId) {
+    await supabase
+      .from("project_submissions")
+      .update(payload)
+      .eq("student_id", studentId)
+      .eq("chapter_id", Number(chapterId));
+  }
+
+  try {
+    const allKey = "marzalearn-all-projects";
+    const existing = JSON.parse(localStorage.getItem(allKey) || "[]");
+    const idx = existing.findIndex(
+      (p) =>
+        (submissionId && p.id === submissionId) ||
+        (p.student_id === studentId && Number(p.chapter_id) === Number(chapterId))
+    );
+    if (idx >= 0) {
+      existing[idx] = { ...existing[idx], ...payload };
+      localStorage.setItem(allKey, JSON.stringify(existing));
+    }
+  } catch (e) {}
+
+  return { ok: true };
 }
 
 function normalizeMissionStatus(session) {
@@ -241,27 +404,66 @@ export async function saveStudentProgress(studentId, chapterId, state) {
   return { ok: true };
 }
 
-export function buildStudentChapterProgress(chapters, sessions = [], projects = []) {
+export function buildStudentChapterProgress(
+  chapters,
+  sessions = [],
+  projects = [],
+  dbProgressRows = []
+) {
   return chapters.map((chapter) => {
     const latestSession = sessions.find(
-      (session) => Number(session.chapter_id) === Number(chapter.id) || Number(session.chapter_id) === Number(chapter.databaseId)
+      (session) =>
+        Number(session.chapter_id) === Number(chapter.id) ||
+        Number(session.chapter_id) === Number(chapter.databaseId)
     );
     const latestProject = projects.find(
-      (project) => Number(project.chapter_id) === Number(chapter.id) || Number(project.chapter_id) === Number(chapter.databaseId)
+      (project) =>
+        Number(project.chapter_id) === Number(chapter.id) ||
+        Number(project.chapter_id) === Number(chapter.databaseId)
+    );
+    const dbRow = dbProgressRows.find(
+      (row) =>
+        Number(row.chapter_id) === Number(chapter.id) ||
+        Number(row.chapter_id) === Number(chapter.databaseId)
     );
 
-    const missionStatus = normalizeMissionStatus(latestSession);
-    const currentStep = Math.min(
+    const sessionMissionStatus = normalizeMissionStatus(latestSession);
+    const sessionStep = Math.min(
       6,
       Math.max(0, Number(latestSession?.current_step ?? 0))
     );
-
-    const missionPercent =
-      missionStatus === "completed"
+    const sessionPercent =
+      sessionMissionStatus === "completed"
         ? 100
-        : missionStatus === "in_progress"
-          ? Math.max(8, Math.round((currentStep / 6) * 100))
+        : sessionMissionStatus === "in_progress"
+          ? Math.max(8, Math.round((sessionStep / 6) * 100))
           : 0;
+
+    let dbPercent = 0;
+    let dbStep = 0;
+    if (dbRow) {
+      dbPercent = Number(dbRow.percentage ?? 0);
+      let count = 0;
+      if (dbRow.provide) count++;
+      if (dbRow.restate) count++;
+      if (dbRow.visualize) count++;
+      if (dbRow.engage) count++;
+      if (dbRow.discuss) count++;
+      if (dbRow.play) count++;
+      dbStep = count;
+      if (dbPercent === 0 && count > 0) {
+        dbPercent = Math.round((count / 6) * 100);
+      }
+    }
+
+    const missionPercent = Math.max(sessionPercent, dbPercent);
+    const currentStep = Math.max(sessionStep, dbStep);
+    const missionStatus =
+      missionPercent >= 100 || sessionMissionStatus === "completed"
+        ? "completed"
+        : missionPercent > 0
+          ? "in_progress"
+          : "not_started";
 
     return {
       ...chapter,

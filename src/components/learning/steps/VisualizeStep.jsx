@@ -48,7 +48,9 @@ export default function VisualizeStep({
           <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl">
             {content.title}
           </h2>
-          <p className="mt-4 text-sm leading-7 text-[#65736D] sm:text-base">{content.instructions}</p>
+          <p className="mt-4 text-sm leading-7 text-[#65736D] sm:text-base">
+            Use the digital canvas to draw a simple painting Or include a photo that you think can describe the word.
+          </p>
           {content.example && (
             <p className="mt-2 text-xs font-semibold leading-5 text-[#849089]">Example: {content.example}</p>
           )}
@@ -56,7 +58,7 @@ export default function VisualizeStep({
         <div className="border-l-2 border-[#E8CDBD] pl-5">
           <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#8E776A]">Visual progress</p>
           <p className="mt-1 text-2xl font-extrabold tracking-[-0.04em] text-[#24332D]">{savedCount}/{content.prompts.length}</p>
-          <p className="mt-1 text-xs leading-5 text-[#7A8780]">Draw directly or upload an image for each prompt.</p>
+          <p className="mt-1 text-xs leading-5 text-[#7A8780]">Draw directly on canvas or switch to upload a photo for each word.</p>
         </div>
       </div>
 
@@ -96,7 +98,7 @@ export default function VisualizeStep({
       {savedCount === content.prompts.length && (
         <div className="mt-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-xs font-bold text-emerald-800 shadow-xs">
           <span className="text-xl">🎨</span>
-          <span>Karya visualmu sudah lengkap tersimpan! Klik <strong>Lanjut Step</strong> di bawah untuk bermain mencocokkan kata!</span>
+          <span>Great visual creativity! All your drawings/photos are saved. Click <strong>Next Step</strong> below to proceed!</span>
         </div>
       )}
 

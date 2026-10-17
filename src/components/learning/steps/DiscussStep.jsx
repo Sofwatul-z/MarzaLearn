@@ -52,7 +52,7 @@ export default function DiscussStep({ content, value, onChange }) {
       {response.trim().length >= 20 && (
         <div className="mt-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-xs font-bold text-emerald-800 shadow-xs">
           <span className="text-xl">💬</span>
-          <span>Pendapatmu sangat berbobot dan tersusun rapi! Yuk klik <strong>Lanjut Step</strong> di bawah untuk babak game kuis penutup!</span>
+          <span>Well done! Your discussion response is thoughtful and clear. Click <strong>Next Step</strong> below for the final quiz challenge!</span>
         </div>
       )}
 

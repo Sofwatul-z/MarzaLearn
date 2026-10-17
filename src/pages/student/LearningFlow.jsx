@@ -116,10 +116,10 @@ function MissionIntro({ chapter, recovered, onStart, onBack }) {
               <Sparkles size={12} className="text-yellow-300" /> Chapter {String(chapter.id).padStart(2, "0")} · 6-Step Mission
             </span>
             <h1 className="mt-4 max-w-3xl text-3xl font-black tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
-              Petualangan Belajar 6 Langkah Seru! 🚀
+              The 6-Step Learning Adventure! 🚀
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
-              Mulai dari menjelajahi kosa kata, merangkai kalimatmu sendiri, berkarya visual di kanvas, mencocokkan kata, berdiskusi, hingga game kuis penutup.
+              Explore target vocabulary, craft original sentences, express meanings on the digital canvas, match terms, share discussion ideas, and finish with a celebratory game quiz!
             </p>
           </div>
 
@@ -193,7 +193,7 @@ function MissionIntro({ chapter, recovered, onStart, onBack }) {
   );
 }
 
-function MissionComplete({ chapter, session, saveState, onBackToChapter, onDashboard }) {
+function MissionComplete({ chapter, session, saveState, onBackToChapter, onDashboard, onPjbl }) {
   const engagePairs = chapter.marzano.engage.pairs;
   const matched = session.data.engage?.matched ?? [];
   const mistakes = session.data.engage?.mistakeTerms ?? {};
@@ -210,9 +210,9 @@ function MissionComplete({ chapter, session, saveState, onBackToChapter, onDashb
             <CheckCircle2 size={24} />
           </div>
           <span className="mt-6 inline-block text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#5E786B]">6 / 6 steps completed</span>
-          <h1 className="mt-3 text-4xl font-extrabold tracking-[-0.055em] text-[#24332D] sm:text-5xl">Mission complete.</h1>
+          <h1 className="mt-3 text-4xl font-extrabold tracking-[-0.055em] text-[#24332D] sm:text-5xl">Mission Complete! 🏆</h1>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[#64736C] sm:text-base">
-            Your {chapter.title} learning mission is finished. Open responses and visuals are ready for teacher review; objective activities already have a score.
+            Your {chapter.title} learning mission is completed. Now you are ready to unleash your creativity in the Ultimate Project-Based Learning (PjBL) video project!
           </p>
         </div>
 
@@ -228,33 +228,46 @@ function MissionComplete({ chapter, session, saveState, onBackToChapter, onDashb
             <p className="mt-1 text-xs text-[#7A8780]">correct answers</p>
           </div>
           <div className="bg-white/85 p-5 text-center">
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.13em] text-[#849089]">Teacher review</p>
-            <p className="mt-2 text-base font-extrabold text-[#24332D]">Pending</p>
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.13em] text-[#849089]">Teacher Review</p>
+            <p className="mt-2 text-base font-extrabold text-[#24332D]">Saved & Ready</p>
             <p className="mt-1 text-xs text-[#7A8780]">Restate · Visualize · Discuss</p>
           </div>
         </div>
 
         {pendingVisuals > 0 && (
           <div className="mx-auto mt-5 max-w-4xl rounded-[18px] border border-[#E5C8B8] bg-[#FBEDE4] px-4 py-3 text-xs font-semibold leading-5 text-[#76594C]">
-            {pendingVisuals} visual {pendingVisuals === 1 ? "file is" : "files are"} stored for recovery on this device but not yet uploaded to Supabase Storage. Run the included Phase 5 Supabase setup before production use.
+            {pendingVisuals} visual {pendingVisuals === 1 ? "file is" : "files are"} saved for recovery on this device.
           </div>
         )}
 
         <div className="mt-7 flex justify-center"><SaveIndicator state={saveState} /></div>
-        <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
-          <Button variant="secondary" onClick={onBackToChapter} disabled={saveState === "saving"}>
-            <ArrowLeft size={16} /> Back to chapter
+
+        {/* Prominent PjBL Action */}
+        <div className="mt-6 flex flex-col items-center justify-center gap-4">
+          <Button
+            size="lg"
+            variant="primary"
+            onClick={onPjbl}
+            className="w-full sm:w-auto bg-[#1C2C25] hover:bg-[#283E34] text-white font-black py-4 px-9 rounded-full ring-4 ring-emerald-400/30 shadow-xl shadow-[#24332D]/20 text-base"
+          >
+            <Sparkles size={18} className="text-yellow-300" /> Start Ultimate PjBL Video Project <ArrowRight size={18} />
           </Button>
-          <Button variant="primary" onClick={onDashboard} disabled={saveState === "saving"}>
-            Student Dashboard <ArrowRight size={16} />
-          </Button>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button variant="secondary" onClick={onBackToChapter} disabled={saveState === "saving"}>
+              <ArrowLeft size={16} /> Back to Chapter
+            </Button>
+            <Button variant="ghost" onClick={onDashboard} disabled={saveState === "saving"}>
+              Student Dashboard <ArrowRight size={16} />
+            </Button>
+          </div>
         </div>
       </motion.section>
 
-      <div className="mt-7 border-l-2 border-[#E7C9B9] pl-5">
-        <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#8C7467]">Next in the chapter</p>
-        <p className="mt-1 font-extrabold text-[#24332D]">Ultimate Project will remain a separate activity.</p>
-        <p className="mt-1 max-w-2xl text-xs leading-5 text-[#7B8781]">You will be able to return later to submit the project link without reopening this one-session mission.</p>
+      <div className="mt-7 border-l-2 border-emerald-500/40 pl-5">
+        <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-emerald-800">Next Step: Project-Based Learning</p>
+        <p className="mt-1 font-extrabold text-[#24332D]">Turn your new language skills into a creative digital video.</p>
+        <p className="mt-1 max-w-2xl text-xs leading-5 text-[#7B8781]">Plan your script, follow the video production steps, and submit your link directly for teacher review.</p>
       </div>
     </div>
   );
@@ -311,6 +324,7 @@ export default function LearningFlow() {
         saveState={saveState}
         onBackToChapter={() => navigate(`/student/chapter/${chapter.id}`)}
         onDashboard={() => navigate("/student/dashboard")}
+        onPjbl={() => navigate(`/student/chapter/${chapter.id}/project`)}
       />
     );
   }
@@ -431,40 +445,41 @@ export default function LearningFlow() {
       <footer className="sticky bottom-3 z-30 rounded-[24px] border border-[#DDE5E0] bg-[#FBFCF8]/95 p-3.5 shadow-[0_16px_45px_rgba(36,51,45,0.12)] backdrop-blur-xl sm:p-4">
         <div className="flex items-center justify-between gap-3">
           <Button variant="ghost" onClick={previousStep} disabled={currentStep === 1}>
-            <ArrowLeft size={16} /> <span className="hidden sm:inline">Kembali</span>
+            <ArrowLeft size={16} /> <span className="hidden sm:inline">Back</span>
           </Button>
 
           <div className="hidden text-center sm:block">
             <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#8A9690]">{step.label}</p>
             <p className={`mt-0.5 text-xs font-black ${ready ? "text-emerald-700" : "text-[#8A9690]"}`}>
-              {ready ? "✨ Langkah ini selesai! Lanjut sekarang yuk!" : "Selesaikan aktivitas ini untuk membuka langkah berikutnya"}
+              {ready ? "✨ Activity completed! Ready to advance now!" : "Complete the activity above to unlock the next step"}
             </p>
           </div>
 
           <div className="relative">
-            {/* Animated Bouncing Guidance Arrow pointing to the next action */}
-            <div className="pointer-events-none absolute -top-12 right-0 sm:right-2 z-40 whitespace-nowrap">
+            {/* Animated Bouncing Guidance Pointer pointing to the next action */}
+            <div className="pointer-events-none absolute -top-14 right-0 sm:right-2 z-40 whitespace-nowrap">
               <BouncingGuideArrow
                 isReady={ready}
-                text={currentStep === 6 ? "Keren! Kuis selesai, kumpulkan yuk! 🏆" : "Hebat! Lanjut ke sini yuk! 👉"}
+                text="CLICK HERE!"
+                subtext={currentStep === 6 ? "Finish & Submit Mission! 🏆" : "Click to Advance Step 👉"}
                 direction="down"
               />
             </div>
 
             <motion.div
-              animate={ready ? { scale: [1, 1.04, 1] } : {}}
-              transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
+              animate={ready ? { scale: [1, 1.05, 1] } : {}}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
             >
               <Button
                 variant={ready ? "primary" : "secondary"}
                 onClick={nextStep}
                 disabled={!ready}
-                className={ready ? "ring-4 ring-emerald-400/40 shadow-lg shadow-emerald-600/25 font-black" : ""}
+                className={ready ? "ring-4 ring-emerald-400/40 shadow-xl shadow-emerald-700/25 font-black text-sm px-6" : ""}
               >
                 {currentStep === 6 ? (
-                  <><Check size={16} /> Selesaikan Misi</>
+                  <><Check size={16} /> Complete Mission</>
                 ) : (
-                  <>Lanjut Step <ArrowRight size={16} /></>
+                  <>Next Step <ArrowRight size={16} /></>
                 )}
               </Button>
             </motion.div>

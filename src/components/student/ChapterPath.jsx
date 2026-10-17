@@ -218,7 +218,7 @@ export default function ChapterPath({
                     </div>
                   </div>
 
-                  <div className="mt-6 flex items-end sm:mt-0">
+                  <div className="mt-6 flex flex-col items-stretch gap-2 sm:mt-0 sm:flex-row sm:items-center">
                     <Button
                       variant={
                         chapter.missionStatus === "in_progress" ? "primary" : "secondary"
@@ -235,6 +235,15 @@ export default function ChapterPath({
                         size={16}
                         className="transition-transform duration-200 group-hover/button:-translate-y-0.5 group-hover/button:translate-x-0.5"
                       />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="md"
+                      className="w-full whitespace-nowrap border border-[#DCE4DF] bg-white/90 text-xs font-black text-[#264436] shadow-xs hover:bg-[#EAF4EF] sm:w-auto"
+                      onClick={() => navigate(`/student/chapter/${chapter.id}/project`)}
+                    >
+                      <Sparkles size={14} className="text-amber-500" />
+                      PjBL Project
                     </Button>
                   </div>
                 </div>

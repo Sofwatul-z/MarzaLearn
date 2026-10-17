@@ -155,6 +155,29 @@ function MissionHandoff({ chapter, onStart }) {
   );
 }
 
+function PjblHandoff({ chapter, onStartProject }) {
+  return (
+    <div className="mt-8 overflow-hidden rounded-[34px] border border-[#CDE1D6] bg-gradient-to-br from-[#EAF4EF] via-white to-[#F4F8F6] p-7 sm:p-9 shadow-[0_16px_40px_rgba(36,51,45,0.06)]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <div>
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#9FC5B4] bg-[#DCEFE6] px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#24533C]">
+            <Sparkles size={13} className="text-amber-500" /> Real-World PjBL Project
+          </span>
+          <h3 className="mt-3 text-2xl font-extrabold tracking-[-0.035em] text-[#24332D] sm:text-3xl">
+            Ultimate Project: {chapter.project?.title || `${chapter.title} Project`}
+          </h3>
+          <p className="mt-2.5 max-w-2xl text-sm leading-relaxed text-[#596B63]">
+            Apply your English skills in an authentic video project! Watch modeling examples, draft your script, review production guidelines, and submit your video link for teacher evaluation.
+          </p>
+        </div>
+        <Button variant="primary" size="lg" onClick={onStartProject} className="w-full whitespace-nowrap lg:w-auto">
+          Open PjBL Project <ArrowRight size={17} />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function Chapter() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -278,10 +301,16 @@ export default function Chapter() {
       </div>
 
       {isGrammar && (
-        <MissionHandoff
-          chapter={chapter}
-          onStart={() => navigate(`/student/chapter/${chapter.id}/session`)}
-        />
+        <div className="space-y-6">
+          <MissionHandoff
+            chapter={chapter}
+            onStart={() => navigate(`/student/chapter/${chapter.id}/session`)}
+          />
+          <PjblHandoff
+            chapter={chapter}
+            onStartProject={() => navigate(`/student/chapter/${chapter.id}/project`)}
+          />
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Maximize2, X, Lightbulb, CheckCircle2 } from "lucide-react";
+import { Sparkles, Maximize2, X, Lightbulb, CheckCircle2, Bookmark, Compass } from "lucide-react";
 
 export default function StepHeroHeader({ asset, currentStep, totalSteps = 6, isReady = false }) {
   const [showFullImage, setShowFullImage] = useState(false);
@@ -10,20 +10,21 @@ export default function StepHeroHeader({ asset, currentStep, totalSteps = 6, isR
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, y: -12 }}
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className={`relative mb-8 overflow-hidden rounded-[28px] border border-black/5 bg-gradient-to-br ${asset.gradient} p-5 shadow-sm sm:p-7`}
+        className="relative mb-8 overflow-hidden rounded-[36px] bg-gradient-to-br from-[#FBFCF8] via-[#F4F9F6] to-[#EAF4EF] border border-[#DCE8E1] p-6 shadow-sm sm:p-8"
       >
-        {/* Playful background decorative bubbles */}
-        <div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-white/40 blur-2xl" />
-        <div className="pointer-events-none absolute -bottom-10 left-1/3 h-36 w-36 rounded-full bg-white/30 blur-xl" />
+        {/* Soft atmospheric organic gradient shapes matching reference style */}
+        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-emerald-200/40 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-12 left-1/4 h-56 w-56 rounded-full bg-amber-200/35 blur-2xl" />
+        <div className="pointer-events-none absolute top-1/2 right-1/3 h-40 w-40 rounded-full bg-sky-200/30 blur-2xl" />
 
-        <div className="relative z-10 flex flex-col-reverse gap-6 md:flex-row md:items-center md:justify-between">
-          {/* Left Text & Cheerful Guidance */}
+        <div className="relative z-10 flex flex-col-reverse gap-8 md:flex-row md:items-center md:justify-between">
+          {/* Left Hero Guidance in English */}
           <div className="max-w-xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3.5 py-1 text-xs font-black tracking-wide text-[#24332D] shadow-xs backdrop-blur-md">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-white/95 px-3.5 py-1 text-xs font-black tracking-wide text-[#24332D] shadow-xs backdrop-blur-md">
                 <Sparkles size={13} className="text-amber-500 animate-pulse" />
                 {asset.badge}
               </span>
@@ -32,52 +33,81 @@ export default function StepHeroHeader({ asset, currentStep, totalSteps = 6, isR
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="inline-flex items-center gap-1 rounded-full bg-emerald-500 px-3 py-1 text-[11px] font-black text-white shadow-xs"
+                  className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1 text-[11px] font-black text-white shadow-xs"
                 >
-                  <CheckCircle2 size={12} /> Selesai!
+                  <CheckCircle2 size={12} /> Step Completed!
                 </motion.span>
               )}
             </div>
 
-            <h2 className="mt-3 text-2xl font-black tracking-[-0.035em] text-[#1E2E27] sm:text-3xl">
+            <h2 className="mt-3.5 text-2xl font-black tracking-[-0.035em] text-[#1E2E27] sm:text-3xl lg:text-[2rem] leading-tight">
               {asset.title}
             </h2>
 
-            {/* Friendly Mascot Tip Speech Bubble */}
-            <div className="mt-3.5 inline-flex items-start gap-2.5 rounded-2xl bg-white/85 px-4 py-3 text-xs font-semibold leading-relaxed text-[#4A5D54] shadow-xs backdrop-blur-sm sm:text-sm">
-              <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-amber-100 text-amber-700">
-                <Lightbulb size={12} />
+            {/* Motivational Tip & Strategy */}
+            <div className="mt-4 inline-flex items-start gap-3 rounded-2xl border border-white/80 bg-white/90 p-4 text-xs font-semibold leading-relaxed text-[#4A5D54] shadow-xs backdrop-blur-sm sm:text-sm">
+              <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-amber-100 text-amber-700">
+                <Lightbulb size={13} />
               </span>
-              <p>{asset.tip}</p>
+              <div>
+                <span className="block text-[10px] font-black uppercase tracking-wider text-amber-800">
+                  Mission Pro-Tip
+                </span>
+                <p className="mt-0.5 text-slate-600">{asset.tip}</p>
+              </div>
             </div>
           </div>
 
-          {/* Right Themed Illustration Card */}
+          {/* Right Seamless Integrated Illustration with Floating Badges */}
           <div className="relative mx-auto shrink-0 md:mx-0">
+            {/* Ambient halo glow */}
+            <div className="absolute inset-0 -m-3 rounded-3xl bg-gradient-to-tr from-emerald-300/30 via-teal-200/20 to-amber-200/30 blur-xl" />
+
             <motion.div
-              animate={{ y: [0, -5, 0] }}
-              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-              className="group relative cursor-pointer overflow-hidden rounded-2xl border-2 border-white/80 shadow-md transition-all duration-300 hover:shadow-xl"
+              animate={{ y: [0, -6, 0] }}
+              transition={{ repeat: Infinity, duration: 4.2, ease: "easeInOut" }}
+              className="group relative cursor-pointer overflow-hidden rounded-[26px] border-4 border-white bg-white shadow-lg transition-all duration-300 hover:shadow-2xl"
               onClick={() => setShowFullImage(true)}
             >
               <img
                 src={asset.image}
                 alt={asset.title}
-                className="h-44 w-72 object-cover transition-transform duration-500 group-hover:scale-105 sm:h-48 sm:w-80"
+                className="h-48 w-72 object-cover transition-transform duration-500 group-hover:scale-105 sm:h-52 sm:w-80"
               />
 
-              {/* Hover overlay hint */}
-              <div className="absolute inset-0 flex items-center justify-center bg-black/25 opacity-0 backdrop-blur-xs transition-opacity duration-200 group-hover:opacity-100">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-[#24332D] shadow-md">
-                  <Maximize2 size={13} /> Perbesar Gambar
+              {/* Seamless Bottom Gradient & Tag */}
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 flex items-center justify-between text-white">
+                <span className="text-[10px] font-black uppercase tracking-wider text-white/90">
+                  Step {String(currentStep).padStart(2, "0")} / 0{totalSteps}
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold backdrop-blur-xs">
+                  <Maximize2 size={10} /> Zoom
                 </span>
               </div>
+            </motion.div>
+
+            {/* Floating Achievement Badge Top-Left (Reference Image Style) */}
+            <motion.div
+              animate={{ y: [0, 4, 0] }}
+              transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
+              className="absolute -left-3 -top-3 rounded-full border border-white/80 bg-white/95 px-3 py-1 shadow-md backdrop-blur-md hidden sm:flex items-center gap-1.5 text-[10px] font-black text-emerald-800"
+            >
+              <Compass size={11} className="text-emerald-600" /> English Focus
+            </motion.div>
+
+            {/* Floating Tag Bottom-Right */}
+            <motion.div
+              animate={{ y: [0, -4, 0] }}
+              transition={{ repeat: Infinity, duration: 3.8, ease: "easeInOut", delay: 0.5 }}
+              className="absolute -right-2 -bottom-2 rounded-full border border-white/80 bg-white/95 px-3 py-1 shadow-md backdrop-blur-md hidden sm:flex items-center gap-1.5 text-[10px] font-black text-[#24332D]"
+            >
+              <Bookmark size={11} className="text-amber-500" /> Active Learning
             </motion.div>
           </div>
         </div>
       </motion.div>
 
-      {/* Lightbox Modal for students to view the detailed illustration */}
+      {/* Lightbox Modal */}
       <AnimatePresence>
         {showFullImage && (
           <motion.div
@@ -98,7 +128,7 @@ export default function StepHeroHeader({ asset, currentStep, totalSteps = 6, isR
                 type="button"
                 onClick={() => setShowFullImage(false)}
                 className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full bg-black/60 text-white transition-transform hover:scale-110 hover:bg-black/80"
-                aria-label="Tutup"
+                aria-label="Close"
               >
                 <X size={18} />
               </button>

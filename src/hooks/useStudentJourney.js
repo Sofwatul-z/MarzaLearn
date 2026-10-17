@@ -3,6 +3,7 @@ import { getChapters } from "../services/chapter";
 import {
   buildStudentChapterProgress,
   getStudentLearningSessions,
+  getStudentProgressRows,
   getStudentProjectSubmissions,
 } from "../services/progress";
 import { useAuth } from "./useAuth";
@@ -22,14 +23,22 @@ export default function useStudentJourney() {
 
       try {
         const chapterData = await getChapters();
-        const [sessions, projects] = await Promise.all([
+        const [sessions, projects, dbProgressRows] = await Promise.all([
           getStudentLearningSessions(user?.id),
           getStudentProjectSubmissions(user?.id),
+          getStudentProgressRows(user?.id),
         ]);
 
         if (!active) return;
 
-        setChapters(buildStudentChapterProgress(chapterData, sessions, projects));
+        setChapters(
+          buildStudentChapterProgress(
+            chapterData,
+            sessions,
+            projects,
+            dbProgressRows
+          )
+        );
       } catch (loadError) {
         if (!active) return;
         console.error("Failed to load student journey:", loadError);

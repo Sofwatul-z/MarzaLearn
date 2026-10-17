@@ -10,6 +10,7 @@ import StudentDashboard from "../pages/student/Dashboard";
 import ChapterMap from "../pages/student/ChapterMap";
 import Chapter from "../pages/student/Chapter";
 import LearningFlow from "../pages/student/LearningFlow";
+import PjblWorkspace from "../pages/student/PjblWorkspace";
 
 import TeacherDashboard from "../pages/teacher/Dashboard";
 import StudentManagement from "../pages/teacher/StudentManagement";
@@ -58,6 +59,11 @@ export default function Router() {
             <Route
               path="chapter/:id/session"
               element={<LearningFlow />}
+            />
+
+            <Route
+              path="chapter/:id/project"
+              element={<PjblWorkspace />}
             />
 
           </Route>

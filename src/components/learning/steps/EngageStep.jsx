@@ -144,7 +144,7 @@ export default function EngageStep({ content, value, onChange, chapterId }) {
       {matched.length === pairs.length && (
         <div className="mt-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-xs font-bold text-emerald-800 shadow-xs">
           <span className="text-xl">🎯</span>
-          <span>Bagus sekali! Semua kata berhasil kamu pasangkan dengan tepat. Yuk klik <strong>Lanjut Step</strong> untuk berdiskusi!</span>
+          <span>Excellent work! You matched all target pairs correctly. Click <strong>Next Step</strong> below to join the discussion!</span>
         </div>
       )}
 

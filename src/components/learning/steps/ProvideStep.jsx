@@ -103,7 +103,7 @@ export default function ProvideStep({ content, value, onChange }) {
       {allSeen && (
         <div className="mt-5 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-xs font-bold text-emerald-800 shadow-xs">
           <span className="text-xl">🎉</span>
-          <span>Keren banget! Semua kosa kata sudah kamu jelajahi. Yuk klik <strong>Lanjut Step</strong> di bawah untuk mulai menulis!</span>
+          <span>Awesome! You have explored all the target vocabulary words. Click <strong>Next Step</strong> below to start writing!</span>
         </div>
       )}
 

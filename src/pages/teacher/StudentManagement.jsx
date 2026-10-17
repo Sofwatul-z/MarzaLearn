@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getStudentsByClass } from "../../services/teacher";
+import { getStudentsWithProgress } from "../../services/teacher";
 import StudentProgress from "./StudentProgress";
 import StudentCard from "../../components/teacher/StudentCard";
 import BackDashboard from "../../components/teacher/BackDashboard";
@@ -17,10 +17,10 @@ export default function StudentManagement() {
       setError("");
 
       try {
-        const result = await getStudentsByClass(cls);
+        const result = await getStudentsWithProgress(cls);
         setStudents(Array.isArray(result) ? result : []);
       } catch (err) {
-        console.error("Student RPC Error:", err);
+        console.error("Student Progress Error:", err);
         setStudents([]);
         setError("Unable to load students. Please try again.");
       } finally {
