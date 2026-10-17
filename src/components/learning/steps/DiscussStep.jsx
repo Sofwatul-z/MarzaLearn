@@ -48,6 +48,14 @@ export default function DiscussStep({ content, value, onChange }) {
           <p className="mt-5 border-t border-[#E4E9E6] pt-4 text-xs leading-5 text-[#8A9690]">Use the example as a guide for structure, not something to copy.</p>
         </aside>
       </div>
+
+      {response.trim().length >= 20 && (
+        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-xs font-bold text-emerald-800 shadow-xs">
+          <span className="text-xl">💬</span>
+          <span>Pendapatmu sangat berbobot dan tersusun rapi! Yuk klik <strong>Lanjut Step</strong> di bawah untuk babak game kuis penutup!</span>
+        </div>
+      )}
+
       <SourceNote source={content.source} />
     </div>
   );

@@ -92,6 +92,14 @@ export default function VisualizeStep({
           onSave={saveVisual}
         />
       </div>
+
+      {savedCount === content.prompts.length && (
+        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-xs font-bold text-emerald-800 shadow-xs">
+          <span className="text-xl">🎨</span>
+          <span>Karya visualmu sudah lengkap tersimpan! Klik <strong>Lanjut Step</strong> di bawah untuk bermain mencocokkan kata!</span>
+        </div>
+      )}
+
       <SourceNote source={content.source} />
     </div>
   );

@@ -59,6 +59,14 @@ export default function RestateStep({ content, value, onChange }) {
           );
         })}
       </div>
+
+      {completed === content.prompts.length && (
+        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-xs font-bold text-emerald-800 shadow-xs">
+          <span className="text-xl">🌟</span>
+          <span>Luar biasa! Semua kalimat sudah selesai kamu tulis. Yuk klik <strong>Lanjut Step</strong> di bawah untuk berkreasi visual!</span>
+        </div>
+      )}
+
       <SourceNote source={content.source} />
     </div>
   );

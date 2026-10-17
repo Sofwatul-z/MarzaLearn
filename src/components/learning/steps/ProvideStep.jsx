@@ -99,6 +99,14 @@ export default function ProvideStep({ content, value, onChange }) {
           )}
         </div>
       </div>
+
+      {allSeen && (
+        <div className="mt-5 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-xs font-bold text-emerald-800 shadow-xs">
+          <span className="text-xl">🎉</span>
+          <span>Keren banget! Semua kosa kata sudah kamu jelajahi. Yuk klik <strong>Lanjut Step</strong> di bawah untuk mulai menulis!</span>
+        </div>
+      )}
+
       <SourceNote source={content.source} />
     </div>
   );

@@ -27,7 +27,10 @@ import GamesStep from "../../components/learning/steps/GamesStep";
 import ProvideStep from "../../components/learning/steps/ProvideStep";
 import RestateStep from "../../components/learning/steps/RestateStep";
 import VisualizeStep from "../../components/learning/steps/VisualizeStep";
+import StepHeroHeader from "../../components/learning/StepHeroHeader";
+import BouncingGuideArrow from "../../components/learning/BouncingGuideArrow";
 import { getChapterContent } from "../../data/chapters";
+import { getStepAsset } from "../../data/stepAssets";
 import { useAuth } from "../../hooks/useAuth";
 import useMarzanoSession from "../../hooks/useMarzanoSession";
 
@@ -91,6 +94,8 @@ function SaveIndicator({ state }) {
 }
 
 function MissionIntro({ chapter, recovered, onStart, onBack }) {
+  const introAsset = getStepAsset(chapter.id, 1);
+
   return (
     <div className="pb-8">
       <button
@@ -105,24 +110,29 @@ function MissionIntro({ chapter, recovered, onStart, onBack }) {
         <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-[#CFE8DD]/15 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-[#F4D7C5]/10 blur-3xl" />
 
-        <div className="relative grid gap-9 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
+        <div className="relative grid gap-9 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-center">
           <div>
-            <span className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#B9D8CA]">
-              Chapter {String(chapter.id).padStart(2, "0")} · 6-Step Mission
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#B9D8CA] backdrop-blur-md">
+              <Sparkles size={12} className="text-yellow-300" /> Chapter {String(chapter.id).padStart(2, "0")} · 6-Step Mission
             </span>
-            <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-[-0.055em] text-white sm:text-5xl">
-              One session. Six connected ways to learn.
+            <h1 className="mt-4 max-w-3xl text-3xl font-black tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
+              Petualangan Belajar 6 Langkah Seru! 🚀
             </h1>
-            <p className="mt-5 max-w-2xl text-sm leading-7 text-white/65 sm:text-base">
-              Move from vocabulary discovery to your own sentences, visuals, matching, discussion, and a final game. Each next step opens only after the current activity is complete.
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
+              Mulai dari menjelajahi kosa kata, merangkai kalimatmu sendiri, berkarya visual di kanvas, mencocokkan kata, berdiskusi, hingga game kuis penutup.
             </p>
           </div>
 
-          <div className="rounded-[24px] border border-white/10 bg-white/[0.07] p-5">
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-white/45">Session rule</p>
-            <p className="mt-2 text-sm font-bold leading-6 text-white/85">
-              Plan to finish all six steps in this sitting. Autosave exists for refresh or connection recovery, not as a multi-day workflow.
-            </p>
+          <div className="relative overflow-hidden rounded-[24px] border-2 border-white/20 shadow-2xl transition-transform hover:scale-[1.02]">
+            <img
+              src={introAsset.image}
+              alt={introAsset.title}
+              className="h-48 w-full object-cover sm:h-52"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent p-4 flex flex-col justify-end text-white">
+              <span className="text-[10px] font-bold text-amber-300 tracking-wide">{introAsset.badge}</span>
+              <p className="text-sm font-extrabold mt-0.5 line-clamp-1">{introAsset.title}</p>
+            </div>
           </div>
         </div>
       </section>
@@ -351,7 +361,7 @@ export default function LearningFlow() {
         </div>
       )}
 
-      <section className="min-h-[560px] py-8 sm:py-10">
+      <section className="min-h-[560px] py-6 sm:py-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
@@ -360,6 +370,14 @@ export default function LearningFlow() {
             exit={{ opacity: 0, x: -10 }}
             transition={{ duration: 0.25 }}
           >
+            {/* Cheerful Themed Step Header with Character/Topic Illustration */}
+            <StepHeroHeader
+              asset={getStepAsset(chapter.id, currentStep)}
+              currentStep={currentStep}
+              totalSteps={6}
+              isReady={ready}
+            />
+
             {step.key === "provide" && (
               <ProvideStep
                 content={chapter.marzano.provide}
@@ -410,26 +428,47 @@ export default function LearningFlow() {
         </AnimatePresence>
       </section>
 
-      <footer className="sticky bottom-3 z-30 rounded-[22px] border border-[#DDE5E0] bg-[#FBFCF8]/90 p-3 shadow-[0_16px_45px_rgba(36,51,45,0.1)] backdrop-blur-xl sm:p-4">
+      <footer className="sticky bottom-3 z-30 rounded-[24px] border border-[#DDE5E0] bg-[#FBFCF8]/95 p-3.5 shadow-[0_16px_45px_rgba(36,51,45,0.12)] backdrop-blur-xl sm:p-4">
         <div className="flex items-center justify-between gap-3">
           <Button variant="ghost" onClick={previousStep} disabled={currentStep === 1}>
-            <ArrowLeft size={16} /> <span className="hidden sm:inline">Previous</span>
+            <ArrowLeft size={16} /> <span className="hidden sm:inline">Kembali</span>
           </Button>
 
           <div className="hidden text-center sm:block">
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#8A9690]">{step.label}</p>
-            <p className={`mt-0.5 text-xs font-bold ${ready ? "text-[#52715F]" : "text-[#8A9690]"}`}>
-              {ready ? "Step complete — ready to continue" : "Complete this activity to unlock the next step"}
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#8A9690]">{step.label}</p>
+            <p className={`mt-0.5 text-xs font-black ${ready ? "text-emerald-700" : "text-[#8A9690]"}`}>
+              {ready ? "✨ Langkah ini selesai! Lanjut sekarang yuk!" : "Selesaikan aktivitas ini untuk membuka langkah berikutnya"}
             </p>
           </div>
 
-          <Button variant={ready ? "primary" : "secondary"} onClick={nextStep} disabled={!ready}>
-            {currentStep === 6 ? (
-              <><Check size={16} /> Complete Mission</>
-            ) : (
-              <>Next Step <ArrowRight size={16} /></>
-            )}
-          </Button>
+          <div className="relative">
+            {/* Animated Bouncing Guidance Arrow pointing to the next action */}
+            <div className="pointer-events-none absolute -top-12 right-0 sm:right-2 z-40 whitespace-nowrap">
+              <BouncingGuideArrow
+                isReady={ready}
+                text={currentStep === 6 ? "Keren! Kuis selesai, kumpulkan yuk! 🏆" : "Hebat! Lanjut ke sini yuk! 👉"}
+                direction="down"
+              />
+            </div>
+
+            <motion.div
+              animate={ready ? { scale: [1, 1.04, 1] } : {}}
+              transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
+            >
+              <Button
+                variant={ready ? "primary" : "secondary"}
+                onClick={nextStep}
+                disabled={!ready}
+                className={ready ? "ring-4 ring-emerald-400/40 shadow-lg shadow-emerald-600/25 font-black" : ""}
+              >
+                {currentStep === 6 ? (
+                  <><Check size={16} /> Selesaikan Misi</>
+                ) : (
+                  <>Lanjut Step <ArrowRight size={16} /></>
+                )}
+              </Button>
+            </motion.div>
+          </div>
         </div>
       </footer>
     </div>

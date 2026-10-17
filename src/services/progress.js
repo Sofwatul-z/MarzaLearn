@@ -135,20 +135,91 @@ export async function saveStudentProgress(studentId, chapterId, state) {
     return { ok: false, reason: "missing-data" };
   }
 
-  const currentStep = Math.min(6, Math.max(0, Number(state.currentStep ?? 0)));
-  const percentage = state.status === "completed"
-    ? 100
-    : Math.round((Math.max(0, currentStep - 1) / 6) * 100);
-  const catalogChapter = CHAPTER_CATALOG.find((chapter) => chapter.id === Number(chapterId) || chapter.databaseId === Number(chapterId));
-  const databaseChapterId = catalogChapter?.databaseId ?? Number(chapterId);
+  // Daftar langkah selesai harus tersedia.
+  // Jangan menebak penyelesaian dari langkah yang sedang dibuka.
+  if (!Array.isArray(state.completedSteps)) {
+    return {
+      ok: false,
+      reason: "invalid-completed-steps",
+      error: new Error("state.completedSteps harus berupa array."),
+    };
+  }
+
+  const stepNames = [
+    "provide",
+    "restate",
+    "visualize",
+    "engage",
+    "discuss",
+    "play",
+  ];
+
+  const completedNames = new Set();
+
+  for (const value of state.completedSteps) {
+    let stepName = null;
+
+    // Mendukung nomor urutan langkah 1–6.
+    if (
+      typeof value === "number" &&
+      Number.isInteger(value) &&
+      value >= 1 &&
+      value <= 6
+    ) {
+      stepName = stepNames[value - 1];
+    }
+
+    // Mendukung nama langkah atau nomor urutan berupa teks.
+    if (typeof value === "string") {
+      const normalized = value.trim().toLowerCase();
+
+      if (/^[1-6]$/.test(normalized)) {
+        stepName = stepNames[Number(normalized) - 1];
+      } else {
+        stepName = normalized === "games" ? "play" : normalized;
+      }
+    }
+
+    if (!stepNames.includes(stepName)) {
+      return {
+        ok: false,
+        reason: "invalid-completed-step",
+        error: new Error(
+          "Isi completedSteps tidak dikenali. Gunakan nama langkah " +
+          "atau nomor urutan 1–6, bukan ID baris database."
+        ),
+      };
+    }
+
+    completedNames.add(stepName);
+  }
+
+  const catalogChapter = CHAPTER_CATALOG.find(
+    (chapter) =>
+      chapter.id === Number(chapterId) ||
+      chapter.databaseId === Number(chapterId)
+  );
+
+  const databaseChapterId =
+    catalogChapter?.databaseId ?? Number(chapterId);
+
+  if (
+    !Number.isInteger(databaseChapterId) ||
+    databaseChapterId <= 0
+  ) {
+    return { ok: false, reason: "invalid-chapter-id" };
+  }
 
   const payload = {
     student_id: studentId,
     chapter_id: databaseChapterId,
-    current_step: currentStep,
-    percentage,
-    status: state.status,
-    updated_at: state.updatedAt ?? new Date().toISOString(),
+    provide: completedNames.has("provide"),
+    restate: completedNames.has("restate"),
+    visualize: completedNames.has("visualize"),
+    engage: completedNames.has("engage"),
+    discuss: completedNames.has("discuss"),
+    play: completedNames.has("play"),
+    percentage: Math.round((completedNames.size / 6) * 100),
   };
 
   const { error } = await supabase
@@ -156,10 +227,15 @@ export async function saveStudentProgress(studentId, chapterId, state) {
     .upsert(payload, { onConflict: "student_id,chapter_id" });
 
   if (error) {
-    if (!isMissingOptionalTable(error)) {
-      console.warn("MarzaLearn: failed to save student progress", error);
-    }
-    return { ok: false, reason: isMissingOptionalTable(error) ? "unavailable" : "error", error };
+    console.warn("MarzaLearn: failed to save student progress", error);
+
+    return {
+      ok: false,
+      reason: isMissingOptionalTable(error)
+        ? "unavailable"
+        : "error",
+      error,
+    };
   }
 
   return { ok: true };

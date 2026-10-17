@@ -113,7 +113,46 @@ export async function saveLearningSession(studentId, chapterId, state) {
     .from("learning_sessions")
     .upsert(payload, { onConflict: "student_id,chapter_id" });
 
-  const progressResult = await saveStudentProgress(studentId, chapterId, state);
+  const progressResult = await saveStudentProgress(
+    studentId,
+    chapterId,
+    state
+  );
+
+  if (error) {
+    console.warn("MarzaLearn: session cloud save failed", error);
+
+    return {
+      ok: false,
+      reason: isMissingOptionalResource(error)
+        ? "unavailable"
+        : "session-save-error",
+      error,
+      sessionSaved: false,
+      progressSaved: progressResult.ok,
+    };
+  }
+
+  if (!progressResult.ok) {
+    console.warn(
+      "MarzaLearn: progress summary save failed",
+      progressResult.error
+    );
+
+    return {
+      ok: false,
+      reason: "progress-save-error",
+      error: progressResult.error,
+      sessionSaved: true,
+      progressSaved: false,
+    };
+  }
+
+  return {
+    ok: true,
+    sessionSaved: true,
+    progressSaved: true,
+  };
 
   if (error) {
     if (!isMissingOptionalResource(error)) {
