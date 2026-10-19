@@ -22,6 +22,8 @@ import Review from "../pages/teacher/Review";
 import ProtectedRoute from "./ProtectedRoute";
 
 
+import WarmupPreview from "../pages/student/WarmupPreview";
+
 export default function Router() {
   return (
     <BrowserRouter>
@@ -30,6 +32,7 @@ export default function Router() {
         {/* Public */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/warmup-preview" element={<WarmupPreview />} />
 
 
         {/* STUDENT */}

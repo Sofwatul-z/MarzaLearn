@@ -38,10 +38,10 @@ export default function StepHeroHeader({
   return (
     <>
       {/* ========================================================================= */}
-      {/* FULL-WIDTH HERO LAYER (BREAKOUT OUTSIDE MAX-WIDTH CONTAINER)               */}
+      {/* FULL-WIDTH HERO LAYER (BREAKOUT OUTSIDE MAX-WIDTH CONTAINER ON DESKTOP)    */}
       {/* ========================================================================= */}
       <section
-        className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen max-w-[100vw] overflow-x-hidden mb-10 transition-colors"
+        className="relative w-full lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:w-screen lg:max-w-[100vw] overflow-hidden mb-8 lg:mb-10 transition-colors"
         style={{ backgroundColor: theme.heroBg }}
         aria-label="Chapter learning hero"
       >
@@ -191,7 +191,7 @@ export default function StepHeroHeader({
                   )}
                 </div>
 
-                <h1 className="mt-3 text-2xl sm:text-3xl font-extrabold tracking-[-0.035em] text-[#183B40] leading-tight">
+                <h1 className="mt-3 text-lg sm:text-2xl font-extrabold tracking-[-0.03em] text-[#183B40] leading-snug">
                   {asset.title}
                 </h1>
 
