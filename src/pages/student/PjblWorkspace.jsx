@@ -3,10 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
+  ArrowRight,
   CheckSquare,
   ExternalLink,
   Film,
   Lightbulb,
+  Lock,
   Play,
   Send,
   Sparkles,
@@ -20,6 +22,7 @@ import { getPjblChapter } from "../../data/pjblData";
 import { useAuth } from "../../hooks/useAuth";
 import {
   getProjectSubmission,
+  getStudentProgressRows,
   submitStudentProject,
 } from "../../services/progress";
 
@@ -39,13 +42,18 @@ export default function PjblWorkspace() {
   const [existingSubmission, setExistingSubmission] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
+  const [missionComplete, setMissionComplete] = useState(false);
 
   useEffect(() => {
     let active = true;
     async function loadData() {
       if (!user?.id) return;
       try {
-        const sub = await getProjectSubmission(user.id, chapterId);
+        const [sub, progressRows] = await Promise.all([
+          getProjectSubmission(user.id, chapterId),
+          getStudentProgressRows(user.id),
+        ]);
+
         if (active && sub) {
           setExistingSubmission(sub);
           setVideoUrl(sub.video_url || "");
@@ -54,8 +62,20 @@ export default function PjblWorkspace() {
             setCheckedItems(sub.checklist);
           }
         }
+
+        if (active && progressRows) {
+          const row = progressRows.find(
+            (r) => Number(r.chapter_id) === Number(chapterId) || Number(r.chapter_id) === 15 + Number(chapterId)
+          );
+          if (row) {
+            const done =
+              row.percentage >= 100 ||
+              (row.provide && row.restate && row.visualize && row.engage && row.discuss && row.play);
+            setMissionComplete(Boolean(done));
+          }
+        }
       } catch (e) {
-        console.warn("Could not load prior submission:", e);
+        console.warn("Could not load PjBL prerequisites or submission:", e);
       } finally {
         if (active) setLoading(false);
       }
@@ -120,6 +140,31 @@ export default function PjblWorkspace() {
   }
 
   if (loading) return <Loader label="Opening PjBL Project Workspace..." />;
+
+  if (!missionComplete) {
+    return (
+      <div className="py-20 text-center max-w-xl mx-auto px-4">
+        <div className="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-full bg-amber-100 text-amber-700 shadow-inner">
+          <Lock size={36} />
+        </div>
+        <span className="ml-eyebrow">Project Locked</span>
+        <h1 className="mt-3 text-3xl font-extrabold tracking-[-0.04em] text-[#24332D]">
+          Complete the 6-Step Mission First
+        </h1>
+        <p className="mt-4 text-sm leading-relaxed text-[#617269]">
+          The Ultimate PjBL Video Project for Chapter {chapterId} ({pjbl?.title}) requires concepts, vocabulary, and speaking practice from all 6 Marzano steps. Finish your 6-step mission to unlock this workspace!
+        </p>
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button variant="primary" size="lg" onClick={() => navigate(`/student/chapter/${chapterId}/session`)}>
+            Go to 6-Step Mission <ArrowRight size={16} />
+          </Button>
+          <Button variant="secondary" size="lg" onClick={() => navigate(`/student/chapter/${chapterId}`)}>
+            Back to Chapter
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const isReviewed = existingSubmission?.status === "reviewed";
 

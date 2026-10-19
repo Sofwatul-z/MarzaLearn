@@ -9,6 +9,7 @@ import {
   Clock3,
   Headphones,
   Layers3,
+  Lock,
   Sparkles,
 } from "lucide-react";
 import Button from "../../components/common/Button";
@@ -19,6 +20,8 @@ import GrammarExplorer from "../../components/learning/GrammarExplorer";
 import LearnProgress from "../../components/learning/LearnProgress";
 import { getChapterContent } from "../../data/chapters";
 import { getChapterById } from "../../services/chapter";
+import { getStudentProgressRows } from "../../services/progress";
+import { useAuth } from "../../hooks/useAuth";
 import SourceNote from "../../components/common/SourceNote";
 
 const stageOrder = ["introduction", "listen", "grammar"];
@@ -155,24 +158,57 @@ function MissionHandoff({ chapter, onStart }) {
   );
 }
 
-function PjblHandoff({ chapter, onStartProject }) {
+function PjblHandoff({ chapter, onStartProject, isComplete }) {
   return (
-    <div className="mt-8 overflow-hidden rounded-[34px] border border-[#CDE1D6] bg-gradient-to-br from-[#EAF4EF] via-white to-[#F4F8F6] p-7 sm:p-9 shadow-[0_16px_40px_rgba(36,51,45,0.06)]">
+    <div
+      className={`mt-8 overflow-hidden rounded-[34px] border p-7 sm:p-9 shadow-[0_16px_40px_rgba(36,51,45,0.06)] transition-all ${
+        isComplete
+          ? "border-[#CDE1D6] bg-gradient-to-br from-[#EAF4EF] via-white to-[#F4F8F6]"
+          : "border-[#E2E8E4] bg-[#F7F9F8] opacity-85"
+      }`}
+    >
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-[#9FC5B4] bg-[#DCEFE6] px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#24533C]">
-            <Sparkles size={13} className="text-amber-500" /> Real-World PjBL Project
+          <span
+            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] ${
+              isComplete
+                ? "border-[#9FC5B4] bg-[#DCEFE6] text-[#24533C]"
+                : "border-[#DCE4DF] bg-white text-[#73837B]"
+            }`}
+          >
+            {isComplete ? (
+              <>
+                <Sparkles size={13} className="text-amber-500" /> Real-World PjBL Project (Unlocked)
+              </>
+            ) : (
+              <>
+                <Lock size={12} className="text-[#73837B]" /> PjBL Project (Locked)
+              </>
+            )}
           </span>
           <h3 className="mt-3 text-2xl font-extrabold tracking-[-0.035em] text-[#24332D] sm:text-3xl">
             Ultimate Project: {chapter.project?.title || `${chapter.title} Project`}
           </h3>
           <p className="mt-2.5 max-w-2xl text-sm leading-relaxed text-[#596B63]">
-            Apply your English skills in an authentic video project! Watch modeling examples, draft your script, review production guidelines, and submit your video link for teacher evaluation.
+            {isComplete
+              ? "Apply your English skills in an authentic video project! Watch modeling examples, draft your script, review production guidelines, and submit your video link for teacher evaluation."
+              : "This video project is locked. You must complete all 6 steps of the Marzano Learning Mission (Provide, Restate, Visualize, Engage, Discuss, Games) to unlock this project."}
           </p>
         </div>
-        <Button variant="primary" size="lg" onClick={onStartProject} className="w-full whitespace-nowrap lg:w-auto">
-          Open PjBL Project <ArrowRight size={17} />
-        </Button>
+        {isComplete ? (
+          <Button variant="primary" size="lg" onClick={onStartProject} className="w-full whitespace-nowrap lg:w-auto">
+            Open PjBL Project <ArrowRight size={17} />
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            size="lg"
+            disabled
+            className="w-full whitespace-nowrap border border-[#DDE4DF] bg-white/70 text-[#7A8881] cursor-not-allowed opacity-75 lg:w-auto"
+          >
+            <Lock size={15} /> Locked (Finish 6 Steps First)
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -181,11 +217,13 @@ function PjblHandoff({ chapter, onStartProject }) {
 export default function Chapter() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const bundled = useMemo(() => getChapterContent(id), [id]);
   const [chapterMeta, setChapterMeta] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeStage, setActiveStage] = useState("introduction");
   const [completed, setCompleted] = useState([]);
+  const [missionComplete, setMissionComplete] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -200,6 +238,27 @@ export default function Chapter() {
     load();
     return () => { mounted = false; };
   }, [id]);
+
+  useEffect(() => {
+    let mounted = true;
+    async function checkMission() {
+      if (!user?.id || !id) return;
+      try {
+        const rows = await getStudentProgressRows(user.id);
+        const row = rows.find(
+          (r) => Number(r.chapter_id) === Number(id) || Number(r.chapter_id) === 15 + Number(id)
+        );
+        if (mounted && row) {
+          const done =
+            row.percentage >= 100 ||
+            (row.provide && row.restate && row.visualize && row.engage && row.discuss && row.play);
+          setMissionComplete(Boolean(done));
+        }
+      } catch (e) {}
+    }
+    checkMission();
+    return () => { mounted = false; };
+  }, [user?.id, id]);
 
   const chapter = bundled ? { ...chapterMeta, ...bundled } : null;
 
@@ -308,6 +367,7 @@ export default function Chapter() {
           />
           <PjblHandoff
             chapter={chapter}
+            isComplete={missionComplete}
             onStartProject={() => navigate(`/student/chapter/${chapter.id}/project`)}
           />
         </div>

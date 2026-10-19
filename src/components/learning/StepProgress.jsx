@@ -29,8 +29,8 @@ export default function StepProgress({
             <div key={label} className="relative flex min-w-0 flex-col items-center">
               {index < steps.length - 1 && (
                 <span
-                  className={`absolute left-1/2 right-[-50%] top-[18px] h-px ${
-                    complete ? "bg-[#8EBEAA]" : "bg-[#D9E1DD]"
+                  className={`absolute left-1/2 right-[-50%] top-[18px] h-0.5 ${
+                    complete ? "bg-[#107C55]" : "bg-[#D9E1DD]"
                   }`}
                   aria-hidden="true"
                 />
@@ -40,21 +40,21 @@ export default function StepProgress({
                 disabled={!unlocked}
                 onClick={() => unlocked && onSelect?.(number)}
                 aria-current={active ? "step" : undefined}
-                className={`relative z-10 grid h-9 w-9 place-items-center rounded-full border text-xs font-extrabold transition-all ${
+                className={`relative z-10 grid h-9 w-9 place-items-center rounded-full border text-xs font-black transition-all ${
                   complete
-                    ? "border-[#8EBEAA] bg-[#CFE8DD] text-[#29483A]"
+                    ? "border-[#0D5A3E] bg-[#107C55] text-white shadow-xs"
                     : active
-                      ? "border-[#24332D] bg-[#24332D] text-white shadow-[0_8px_20px_rgba(36,51,45,0.17)]"
+                      ? "border-red-700 bg-[#DC2626] text-white ring-4 ring-red-500/20 shadow-[0_8px_20px_rgba(220,38,38,0.25)]"
                       : unlocked
-                        ? "border-[#C9D6CF] bg-white text-[#66766E] hover:border-[#9FB9AC]"
+                        ? "border-[#C9D6CF] bg-white text-[#4A5D54] hover:border-[#107C55]"
                         : "cursor-not-allowed border-[#E1E6E3] bg-[#F5F7F5] text-[#A8B1AC]"
                 }`}
               >
                 {complete ? <Check size={15} strokeWidth={3} /> : unlocked ? number : <LockKeyhole size={13} />}
               </button>
               <span
-                className={`mt-2 truncate px-1 text-[10px] font-extrabold uppercase tracking-[0.08em] ${
-                  active ? "text-[#24332D]" : complete ? "text-[#547265]" : "text-[#8A9690]"
+                className={`mt-2 truncate px-1 text-[10px] font-black uppercase tracking-[0.08em] ${
+                  active ? "text-[#DC2626]" : complete ? "text-[#107C55]" : "text-[#7B8B84]"
                 }`}
               >
                 {label}

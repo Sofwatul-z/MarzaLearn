@@ -1,0 +1,64 @@
+{
+  "id": "01",
+  "theme": "badminton-warmup",
+  "version": 1,
+  "generation": "AI-generated adaptations of supplied reference, not exact pixel extractions",
+  "assets": [
+    {
+      "file": "assets/01-hero-desktop.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 1628803,
+      "role": "Hero desktop, ruang teks kiri",
+      "has_transparency": false
+    },
+    {
+      "file": "assets/01-hero-mobile.png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1661501,
+      "role": "Hero mobile, teks sebaiknya di atas gambar",
+      "has_transparency": false
+    },
+    {
+      "file": "assets/01-character.png",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1700537,
+      "role": "Karakter alternatif, bukan tambahan di atas hero",
+      "has_transparency": true
+    },
+    {
+      "file": "assets/01-racket-shuttle.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 1890655,
+      "role": "Dekorasi raket dan shuttlecock",
+      "has_transparency": true
+    },
+    {
+      "file": "assets/01-shuttlecock.png",
+      "width": 1402,
+      "height": 1122,
+      "bytes": 1031961,
+      "role": "Dekorasi kecil atau ilustrasi kartu",
+      "has_transparency": true
+    },
+    {
+      "file": "assets/01-shoes.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 1990236,
+      "role": "Ilustrasi perlengkapan",
+      "has_transparency": true
+    },
+    {
+      "file": "assets/01-bottle-towel.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 1563956,
+      "role": "Ilustrasi hidrasi dan persiapan",
+      "has_transparency": true
+    }
+  ]
+}

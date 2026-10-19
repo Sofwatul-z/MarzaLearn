@@ -1,52 +1,66 @@
 // Chapter 1 Assets (Descriptive Text - Athletes)
-import ch1Step1 from "../assets/5e3c5592-d5e2-4512-9970-0ad7b0703e43.png";
-import ch1Step2 from "../assets/d5dfb35f-4b20-4632-8a4a-937998137dfe.png";
-import ch1Step3 from "../assets/2e85e1e0-18a6-4e5a-a53d-0d026d758030.png";
-import ch1Step4 from "../assets/4e53056a-a407-483f-bddf-84ce83efdadc (1).png";
-import ch1Step5 from "../assets/660f433d-5a8c-40ac-bce0-9ad6e9aee930.png";
-import ch1Step6 from "../assets/13a0e7fe-80ae-4907-8271-cd319011c3b3.png";
+import ch1Step1Desktop from "../assets/badminton-warmup/01-hero-desktop.webp";
+import ch1Step1Mobile from "../assets/badminton-warmup/01-hero-mobile.webp";
+import ch1RacketShuttle from "../assets/badminton-warmup/01-racket-shuttle.webp";
+import ch1Shuttlecock from "../assets/badminton-warmup/01-shuttlecock.webp";
+import ch1Shoes from "../assets/badminton-warmup/01-shoes.webp";
+import ch1BottleTowel from "../assets/badminton-warmup/01-bottle-towel.webp";
+
+import ch1Step2 from "../assets/chapter 1/step 2/02-badminton-match/assets/d5dfb35f-4b20-4632-8a4a-937998137dfe.png";
+import ch1Step3 from "../assets/chapter 1/step 3/2e85e1e0-18a6-4e5a-a53d-0d026d758030.png";
+import ch1Step4 from "../assets/chapter 1/step 4/4e53056a-a407-483f-bddf-84ce83efdadc (1).png";
+import ch1Step5 from "../assets/chapter 1/step 5/660f433d-5a8c-40ac-bce0-9ad6e9aee930.png";
+import ch1Step6 from "../assets/chapter 1/step 6/13a0e7fe-80ae-4907-8271-cd319011c3b3.png";
 
 // Chapter 2 Assets (Recount Text - Badminton at Istora)
-import ch2Step1 from "../assets/fce3ff35-26de-422c-a5f9-0ae9db83bbfa.png";
-import ch2Step2 from "../assets/720246dc-aed9-44b1-afb9-566727452a1e.png";
-import ch2Step3 from "../assets/8fb7e685-37b9-46be-9867-5897f732cad5.png";
-import ch2Step4 from "../assets/da1c001d-f365-4a06-80b7-ae70a6876514.png";
-import ch2Step5 from "../assets/7d352ddb-1abe-48a0-adb9-2a6bffd36b36.png";
-import ch2Step6 from "../assets/b47709ce-2fbe-4e1d-8c62-0dae03b0ef68.png";
+import ch2Step1 from "../assets/chapter 2/step 1/fce3ff35-26de-422c-a5f9-0ae9db83bbfa.png";
+import ch2Step2 from "../assets/chapter 2/step 2/720246dc-aed9-44b1-afb9-566727452a1e.png";
+import ch2Step3 from "../assets/chapter 2/step 3/8fb7e685-37b9-46be-9867-5897f732cad5.png";
+import ch2Step4 from "../assets/chapter 2/step 4/da1c001d-f365-4a06-80b7-ae70a6876514.png";
+import ch2Step5 from "../assets/chapter 2/step 5/7d352ddb-1abe-48a0-adb9-2a6bffd36b36.png";
+import ch2Step6 from "../assets/chapter 2/step 6/b47709ce-2fbe-4e1d-8c62-0dae03b0ef68.png";
 
 // Chapter 3 Assets (Procedure Text - Healthy Lifestyle & Habits)
-import ch3Step1 from "../assets/da390543-0653-4bea-9129-67ced8750a1e.png";
-import ch3Step2 from "../assets/e74f7d65-539b-4920-bdd8-9e206776be2d.png";
-import ch3Step3 from "../assets/93928277-bf99-4a65-ab09-0eb4b1e83377.png";
-import ch3Step4 from "../assets/cf4f6949-83c7-4d6a-8e9b-4ae5f5efa8e0.png";
-import ch3Step5 from "../assets/5fab6b7f-93d0-46c8-a82e-c475c8da763f.png";
-import ch3Step6 from "../assets/5a40198d-6639-4ee9-bed8-d424463508d9.png";
+import ch3Step1 from "../assets/chapter 3/step 1/da390543-0653-4bea-9129-67ced8750a1e.png";
+import ch3Step2 from "../assets/chapter 3/step 2/e74f7d65-539b-4920-bdd8-9e206776be2d.png";
+import ch3Step3 from "../assets/chapter 3/step 3/93928277-bf99-4a65-ab09-0eb4b1e83377.png";
+import ch3Step4 from "../assets/chapter 3/step 4/cf4f6949-83c7-4d6a-8e9b-4ae5f5efa8e0.png";
+import ch3Step5 from "../assets/chapter 3/step 5/5fab6b7f-93d0-46c8-a82e-c475c8da763f.png";
+import ch3Step6 from "../assets/chapter 3/step 6/5a40198d-6639-4ee9-bed8-d424463508d9.png";
 
 // Chapter 4 Assets (Analytical Exposition - Screen Time Before Bed)
-import ch4Step1 from "../assets/0aed45e4-7996-4727-a440-25b6d99d75cf.png";
-import ch4Step2 from "../assets/7fdd7296-14c2-4845-8d5b-578fd58f4207.png";
-import ch4Step3 from "../assets/eb02a035-2c6d-4186-900c-1266fa507bf1.png";
-import ch4Step4 from "../assets/fd526495-6aa7-430c-9394-09ed30306d95.png";
-import ch4Step5 from "../assets/fabbe537-1464-4850-ac68-ef4543a365e2.png";
-import ch4Step6 from "../assets/12a0de87-eda7-477b-8d1e-7032307099c2.png";
+import ch4Step1 from "../assets/chapter 4/step 1/0aed45e4-7996-4727-a440-25b6d99d75cf.png";
+import ch4Step2 from "../assets/chapter 4/step 2/7fdd7296-14c2-4845-8d5b-578fd58f4207.png";
+import ch4Step3 from "../assets/chapter 4/step 3/eb02a035-2c6d-4186-900c-1266fa507bf1.png";
+import ch4Step4 from "../assets/chapter 4/step 4/fd526495-6aa7-430c-9394-09ed30306d95.png";
+import ch4Step5 from "../assets/chapter 4/step 5/fabbe537-1464-4850-ac68-ef4543a365e2.png";
+import ch4Step6 from "../assets/chapter 4/step 6/12a0de87-eda7-477b-8d1e-7032307099c2.png";
 
 // Chapter 5 Assets (Narrative Text - The Legend of Malin Kundang)
-import ch5Step1 from "../assets/f00e1dd8-986b-4797-a6d3-79436c73118a.png";
-import ch5Step2 from "../assets/3a16fa95-e413-413b-b073-083e636aafea.png";
-import ch5Step3 from "../assets/b7cc9c9b-4b51-48d8-9338-26740c4204f4.png";
-import ch5Step4 from "../assets/c094f997-7792-4959-9202-9cb2986ae3ac.png";
-import ch5Step5 from "../assets/11d523af-0e78-456f-beaa-67bea0795b54.png";
-import ch5Step6 from "../assets/91c7bb29-3130-4e44-a36f-acb45770e344.png";
+import ch5Step1 from "../assets/chapter 5/step 1/f00e1dd8-986b-4797-a6d3-79436c73118a.png";
+import ch5Step2 from "../assets/chapter 5/step 2/3a16fa95-e413-413b-b073-083e636aafea.png";
+import ch5Step3 from "../assets/chapter 5/step 3/b7cc9c9b-4b51-48d8-9338-26740c4204f4.png";
+import ch5Step4 from "../assets/chapter 5/step 4/c094f997-7792-4959-9202-9cb2986ae3ac.png";
+import ch5Step5 from "../assets/chapter 5/step 5/11d523af-0e78-456f-beaa-67bea0795b54.png";
+import ch5Step6 from "../assets/chapter 5/step 6/91c7bb29-3130-4e44-a36f-acb45770e344.png";
 
 export const STEP_ASSETS = {
   1: {
     1: {
-      image: ch1Step1,
+      image: ch1Step1Desktop,
+      heroDesktop: ch1Step1Desktop,
+      heroMobile: ch1Step1Mobile,
+      decorations: {
+        racketShuttle: ch1RacketShuttle,
+        shuttlecock: ch1Shuttlecock,
+        shoes: ch1Shoes,
+        bottleTowel: ch1BottleTowel,
+      },
       badge: "Step 01 · Let's Discover Words! ✨",
-      title: "Meet the Champion & Master Key Vocabulary! 🏸",
+      title: "Describing Athletes & Their Physical Agility",
       tip: "Pay close attention to descriptive adjectives that highlight speed, resilience, and agility!",
-      gradient: "from-emerald-500/15 via-teal-500/10 to-amber-500/10",
-      accentColor: "#10b981",
+      gradient: "from-[#F8F5EC] via-[#F8F5EC] to-transparent",
+      accentColor: "#183B40",
     },
     2: {
       image: ch1Step2,

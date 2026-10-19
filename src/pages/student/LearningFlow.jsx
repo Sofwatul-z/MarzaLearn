@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -289,6 +289,16 @@ export default function LearningFlow() {
     completeStep,
   } = useMarzanoSession(chapter?.id);
 
+  useEffect(() => {
+    if (chapter?.id === 1) {
+      const origBg = document.body.style.backgroundColor;
+      document.body.style.backgroundColor = "#F8F5EC";
+      return () => {
+        document.body.style.backgroundColor = origBg;
+      };
+    }
+  }, [chapter?.id]);
+
   if (!chapter) {
     return (
       <div className="py-20 text-center">
@@ -384,12 +394,13 @@ export default function LearningFlow() {
             exit={{ opacity: 0, x: -10 }}
             transition={{ duration: 0.25 }}
           >
-            {/* Cheerful Themed Step Header with Character/Topic Illustration */}
+            {/* Arena-Themed Step Hero with Seamless Environmental Integration */}
             <StepHeroHeader
               asset={getStepAsset(chapter.id, currentStep)}
               currentStep={currentStep}
               totalSteps={6}
               isReady={ready}
+              chapterId={chapter.id}
             />
 
             {step.key === "provide" && (
@@ -397,6 +408,7 @@ export default function LearningFlow() {
                 content={chapter.marzano.provide}
                 value={session.data.provide}
                 onChange={(value) => updateStepData("provide", value)}
+                chapterId={chapter.id}
               />
             )}
             {step.key === "restate" && (

@@ -4,7 +4,7 @@ import Button from "../../common/Button";
 import VocabularyCard from "../VocabularyCard";
 import SourceNote from "../../common/SourceNote";
 
-export default function ProvideStep({ content, value, onChange }) {
+export default function ProvideStep({ content, value, onChange, chapterId = 1 }) {
   const words = content.vocabulary ?? [];
   const seen = value?.seen ?? [];
   const initialIndex = useMemo(() => {
@@ -57,6 +57,7 @@ export default function ProvideStep({ content, value, onChange }) {
           index={index}
           total={words.length}
           onPronounce={pronounce}
+          chapterId={chapterId}
         />
       )}
 

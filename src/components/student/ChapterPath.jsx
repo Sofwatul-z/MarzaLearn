@@ -7,6 +7,7 @@ import {
   FileCheck2,
   FileClock,
   Headphones,
+  Lock,
   Sparkles,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -211,7 +212,7 @@ export default function ChapterPath({
                           <span>
                             {projectAvailable
                               ? `${project.label} · ${chapter.projectLabel}`
-                              : `Ultimate Project · ${chapter.projectLabel}`}
+                              : `Ultimate Project · 🔒 Locked until 6 steps finished`}
                           </span>
                         </div>
                       </div>
@@ -236,15 +237,28 @@ export default function ChapterPath({
                         className="transition-transform duration-200 group-hover/button:-translate-y-0.5 group-hover/button:translate-x-0.5"
                       />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="md"
-                      className="w-full whitespace-nowrap border border-[#DCE4DF] bg-white/90 text-xs font-black text-[#264436] shadow-xs hover:bg-[#EAF4EF] sm:w-auto"
-                      onClick={() => navigate(`/student/chapter/${chapter.id}/project`)}
-                    >
-                      <Sparkles size={14} className="text-amber-500" />
-                      PjBL Project
-                    </Button>
+                    {projectAvailable ? (
+                      <Button
+                        variant="primary"
+                        size="md"
+                        className="w-full whitespace-nowrap bg-[#24332D] text-xs font-black text-white shadow-xs hover:bg-[#2F443C] sm:w-auto"
+                        onClick={() => navigate(`/student/chapter/${chapter.id}/project`)}
+                      >
+                        <Sparkles size={14} className="text-amber-300" />
+                        Start PjBL Project
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="md"
+                        disabled
+                        className="w-full whitespace-nowrap border border-[#E3E8E5] bg-[#F4F7F5] text-xs font-bold text-[#8C9892] opacity-75 cursor-not-allowed sm:w-auto"
+                        title="Complete all 6 steps in this chapter to unlock the PjBL Project"
+                      >
+                        <Lock size={13} className="text-[#8C9892]" />
+                        PjBL Locked
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
