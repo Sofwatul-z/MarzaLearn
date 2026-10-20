@@ -41,7 +41,7 @@ function getLocalLearningSessions(studentId) {
       const raw = window.localStorage.getItem(key);
       if (!raw || !chapterId) continue;
       const session = JSON.parse(raw);
-      if (!session?.status || session.status === "not_started") continue;
+      if (!session?.status || session.status === "not_started" || session.status === "reset") continue;
 
       sessions.push({
         chapter_id: chapterId,
@@ -279,8 +279,9 @@ export async function gradeProjectSubmission({
 function normalizeMissionStatus(session) {
   const status = session?.status?.toLowerCase();
 
+  if (status === "reset" || status === "not_started") return "not_started";
   if (status === "completed" || session?.completed_at) return "completed";
-  if (status === "in_progress" || status === "active" || session) return "in_progress";
+  if (status === "in_progress" || status === "active") return "in_progress";
   return "not_started";
 }
 

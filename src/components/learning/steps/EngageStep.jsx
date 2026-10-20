@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Check, MousePointer2, X } from "lucide-react";
+import { Check, Link2, MousePointer2, X } from "lucide-react";
 import { seededShuffle } from "../../../utils/learning";
 import SourceNote from "../../common/SourceNote";
 
@@ -67,6 +67,20 @@ export default function EngageStep({ content, value, onChange, chapterId }) {
           <p className="mt-1 text-2xl font-extrabold tracking-[-0.04em] text-[#24332D]">{firstTryScore}/{pairs.length}</p>
           <p className="mt-1 text-xs leading-5 text-[#7A8780]">A mistake does not block you. Match every pair to finish.</p>
         </div>
+      </div>
+
+      {/* Student Action Instructions in English */}
+      <div className="mt-6 rounded-2xl border border-[#D7E3DC] bg-[#EAF4EF]/75 p-4 sm:p-5 shadow-xs">
+        <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#355245]">
+          <Link2 size={16} className="text-[#355245]" />
+          <span>What to Do in this Step:</span>
+        </div>
+        <ol className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed text-[#4A5D54]">
+          <li>1. Click on a vocabulary word in the <strong>Words</strong> column on the left (highlighted in dark green).</li>
+          <li>2. Read the definitions in the <strong>Matches</strong> column on the right and click the correct meaning.</li>
+          <li>3. Correct matches turn green and lock in place. If incorrect, review the definitions and try again!</li>
+          <li>4. Connect all {pairs.length} pairs ({matched.length}/{pairs.length} matched) to unlock the next step!</li>
+        </ol>
       </div>
 
       <div className="mt-8 rounded-[30px] border border-[#DDE5E0] bg-white/75 p-5 sm:p-7">
@@ -140,14 +154,6 @@ export default function EngageStep({ content, value, onChange, chapterId }) {
           )}
         </div>
       </div>
-
-      {matched.length === pairs.length && (
-        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-xs font-bold text-emerald-800 shadow-xs">
-          <span className="text-xl">🎯</span>
-          <span>Excellent work! You matched all target pairs correctly. Click <strong>Next Step</strong> below to join the discussion!</span>
-        </div>
-      )}
-
       <SourceNote source={content.source} />
     </div>
   );

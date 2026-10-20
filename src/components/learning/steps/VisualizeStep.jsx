@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, CloudOff } from "lucide-react";
+import { Brush, CheckCircle2, CloudOff } from "lucide-react";
 import CanvasBoard from "../CanvasBoard";
 import { uploadVisualAsset } from "../../../services/session";
 import SourceNote from "../../common/SourceNote";
@@ -48,9 +48,7 @@ export default function VisualizeStep({
           <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl">
             {content.title}
           </h2>
-          <p className="mt-4 text-sm leading-7 text-[#65736D] sm:text-base">
-            Use the digital canvas to draw a simple painting Or include a photo that you think can describe the word.
-          </p>
+          <p className="mt-4 text-sm leading-7 text-[#65736D] sm:text-base">{content.instructions}</p>
           {content.example && (
             <p className="mt-2 text-xs font-semibold leading-5 text-[#849089]">Example: {content.example}</p>
           )}
@@ -58,8 +56,22 @@ export default function VisualizeStep({
         <div className="border-l-2 border-[#E8CDBD] pl-5">
           <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#8E776A]">Visual progress</p>
           <p className="mt-1 text-2xl font-extrabold tracking-[-0.04em] text-[#24332D]">{savedCount}/{content.prompts.length}</p>
-          <p className="mt-1 text-xs leading-5 text-[#7A8780]">Draw directly on canvas or switch to upload a photo for each word.</p>
+          <p className="mt-1 text-xs leading-5 text-[#7A8780]">Draw directly or upload an image for each prompt.</p>
         </div>
+      </div>
+
+      {/* Student Action Instructions in English */}
+      <div className="mt-6 rounded-2xl border border-[#D7E3DC] bg-[#EAF4EF]/75 p-4 sm:p-5 shadow-xs">
+        <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#355245]">
+          <Brush size={16} className="text-[#355245]" />
+          <span>What to Do in this Step:</span>
+        </div>
+        <ol className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed text-[#4A5D54]">
+          <li>1. Select each word prompt using the pill buttons below (e.g. <em>{content.prompts[0]}</em>).</li>
+          <li>2. Create your visual: either <strong>draw directly</strong> with the digital canvas brush and shapes, OR <strong>upload an image</strong> from your device.</li>
+          <li>3. Click the <strong>Save Visual</strong> button inside the canvas card to save your work.</li>
+          <li>4. Save artwork for all {content.prompts.length} words ({savedCount}/{content.prompts.length} saved) to unlock the next step!</li>
+        </ol>
       </div>
 
       <div className="mt-7 flex gap-2 overflow-x-auto pb-2">
@@ -94,14 +106,6 @@ export default function VisualizeStep({
           onSave={saveVisual}
         />
       </div>
-
-      {savedCount === content.prompts.length && (
-        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-xs font-bold text-emerald-800 shadow-xs">
-          <span className="text-xl">🎨</span>
-          <span>Great visual creativity! All your drawings/photos are saved. Click <strong>Next Step</strong> below to proceed!</span>
-        </div>
-      )}
-
       <SourceNote source={content.source} />
     </div>
   );

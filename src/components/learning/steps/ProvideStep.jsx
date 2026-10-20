@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Check } from "lucide-react";
 import Button from "../../common/Button";
 import VocabularyCard from "../VocabularyCard";
 import SourceNote from "../../common/SourceNote";
 
-export default function ProvideStep({ content, value, onChange, chapterId = 1 }) {
+export default function ProvideStep({ content, value, onChange }) {
   const words = content.vocabulary ?? [];
   const seen = value?.seen ?? [];
   const initialIndex = useMemo(() => {
@@ -40,8 +40,8 @@ export default function ProvideStep({ content, value, onChange, chapterId = 1 })
   const allSeen = words.length > 0 && seen.length >= words.length;
 
   return (
-    <div>
-      <div className="mb-7 max-w-2xl">
+    <div className="w-full">
+      <div className="mb-7">
         <span className="ml-eyebrow">Step 01 · Provide</span>
         <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl">
           {content.title}
@@ -51,13 +51,25 @@ export default function ProvideStep({ content, value, onChange, chapterId = 1 })
         </p>
       </div>
 
+      {/* Student Action Instructions in English */}
+      <div className="mb-6 rounded-2xl border border-[#D7E3DC] bg-[#EAF4EF]/75 p-4 sm:p-5 shadow-xs">
+        <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#355245]">
+          <BookOpen size={16} className="text-[#355245]" />
+          <span>What to Do in this Step:</span>
+        </div>
+        <ol className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed text-[#4A5D54]">
+          <li>1. Click the <strong>Speaker / Audio</strong> button on each card to hear correct English pronunciation.</li>
+          <li>2. Read through the definition, word class (noun/adjective/verb), and context sentence.</li>
+          <li>3. Click <strong>"Got it"</strong> to move to the next word. Once all {words.length} dots turn green, click <strong>Next Step</strong> at the bottom.</li>
+        </ol>
+      </div>
+
       {current && (
         <VocabularyCard
           word={current}
           index={index}
           total={words.length}
           onPronounce={pronounce}
-          chapterId={chapterId}
         />
       )}
 

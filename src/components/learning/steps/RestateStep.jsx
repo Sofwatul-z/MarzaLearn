@@ -1,4 +1,4 @@
-import { CheckCircle2, Lightbulb } from "lucide-react";
+import { CheckCircle2, Lightbulb, PenLine } from "lucide-react";
 import SourceNote from "../../common/SourceNote";
 
 export default function RestateStep({ content, value, onChange }) {
@@ -27,6 +27,20 @@ export default function RestateStep({ content, value, onChange }) {
           <p className="mt-1 text-2xl font-extrabold tracking-[-0.04em] text-[#24332D]">{completed}/{content.prompts.length}</p>
           <p className="mt-1 text-xs leading-5 text-[#7A8780]">Complete every response to unlock the next step.</p>
         </div>
+      </div>
+
+      {/* Student Action Instructions in English */}
+      <div className="mt-6 rounded-2xl border border-[#D7E3DC] bg-[#EAF4EF]/75 p-4 sm:p-5 shadow-xs">
+        <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#355245]">
+          <PenLine size={16} className="text-[#355245]" />
+          <span>What to Do in this Step:</span>
+        </div>
+        <ol className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed text-[#4A5D54]">
+          <li>1. Read each vocabulary word prompt on the left.</li>
+          <li>2. In the text area, write an original sentence in the <strong>Simple Present Tense</strong> using the target word. <em>(Do not copy directly from the dictionary!)</em></li>
+          <li>3. <strong>Challenge:</strong> Try including descriptive adverbs like <em>really, very, extremely,</em> or <em>quite</em> to enhance your writing.</li>
+          <li>4. Complete all {content.prompts.length} sentences ({completed}/{content.prompts.length} completed) to unlock the next step!</li>
+        </ol>
       </div>
 
       <div className="mt-8 divide-y divide-[#E3E9E5] border-y border-[#E3E9E5]">
@@ -59,14 +73,6 @@ export default function RestateStep({ content, value, onChange }) {
           );
         })}
       </div>
-
-      {completed === content.prompts.length && (
-        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-xs font-bold text-emerald-800 shadow-xs">
-          <span className="text-xl">🌟</span>
-          <span>Great job! You have written sentences for all target words. Click <strong>Next Step</strong> below to start visualizing!</span>
-        </div>
-      )}
-
       <SourceNote source={content.source} />
     </div>
   );

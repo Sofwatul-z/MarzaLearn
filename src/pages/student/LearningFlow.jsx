@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -27,10 +27,9 @@ import GamesStep from "../../components/learning/steps/GamesStep";
 import ProvideStep from "../../components/learning/steps/ProvideStep";
 import RestateStep from "../../components/learning/steps/RestateStep";
 import VisualizeStep from "../../components/learning/steps/VisualizeStep";
-import StepHeroHeader from "../../components/learning/StepHeroHeader";
 import BouncingGuideArrow from "../../components/learning/BouncingGuideArrow";
 import { getChapterContent } from "../../data/chapters";
-import { getStepAsset } from "../../data/stepAssets";
+import { getStepAssets } from "../../data/stepAssets";
 import { useAuth } from "../../hooks/useAuth";
 import useMarzanoSession from "../../hooks/useMarzanoSession";
 
@@ -94,8 +93,6 @@ function SaveIndicator({ state }) {
 }
 
 function MissionIntro({ chapter, recovered, onStart, onBack }) {
-  const introAsset = getStepAsset(chapter.id, 1);
-
   return (
     <div className="pb-8">
       <button
@@ -110,29 +107,24 @@ function MissionIntro({ chapter, recovered, onStart, onBack }) {
         <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-[#CFE8DD]/15 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-[#F4D7C5]/10 blur-3xl" />
 
-        <div className="relative grid gap-9 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-center">
+        <div className="relative grid gap-9 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#B9D8CA] backdrop-blur-md">
-              <Sparkles size={12} className="text-yellow-300" /> Chapter {String(chapter.id).padStart(2, "0")} · 6-Step Mission
+            <span className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#B9D8CA]">
+              Chapter {String(chapter.id).padStart(2, "0")} · 6-Step Mission
             </span>
-            <h1 className="mt-4 max-w-3xl text-3xl font-black tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
-              The 6-Step Learning Adventure! 🚀
+            <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-[-0.055em] text-white sm:text-5xl">
+              One session. Six connected ways to learn.
             </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
-              Explore target vocabulary, craft original sentences, express meanings on the digital canvas, match terms, share discussion ideas, and finish with a celebratory game quiz!
+            <p className="mt-5 max-w-2xl text-sm leading-7 text-white/65 sm:text-base">
+              Move from vocabulary discovery to your own sentences, visuals, matching, discussion, and a final game. Each next step opens only after the current activity is complete.
             </p>
           </div>
 
-          <div className="relative overflow-hidden rounded-[24px] border-2 border-white/20 shadow-2xl transition-transform hover:scale-[1.02]">
-            <img
-              src={introAsset.image}
-              alt={introAsset.title}
-              className="h-48 w-full object-cover sm:h-52"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent p-4 flex flex-col justify-end text-white">
-              <span className="text-[10px] font-bold text-amber-300 tracking-wide">{introAsset.badge}</span>
-              <p className="text-sm font-extrabold mt-0.5 line-clamp-1">{introAsset.title}</p>
-            </div>
+          <div className="rounded-[24px] border border-white/10 bg-white/[0.07] p-5">
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-white/45">Session rule</p>
+            <p className="mt-2 text-sm font-bold leading-6 text-white/85">
+              Plan to finish all six steps in this sitting. Autosave exists for refresh or connection recovery, not as a multi-day workflow.
+            </p>
           </div>
         </div>
       </section>
@@ -289,15 +281,11 @@ export default function LearningFlow() {
     completeStep,
   } = useMarzanoSession(chapter?.id);
 
-  useEffect(() => {
-    if (chapter?.id === 1) {
-      const origBg = document.body.style.backgroundColor;
-      document.body.style.backgroundColor = "#F8F5EC";
-      return () => {
-        document.body.style.backgroundColor = origBg;
-      };
-    }
-  }, [chapter?.id]);
+  const currentStep = session.currentStep;
+  const stepAssets = useMemo(
+    () => getStepAssets(chapter?.id, currentStep),
+    [chapter?.id, currentStep]
+  );
 
   if (!chapter) {
     return (
@@ -339,8 +327,8 @@ export default function LearningFlow() {
     );
   }
 
-  const currentStep = session.currentStep;
-  const step = steps[currentStep - 1];
+  const stepIndex = Math.max(0, Math.min(steps.length - 1, (currentStep || 1) - 1));
+  const step = steps[stepIndex] || steps[0];
   const ready = isStepReady(chapter, session, currentStep);
 
   function nextStep() {
@@ -356,12 +344,100 @@ export default function LearningFlow() {
   }
 
   return (
-    <div className="pb-8">
+    <div className="relative max-w-5xl mx-auto pb-8">
+      {/* LEFT FLANK (Blue Circles) - Positioned in the outer left gutter */}
+      {(stepAssets?.leftTop || stepAssets?.leftBottom) && (
+        <aside
+          className="hidden xl:flex flex-col items-center justify-between absolute right-[calc(100%+1.5rem)] 2xl:right-[calc(100%+2.5rem)] top-4 bottom-28 w-36 2xl:w-44 pointer-events-none select-none z-10"
+          aria-hidden="true"
+        >
+          {/* Blue Circle 1 (Top Left): Level with Header & Step Progress */}
+          {stepAssets.leftTop && (
+            <motion.div
+              key={`lt-${chapter.id}-${currentStep}`}
+              initial={{ opacity: 0, scale: 0.85, x: -12 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              transition={{ duration: 0.35 }}
+              className="flex flex-col items-center"
+            >
+              <img
+                src={stepAssets.leftTop}
+                alt=""
+                className="w-32 2xl:w-40 max-h-48 object-contain drop-shadow-[0_12px_24px_rgba(36,51,45,0.14)]"
+                loading="lazy"
+              />
+            </motion.div>
+          )}
+
+          {/* Blue Circle 2 (Bottom Left): Level with lower activity cards */}
+          {stepAssets.leftBottom && (
+            <motion.div
+              key={`lb-${chapter.id}-${currentStep}`}
+              initial={{ opacity: 0, scale: 0.85, x: -12 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              transition={{ duration: 0.35, delay: 0.1 }}
+              className="flex flex-col items-center mt-auto pt-16"
+            >
+              <img
+                src={stepAssets.leftBottom}
+                alt=""
+                className="w-28 2xl:w-36 max-h-40 object-contain drop-shadow-[0_10px_20px_rgba(36,51,45,0.12)]"
+                loading="lazy"
+              />
+            </motion.div>
+          )}
+        </aside>
+      )}
+
+      {/* RIGHT FLANK (Red Circles) - Positioned in the outer right gutter */}
+      {(stepAssets?.rightTop || stepAssets?.rightBottom) && (
+        <aside
+          className="hidden xl:flex flex-col items-center justify-between absolute left-[calc(100%+1.5rem)] 2xl:left-[calc(100%+2.5rem)] top-4 bottom-28 w-36 2xl:w-44 pointer-events-none select-none z-10"
+          aria-hidden="true"
+        >
+          {/* Red Circle 1 (Top Right): Level with Header & Step Progress */}
+          {stepAssets.rightTop && (
+            <motion.div
+              key={`rt-${chapter.id}-${currentStep}`}
+              initial={{ opacity: 0, scale: 0.85, x: 12 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              transition={{ duration: 0.35 }}
+              className="flex flex-col items-center"
+            >
+              <img
+                src={stepAssets.rightTop}
+                alt=""
+                className="w-32 2xl:w-40 max-h-48 object-contain drop-shadow-[0_12px_24px_rgba(36,51,45,0.14)]"
+                loading="lazy"
+              />
+            </motion.div>
+          )}
+
+          {/* Red Circle 2 (Bottom Right): Level with lower activity cards */}
+          {stepAssets.rightBottom && (
+            <motion.div
+              key={`rb-${chapter.id}-${currentStep}`}
+              initial={{ opacity: 0, scale: 0.85, x: 12 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              transition={{ duration: 0.35, delay: 0.1 }}
+              className="flex flex-col items-center mt-auto pt-16"
+            >
+              <img
+                src={stepAssets.rightBottom}
+                alt=""
+                className="w-28 2xl:w-36 max-h-40 object-contain drop-shadow-[0_10px_20px_rgba(36,51,45,0.12)]"
+                loading="lazy"
+              />
+            </motion.div>
+          )}
+        </aside>
+      )}
+
       <section className="border-b border-[#E2E8E4] pb-3">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <span className="ml-eyebrow">Chapter {String(chapter.id).padStart(2, "0")} · Focus session</span>
-            <h1 className="mt-2 text-2xl font-extrabold tracking-[-0.04em] text-[#24332D] sm:text-3xl">
+            <h1 className="mt-1 text-2xl font-extrabold tracking-[-0.04em] text-[#24332D] sm:text-3xl">
               {chapter.title} · 6-Step Mission
             </h1>
           </div>
@@ -378,6 +454,21 @@ export default function LearningFlow() {
         />
       </section>
 
+      {/* Versi Mobile: Deretan dekorasi step yang ceria di bawah progress bar, rapi dan tidak menutupi tulisan */}
+      {stepAssets?.mobile?.length > 0 && (
+        <div className="xl:hidden flex items-center justify-center gap-4 py-2.5 px-3 my-4 rounded-2xl bg-[#EAF4EF]/60 border border-[#D7E3DC] select-none pointer-events-none overflow-x-auto">
+          {stepAssets.mobile.map((imgSrc, idx) => (
+            <img
+              key={idx}
+              src={imgSrc}
+              alt=""
+              className="h-12 w-12 sm:h-14 sm:w-14 object-contain drop-shadow-sm shrink-0"
+              loading="lazy"
+            />
+          ))}
+        </div>
+      )}
+
       {recovered && (
         <div className="mt-5 flex items-start gap-3 rounded-[18px] border border-[#D2E0D8] bg-[#EAF4EF]/75 px-4 py-3 text-xs leading-5 text-[#597065]">
           <RefreshCw size={15} className="mt-0.5 shrink-0" />
@@ -385,7 +476,8 @@ export default function LearningFlow() {
         </div>
       )}
 
-      <section className="min-h-[560px] py-6 sm:py-8">
+      {/* Main Activity Area: Full width, spacious and clear without inner aside squeezing */}
+      <section className="min-h-[560px] py-6 sm:py-8 w-full">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
@@ -393,16 +485,8 @@ export default function LearningFlow() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -10 }}
             transition={{ duration: 0.25 }}
+            className="w-full"
           >
-            {/* Arena-Themed Step Hero with Seamless Environmental Integration */}
-            <StepHeroHeader
-              asset={getStepAsset(chapter.id, currentStep)}
-              currentStep={currentStep}
-              totalSteps={6}
-              isReady={ready}
-              chapterId={chapter.id}
-            />
-
             {step.key === "provide" && (
               <ProvideStep
                 content={chapter.marzano.provide}
@@ -473,7 +557,7 @@ export default function LearningFlow() {
               <BouncingGuideArrow
                 isReady={ready}
                 text="CLICK HERE!"
-                subtext={currentStep === 6 ? "Finish & Submit Mission! 🏆" : "Click to Advance Step 👉"}
+                subtext={currentStep === 6 ? "Finish & Submit Mission! 🏆" : "Click to Advance Step"}
                 direction="down"
               />
             </div>

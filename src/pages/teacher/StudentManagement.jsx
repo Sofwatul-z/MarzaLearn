@@ -11,6 +11,20 @@ export default function StudentManagement() {
   const [error, setError] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
 
+  async function reloadStudents() {
+    try {
+      const result = await getStudentsWithProgress(cls);
+      const studentList = Array.isArray(result) ? result : [];
+      setStudents(studentList);
+      if (selectedStudent) {
+        const updated = studentList.find((s) => s.id === selectedStudent.id);
+        if (updated) setSelectedStudent(updated);
+      }
+    } catch (err) {
+      console.error("Student Progress Error:", err);
+    }
+  }
+
   useEffect(() => {
     async function loadStudents() {
       setLoading(true);
@@ -152,7 +166,7 @@ export default function StudentManagement() {
           </div>
 
 
-          <StudentProgress student={selectedStudent} />
+          <StudentProgress student={selectedStudent} onRefresh={reloadStudents} />
 
         </div>
       )}

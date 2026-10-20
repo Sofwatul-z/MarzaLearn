@@ -119,6 +119,29 @@ export default function useMarzanoSession(chapterId) {
   }, []);
 
   useEffect(() => {
+    function handleResetEvent(event) {
+      const { studentId, chapterId: resetChapterId } = event.detail || {};
+      if (
+        studentId === user?.id &&
+        (!resetChapterId || Number(resetChapterId) === Number(chapterId))
+      ) {
+        if (storageKey) {
+          try {
+            window.localStorage.removeItem(storageKey);
+          } catch (e) {}
+        }
+        setSession(createDefaultState());
+        setRecovered(false);
+      }
+    }
+
+    window.addEventListener("marzalearn:session-reset", handleResetEvent);
+    return () => {
+      window.removeEventListener("marzalearn:session-reset", handleResetEvent);
+    };
+  }, [user?.id, chapterId, storageKey]);
+
+  useEffect(() => {
     let active = true;
 
     async function load() {
@@ -144,8 +167,20 @@ export default function useMarzanoSession(chapterId) {
 
       if (!active) return;
 
-      const hasCloud = cloud?.status && cloud.status !== "not_started";
-      const hasLocal = local?.status && local.status !== "not_started";
+      if (cloud?.status === "reset") {
+        if (storageKey) {
+          try {
+            window.localStorage.removeItem(storageKey);
+          } catch (e) {}
+        }
+        setSession(createDefaultState());
+        setRecovered(false);
+        setLoading(false);
+        return;
+      }
+
+      const hasCloud = cloud?.status && cloud.status !== "not_started" && cloud.status !== "reset";
+      const hasLocal = local?.status && local.status !== "not_started" && local.status !== "reset";
       let chosen = createDefaultState();
 
       if (hasLocal || hasCloud) {

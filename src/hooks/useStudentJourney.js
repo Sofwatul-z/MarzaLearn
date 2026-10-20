@@ -50,8 +50,14 @@ export default function useStudentJourney() {
 
     loadJourney();
 
+    function handleReset() {
+      loadJourney();
+    }
+    window.addEventListener("marzalearn:session-reset", handleReset);
+
     return () => {
       active = false;
+      window.removeEventListener("marzalearn:session-reset", handleReset);
     };
   }, [user?.id]);
 
