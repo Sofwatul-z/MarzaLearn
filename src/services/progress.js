@@ -1,5 +1,6 @@
 import { supabase } from "./supabase";
 import { CHAPTER_CATALOG } from "../data/chapterCatalog";
+import { getStudentsByClass, getResetOverrides } from "./teacher";
 
 function isMissingOptionalTable(error) {
   if (!error) return false;
@@ -83,6 +84,13 @@ function mergeSessionProgress(cloudSessions, localSessions) {
 export async function getStudentLearningSessions(studentId) {
   if (!studentId) return [];
 
+  let overrides = {};
+  try {
+    overrides = JSON.parse(localStorage.getItem("marzalearn-reset-overrides") || "{}");
+  } catch (e) {}
+  const studentOverrides = overrides[studentId] || {};
+  const isAllReset = Boolean(studentOverrides["all"]);
+
   const cloud = await safelyLoad(
     supabase
       .from("learning_sessions")
@@ -92,27 +100,74 @@ export async function getStudentLearningSessions(studentId) {
     "learning sessions"
   );
 
-  return mergeSessionProgress(cloud, getLocalLearningSessions(studentId)).map((session) => {
-    const catalogChapter = CHAPTER_CATALOG.find(
-      (chapter) => chapter.id === Number(session.chapter_id) || chapter.databaseId === Number(session.chapter_id)
-    );
-    return catalogChapter ? { ...session, chapter_id: catalogChapter.id } : session;
-  });
+  return mergeSessionProgress(cloud, getLocalLearningSessions(studentId))
+    .filter((session) => {
+      const cId = Number(session.chapter_id);
+      const isReset =
+        isAllReset ||
+        Boolean(studentOverrides[cId]) ||
+        Boolean(studentOverrides[cId - 15]) ||
+        Boolean(studentOverrides[cId + 15]);
+      return !isReset;
+    })
+    .map((session) => {
+      const catalogChapter = CHAPTER_CATALOG.find(
+        (chapter) => chapter.id === Number(session.chapter_id) || chapter.databaseId === Number(session.chapter_id)
+      );
+      return catalogChapter ? { ...session, chapter_id: catalogChapter.id } : session;
+    });
 }
 
 export async function getStudentProgressRows(studentId) {
   if (!studentId) return [];
-  return safelyLoad(
+  const rows = await safelyLoad(
     supabase
       .from("student_progress")
       .select("*")
       .eq("student_id", studentId),
     "student_progress table"
   );
+
+  let overrides = {};
+  try {
+    overrides = JSON.parse(localStorage.getItem("marzalearn-reset-overrides") || "{}");
+  } catch (e) {}
+  const studentOverrides = overrides[studentId] || {};
+  const isAllReset = Boolean(studentOverrides["all"]);
+
+  return rows.map((r) => {
+    const cId = Number(r.chapter_id);
+    const isReset =
+      isAllReset ||
+      Boolean(studentOverrides[cId]) ||
+      Boolean(studentOverrides[cId - 15]) ||
+      Boolean(studentOverrides[cId + 15]);
+
+    if (isReset) {
+      return {
+        ...r,
+        percentage: 0,
+        provide: false,
+        restate: false,
+        visualize: false,
+        engage: false,
+        discuss: false,
+        play: false,
+      };
+    }
+    return r;
+  });
 }
 
 export async function getStudentProjectSubmissions(studentId) {
   if (!studentId) return [];
+
+  let overrides = {};
+  try {
+    overrides = JSON.parse(localStorage.getItem("marzalearn-reset-overrides") || "{}");
+  } catch (e) {}
+  const studentOverrides = overrides[studentId] || {};
+  const isAllReset = Boolean(studentOverrides["all"]);
 
   const cloud = await safelyLoad(
     supabase
@@ -130,7 +185,15 @@ export async function getStudentProjectSubmissions(studentId) {
   } catch (e) {}
 
   const seen = new Set(cloud.map((p) => Number(p.chapter_id)));
-  return [...cloud, ...local.filter((p) => !seen.has(Number(p.chapter_id)))];
+  return [...cloud, ...local.filter((p) => !seen.has(Number(p.chapter_id)))].filter((p) => {
+    const cId = Number(p.chapter_id);
+    const isReset =
+      isAllReset ||
+      Boolean(studentOverrides[cId]) ||
+      Boolean(studentOverrides[cId - 15]) ||
+      Boolean(studentOverrides[cId + 15]);
+    return !isReset;
+  });
 }
 
 export async function submitStudentProject({
@@ -227,6 +290,20 @@ export async function getAllProjectSubmissions(className = "XC") {
     });
   } catch (e) {}
 
+  // Filter out any submissions that have active reset overrides
+  const overrides = getResetOverrides();
+  list = list.filter((p) => {
+    const studentOverrides = overrides[p.student_id] || {};
+    const isAllReset = Boolean(studentOverrides["all"]);
+    const cId = Number(p.chapter_id);
+    const isReset =
+      isAllReset ||
+      Boolean(studentOverrides[cId]) ||
+      Boolean(studentOverrides[cId - 15]) ||
+      Boolean(studentOverrides[cId + 15]);
+    return !isReset;
+  });
+
   if (className) {
     list = list.filter(
       (p) => !p.class_name || p.class_name.toUpperCase() === className.toUpperCase()
@@ -272,6 +349,250 @@ export async function gradeProjectSubmission({
       localStorage.setItem(allKey, JSON.stringify(existing));
     }
   } catch (e) {}
+
+  return { ok: true };
+}
+
+export async function getAllStepMissionSubmissions(className = "XC") {
+  // 1. Get students by class matching StudentManagement.jsx exactly
+  const students = await getStudentsByClass(className);
+  if (!students || students.length === 0) return [];
+
+  const studentIds = students.map((s) => s.id);
+
+  // 2. Query student_progress directly from Supabase
+  let progressRows = [];
+  try {
+    const { data: pData } = await supabase
+      .from("student_progress")
+      .select("*")
+      .in("student_id", studentIds);
+    progressRows = pData || [];
+  } catch (e) {
+    console.warn("Could not query student_progress:", e);
+  }
+
+  // 3. Also safely check learning_sessions if present
+  let dbSessions = [];
+  try {
+    const { data: sData } = await supabase
+      .from("learning_sessions")
+      .select("*")
+      .in("student_id", studentIds);
+    dbSessions = sData || [];
+  } catch (e) {}
+
+  const overrides = getResetOverrides();
+
+  let storedGrades = {};
+  try {
+    storedGrades = JSON.parse(localStorage.getItem("marzalearn-mission-grades") || "{}");
+  } catch (e) {}
+
+  const results = [];
+
+  for (const student of students) {
+    const studentOverrides = overrides[student.id] || {};
+    const isAllReset = Boolean(studentOverrides["all"]);
+
+    for (let cId = 1; cId <= 5; cId++) {
+      const isReset =
+        isAllReset ||
+        Boolean(studentOverrides[cId]) ||
+        Boolean(studentOverrides[cId - 15]) ||
+        Boolean(studentOverrides[cId + 15]);
+
+      if (isReset) continue;
+
+      const catalogChapter = CHAPTER_CATALOG.find((c) => c.id === cId);
+      const dbChapterId = catalogChapter?.databaseId ?? (cId + 15);
+
+      // Check student_progress row
+      const progressRow = progressRows.find(
+        (r) =>
+          r.student_id === student.id &&
+          (Number(r.chapter_id) === cId ||
+           Number(r.chapter_id) === dbChapterId ||
+           Number(r.chapter_id) === (cId + 15) ||
+           Number(r.chapter_id) === (cId - 15))
+      );
+
+      // Check learning_sessions row
+      const dbSession = dbSessions.find(
+        (s) =>
+          s.student_id === student.id &&
+          (Number(s.chapter_id) === cId || Number(s.chapter_id) === dbChapterId)
+      );
+
+      // Check localStorage session
+      let localSession = null;
+      try {
+        const key = `marzalearn-session-v1:${student.id}:${cId}`;
+        const raw = localStorage.getItem(key);
+        if (raw) localSession = JSON.parse(raw);
+      } catch (e) {}
+
+      // Collect completed steps from student_progress boolean flags and session
+      const completedStepsSet = new Set();
+      if (progressRow) {
+        if (progressRow.provide) completedStepsSet.add("Provide");
+        if (progressRow.restate) completedStepsSet.add("Restate");
+        if (progressRow.visualize) completedStepsSet.add("Visualize");
+        if (progressRow.engage) completedStepsSet.add("Engage");
+        if (progressRow.discuss) completedStepsSet.add("Discuss");
+        if (progressRow.play) completedStepsSet.add("Games");
+      }
+
+      const rawCompletedSteps =
+        dbSession?.session_data?.completedSteps ||
+        localSession?.completedSteps ||
+        [];
+      rawCompletedSteps.forEach((st) => {
+        const stepName = typeof st === "string" ? st : st?.step_name || st?.name;
+        if (stepName) completedStepsSet.add(stepName);
+      });
+
+      const completedSteps = Array.from(completedStepsSet);
+      const percentage = Number(progressRow?.percentage ?? 0);
+      const sessionData = dbSession?.session_data?.data || localSession?.data || {};
+      const status =
+        progressRow?.status ||
+        dbSession?.status ||
+        localSession?.status ||
+        (completedSteps.length >= 6 || percentage >= 100 ? "completed" : completedSteps.length > 0 ? "in_progress" : "not_started");
+
+      const gradeKey1 = `${student.id}-${cId}`;
+      const gradeKey2 = `${student.id}-${dbChapterId}`;
+      const grade =
+        storedGrades[gradeKey1] ||
+        storedGrades[gradeKey2] ||
+        dbSession?.session_data?.grade ||
+        sessionData?.grade ||
+        (progressRow?.score != null ? { score: progressRow.score, feedback: progressRow.feedback || "" } : null);
+
+      const hasWork =
+        completedSteps.length > 0 ||
+        percentage > 0 ||
+        status === "completed" ||
+        status === "in_progress" ||
+        (sessionData.provide?.seen?.length ?? 0) > 0 ||
+        Object.keys(sessionData.restate?.responses ?? {}).length > 0 ||
+        Object.keys(sessionData.visualize?.items ?? {}).length > 0 ||
+        (sessionData.engage?.matched?.length ?? 0) > 0 ||
+        (sessionData.discuss?.response?.trim().length ?? 0) > 0 ||
+        Object.keys(sessionData.games?.answers ?? {}).length > 0;
+
+      if (hasWork) {
+        // Ensure sessionData has presentable structure for all completed steps
+        const displaySessionData = {
+          provide: sessionData.provide || (completedStepsSet.has("Provide") ? { seen: ["vocabulary-completed"] } : null),
+          restate: sessionData.restate || (completedStepsSet.has("Restate") ? { responses: { 0: "Student completed sentence restatements." } } : null),
+          visualize: sessionData.visualize || (completedStepsSet.has("Visualize") ? { items: { 0: { mode: "draw", preview: null } } } : null),
+          engage: sessionData.engage || (completedStepsSet.has("Engage") ? { matched: ["All pairs matched"], failed: [] } : null),
+          discuss: sessionData.discuss || (completedStepsSet.has("Discuss") ? { response: "Student discussion reflection completed." } : null),
+          games: sessionData.games || (completedStepsSet.has("Games") ? { answers: { 0: { correct: true } } } : null),
+        };
+
+        const isReviewed = grade?.score != null;
+
+        results.push({
+          id: `mission-${student.id}-${cId}`,
+          student_id: student.id,
+          student_name: student.full_name || student.name || "Student",
+          class_name: student.class_name || className,
+          attendance_number: student.student_id || student.attendance_number || "01",
+          chapter_id: cId,
+          chapter_title: catalogChapter?.title || `Chapter ${cId}`,
+          status: isReviewed ? "reviewed" : status === "completed" || completedSteps.length >= 6 ? "completed" : "in_progress",
+          current_step: Math.max(1, completedSteps.length, Number(progressRow?.current_step || 1)),
+          completed_steps: completedSteps,
+          session_data: displaySessionData,
+          score: grade?.score ?? null,
+          feedback: grade?.feedback ?? "",
+          reviewed_at: grade?.graded_at || grade?.reviewed_at || null,
+          submitted_at:
+            progressRow?.updated_at ||
+            dbSession?.completed_at ||
+            dbSession?.updated_at ||
+            localSession?.updatedAt ||
+            new Date().toISOString(),
+        });
+      }
+    }
+  }
+
+  return results.sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime());
+}
+
+export async function gradeStepMissionSubmission({
+  studentId,
+  chapterId,
+  score,
+  feedback,
+}) {
+  const numChapterId = Number(chapterId);
+  const gradePayload = {
+    score: Number(score),
+    feedback: feedback || "",
+    status: "reviewed",
+    graded_at: new Date().toISOString(),
+  };
+
+  try {
+    const gradesKey = "marzalearn-mission-grades";
+    const existing = JSON.parse(localStorage.getItem(gradesKey) || "{}");
+    existing[`${studentId}-${numChapterId}`] = gradePayload;
+    existing[`${studentId}-${numChapterId + 15}`] = gradePayload;
+    localStorage.setItem(gradesKey, JSON.stringify(existing));
+
+    const sessKey = `marzalearn-session-v1:${studentId}:${numChapterId}`;
+    const rawSess = localStorage.getItem(sessKey);
+    if (rawSess) {
+      const sess = JSON.parse(rawSess);
+      sess.data = sess.data || {};
+      sess.data.grade = gradePayload;
+      localStorage.setItem(sessKey, JSON.stringify(sess));
+    }
+  } catch (e) {}
+
+  try {
+    const catalogChapter = CHAPTER_CATALOG.find((c) => c.id === numChapterId);
+    const dbCId = catalogChapter?.databaseId ?? (numChapterId + 15);
+    const targetIds = [numChapterId, dbCId, numChapterId + 15];
+
+    await supabase
+      .from("student_progress")
+      .update({
+        updated_at: new Date().toISOString(),
+      })
+      .eq("student_id", studentId)
+      .in("chapter_id", targetIds);
+  } catch (e) {}
+
+  if (typeof window !== "undefined") {
+    try {
+      window.dispatchEvent(
+        new CustomEvent("marzalearn:mission-graded", {
+          detail: { studentId, chapterId: numChapterId, ...gradePayload },
+        })
+      );
+      window.dispatchEvent(
+        new CustomEvent("marzalearn:session-reset", {
+          detail: { studentId, chapterId: numChapterId },
+        })
+      );
+      if (typeof BroadcastChannel !== "undefined") {
+        const bc = new BroadcastChannel("marzalearn_sync");
+        bc.postMessage({
+          type: "MISSION_GRADED",
+          studentId,
+          chapterId: numChapterId,
+          ...gradePayload,
+        });
+        bc.close();
+      }
+    } catch (e) {}
+  }
 
   return { ok: true };
 }
@@ -400,6 +721,19 @@ export async function saveStudentProgress(studentId, chapterId, state) {
         : "error",
       error,
     };
+  }
+
+  if (completedNames.size > 0 && typeof window !== "undefined") {
+    try {
+      const overrides = JSON.parse(window.localStorage.getItem("marzalearn-reset-overrides") || "{}");
+      if (overrides[studentId]) {
+        const num = Number(chapterId);
+        delete overrides[studentId][num];
+        delete overrides[studentId][num + 15];
+        delete overrides[studentId]["all"];
+        window.localStorage.setItem("marzalearn-reset-overrides", JSON.stringify(overrides));
+      }
+    } catch (e) {}
   }
 
   return { ok: true };

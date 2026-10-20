@@ -1,8 +1,14 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import GradientBlob from "../components/ui/GradientBlob";
 import StudentHeader from "../components/student/StudentHeader";
+import { getChapterTheme } from "../data/chapterThemes";
 
 export default function StudentLayout() {
+  const location = useLocation();
+  const match = location.pathname.match(/\/student\/chapter\/(\d+)/);
+  const chapterId = match ? Number(match[1]) : 1;
+  const theme = getChapterTheme(chapterId);
+
   return (
     <div className="ml-app-shell">
       <a
@@ -13,16 +19,16 @@ export default function StudentLayout() {
       </a>
 
       <GradientBlob
-        tone="mint"
-        size={430}
+        color={theme?.primary || "#EAC3D5"}
+        size={460}
         className="-right-44 top-16 -z-20 sm:-right-28"
-        opacity={0.4}
+        opacity={0.42}
       />
       <GradientBlob
-        tone="peach"
-        size={330}
+        color={theme?.accent || "#F4D7C5"}
+        size={350}
         className="-left-48 bottom-8 -z-20"
-        opacity={0.28}
+        opacity={0.30}
         delay={1.5}
       />
 

@@ -54,10 +54,23 @@ export default function useStudentJourney() {
       loadJourney();
     }
     window.addEventListener("marzalearn:session-reset", handleReset);
+    window.addEventListener("storage", handleReset);
+
+    let bc = null;
+    try {
+      if (typeof BroadcastChannel !== "undefined") {
+        bc = new BroadcastChannel("marzalearn_sync");
+        bc.onmessage = () => {
+          loadJourney();
+        };
+      }
+    } catch (e) {}
 
     return () => {
       active = false;
       window.removeEventListener("marzalearn:session-reset", handleReset);
+      window.removeEventListener("storage", handleReset);
+      if (bc) bc.close();
     };
   }, [user?.id]);
 

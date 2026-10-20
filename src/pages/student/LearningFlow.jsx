@@ -29,6 +29,7 @@ import RestateStep from "../../components/learning/steps/RestateStep";
 import VisualizeStep from "../../components/learning/steps/VisualizeStep";
 import BouncingGuideArrow from "../../components/learning/BouncingGuideArrow";
 import { getChapterContent } from "../../data/chapters";
+import { getChapterTheme } from "../../data/chapterThemes";
 import { getStepAssets } from "../../data/stepAssets";
 import { useAuth } from "../../hooks/useAuth";
 import useMarzanoSession from "../../hooks/useMarzanoSession";
@@ -62,7 +63,9 @@ function isStepReady(chapter, session, stepNumber) {
   }
 
   if (stepNumber === 4) {
-    return (data.engage?.matched?.length ?? 0) >= chapter.marzano.engage.pairs.length;
+    const matchedCount = data.engage?.matched?.length ?? 0;
+    const failedCount = data.engage?.failed?.length ?? 0;
+    return (matchedCount + failedCount) >= chapter.marzano.engage.pairs.length;
   }
 
   if (stepNumber === 5) {
@@ -92,7 +95,7 @@ function SaveIndicator({ state }) {
   );
 }
 
-function MissionIntro({ chapter, recovered, onStart, onBack }) {
+function MissionIntro({ chapter, recovered, onStart, onBack, theme }) {
   const introAsset = getStepAssets(chapter?.id, 1);
 
   return (
@@ -105,19 +108,38 @@ function MissionIntro({ chapter, recovered, onStart, onBack }) {
         <ArrowLeft size={15} /> Back to chapter learning
       </button>
 
-      <section className="relative overflow-hidden rounded-[34px] bg-[#24332D] px-6 py-8 text-white shadow-[0_28px_75px_rgba(36,51,45,0.15)] sm:px-9 sm:py-10 lg:px-11">
-        <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-[#CFE8DD]/15 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-[#F4D7C5]/10 blur-3xl" />
+      <section
+        style={{
+          borderColor: theme?.borderSoft,
+          backgroundColor: theme?.primaryDark || "#24332D",
+        }}
+        className="relative overflow-hidden rounded-[34px] px-6 py-8 text-white shadow-[0_28px_75px_rgba(36,51,45,0.15)] sm:px-9 sm:py-10 lg:px-11"
+      >
+        <div
+          style={{ backgroundColor: theme?.primary }}
+          className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full opacity-30 blur-3xl"
+        />
+        <div
+          style={{ backgroundColor: theme?.accent || "#F4D7C5" }}
+          className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full opacity-25 blur-3xl"
+        />
 
         <div className="relative grid gap-9 lg:grid-cols-[minmax(0,1fr)_auto_260px] lg:items-center">
           <div>
-            <span className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#B9D8CA]">
+            <span
+              style={{
+                backgroundColor: theme?.badgeBg,
+                borderColor: theme?.border,
+                color: theme?.badgeText,
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.17em]"
+            >
               Chapter {String(chapter.id).padStart(2, "0")} · 6-Step Mission
             </span>
             <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-[-0.055em] text-white sm:text-5xl">
               One session. Six connected ways to learn.
             </h1>
-            <p className="mt-5 max-w-2xl text-sm leading-7 text-white/65 sm:text-base">
+            <p className="mt-5 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
               Move from vocabulary discovery to your own sentences, visuals, matching, discussion, and a final game. Each next step opens only after the current activity is complete.
             </p>
           </div>
@@ -147,7 +169,16 @@ function MissionIntro({ chapter, recovered, onStart, onBack }) {
 
       <section className="py-10 sm:py-12">
         <div className="mb-7 max-w-2xl">
-          <span className="ml-eyebrow">Mission roadmap</span>
+          <span
+            style={{
+              backgroundColor: theme?.badgeBg,
+              color: theme?.badgeText,
+              borderColor: theme?.borderSoft,
+            }}
+            className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em]"
+          >
+            Mission roadmap
+          </span>
           <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D]">Six steps, one learning flow.</h2>
         </div>
 
@@ -165,7 +196,10 @@ function MissionIntro({ chapter, recovered, onStart, onBack }) {
               >
                 <div className="relative flex justify-center">
                   {index < steps.length - 1 && <span className="absolute bottom-0 top-12 w-px bg-[#DDE5E0]" />}
-                  <span className={`relative z-10 grid h-11 w-11 place-items-center rounded-full border ${index === 0 ? "border-[#24332D] bg-[#24332D] text-white" : "border-[#D7E1DC] bg-[#FBFCF8] text-[#6F7D76]"}`}>
+                  <span
+                    style={index === 0 ? { backgroundColor: theme?.primaryDark || "#24332D", borderColor: theme?.primaryDark || "#24332D" } : {}}
+                    className={`relative z-10 grid h-11 w-11 place-items-center rounded-full border ${index === 0 ? "text-white" : "border-[#D7E1DC] bg-[#FBFCF8] text-[#6F7D76]"}`}
+                  >
                     <Icon size={17} />
                   </span>
                 </div>
@@ -182,9 +216,14 @@ function MissionIntro({ chapter, recovered, onStart, onBack }) {
           })}
         </div>
 
-        <div className="mt-8 flex flex-col gap-4 rounded-[26px] border border-[#D7E3DC] bg-[#EAF4EF]/70 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div
+          style={{ borderColor: theme?.borderSoft, backgroundColor: theme?.bgLight || "rgba(234,244,239,0.7)" }}
+          className="mt-8 flex flex-col gap-4 rounded-[26px] border p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"
+        >
           <div>
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#688075]">Ready when you are</p>
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.14em]" style={{ color: theme?.primaryDark || "#688075" }}>
+              Ready when you are
+            </p>
             <p className="mt-1 font-extrabold tracking-[-0.02em] text-[#24332D]">
               {recovered ? "A previous in-progress session was recovered." : `Provide begins with ${chapter.marzano.provide.vocabulary.length} target words.`}
             </p>
@@ -192,7 +231,7 @@ function MissionIntro({ chapter, recovered, onStart, onBack }) {
               {recovered ? "Continue from the last autosaved step." : "Starting creates your learning session and enables recovery autosave."}
             </p>
           </div>
-          <Button variant="primary" size="lg" onClick={onStart} className="w-full sm:w-auto">
+          <Button theme={theme} variant="primary" size="lg" onClick={onStart} className="w-full sm:w-auto font-black">
             {recovered ? "Resume Mission" : "Start Mission"} <ArrowRight size={17} />
           </Button>
         </div>
@@ -201,7 +240,7 @@ function MissionIntro({ chapter, recovered, onStart, onBack }) {
   );
 }
 
-function MissionComplete({ chapter, session, saveState, onBackToChapter, onDashboard, onPjbl }) {
+function MissionComplete({ chapter, session, saveState, theme, onBackToChapter, onDashboard, onPjbl }) {
   const engagePairs = chapter.marzano.engage.pairs;
   const matched = session.data.engage?.matched ?? [];
   const mistakes = session.data.engage?.mistakeTerms ?? {};
@@ -212,12 +251,25 @@ function MissionComplete({ chapter, session, saveState, onBackToChapter, onDashb
 
   return (
     <div className="pb-10 pt-4">
-      <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="overflow-hidden rounded-[36px] border border-[#C9DDD2] bg-[#EAF4EF]/80 px-6 py-9 sm:px-10 sm:py-12">
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        style={{ borderColor: theme?.borderSoft, backgroundColor: theme?.bgSurface || "rgba(234,244,239,0.8)" }}
+        className="overflow-hidden rounded-[36px] border px-6 py-9 sm:px-10 sm:py-12"
+      >
         <div className="mx-auto max-w-3xl text-center">
-          <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#24332D] text-white shadow-[0_12px_28px_rgba(36,51,45,0.18)]">
+          <div
+            style={{ backgroundColor: theme?.primaryDark || "#24332D" }}
+            className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white shadow-[0_12px_28px_rgba(36,51,45,0.18)]"
+          >
             <CheckCircle2 size={24} />
           </div>
-          <span className="mt-6 inline-block text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#5E786B]">6 / 6 steps completed</span>
+          <span
+            style={{ color: theme?.primaryDark || "#5E786B" }}
+            className="mt-6 inline-block text-[10px] font-extrabold uppercase tracking-[0.16em]"
+          >
+            6 / 6 steps completed
+          </span>
           <h1 className="mt-3 text-4xl font-extrabold tracking-[-0.055em] text-[#24332D] sm:text-5xl">Mission Complete! 🏆</h1>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[#64736C] sm:text-base">
             Your {chapter.title} learning mission is completed. Now you are ready to unleash your creativity in the Ultimate Project-Based Learning (PjBL) video project!
@@ -236,11 +288,29 @@ function MissionComplete({ chapter, session, saveState, onBackToChapter, onDashb
             <p className="mt-1 text-xs text-[#7A8780]">correct answers</p>
           </div>
           <div className="bg-white/85 p-5 text-center">
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.13em] text-[#849089]">Teacher Review</p>
-            <p className="mt-2 text-base font-extrabold text-[#24332D]">Saved & Ready</p>
-            <p className="mt-1 text-xs text-[#7A8780]">Restate · Visualize · Discuss</p>
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.13em]" style={{ color: theme?.primaryDark || "#849089" }}>Teacher Review</p>
+            <p className="mt-2 text-xl font-extrabold text-[#24332D]">
+              {session.data?.grade?.score != null ? `${session.data.grade.score}/100` : "Saved & Ready"}
+            </p>
+            <p className="mt-1 text-xs text-[#7A8780]">
+              {session.data?.grade?.score != null ? "Graded by teacher" : "Restate · Visualize · Discuss"}
+            </p>
           </div>
         </div>
+
+        {session.data?.grade?.feedback && (
+          <div
+            style={{ backgroundColor: theme?.badgeBg, borderColor: theme?.borderSoft }}
+            className="mx-auto mt-5 max-w-4xl rounded-[20px] border p-4 text-left shadow-xs"
+          >
+            <p className="text-[10px] font-extrabold uppercase tracking-wider" style={{ color: theme?.primaryDark }}>
+              Teacher Feedback
+            </p>
+            <p className="mt-1 text-sm font-semibold text-[#24332D]">
+              {session.data.grade.feedback}
+            </p>
+          </div>
+        )}
 
         {pendingVisuals > 0 && (
           <div className="mx-auto mt-5 max-w-4xl rounded-[18px] border border-[#E5C8B8] bg-[#FBEDE4] px-4 py-3 text-xs font-semibold leading-5 text-[#76594C]">
@@ -258,7 +328,7 @@ function MissionComplete({ chapter, session, saveState, onBackToChapter, onDashb
             onClick={onPjbl}
             className="w-full sm:w-auto bg-[#1C2C25] hover:bg-[#283E34] text-white font-black py-4 px-9 rounded-full ring-4 ring-emerald-400/30 shadow-xl shadow-[#24332D]/20 text-base"
           >
-            <Sparkles size={18} className="text-yellow-300" /> Start Ultimate PjBL Video Project <ArrowRight size={18} />
+            <Sparkles size={18} className="text-yellow-300" /> Start Ultimate Video Project <ArrowRight size={18} />
           </Button>
 
           <div className="flex flex-col sm:flex-row gap-3">
@@ -273,7 +343,9 @@ function MissionComplete({ chapter, session, saveState, onBackToChapter, onDashb
       </motion.section>
 
       <div className="mt-7 border-l-2 border-emerald-500/40 pl-5">
-        <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-emerald-800">Next Step: Project-Based Learning</p>
+        <p className="text-[10px] font-extrabold uppercase tracking-[0.14em]" style={{ color: theme?.primaryDark || "#065F46" }}>
+          Next Step: Project-Based Learning
+        </p>
         <p className="mt-1 font-extrabold text-[#24332D]">Turn your new language skills into a creative digital video.</p>
         <p className="mt-1 max-w-2xl text-xs leading-5 text-[#7B8781]">Plan your script, follow the video production steps, and submit your link directly for teacher review.</p>
       </div>
@@ -286,6 +358,7 @@ export default function LearningFlow() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const chapter = useMemo(() => getChapterContent(id), [id]);
+  const theme = useMemo(() => getChapterTheme(chapter?.id), [chapter?.id]);
   const {
     session,
     loading,
@@ -320,6 +393,7 @@ export default function LearningFlow() {
     return (
       <MissionIntro
         chapter={chapter}
+        theme={theme}
         recovered={recovered}
         onStart={() => {
           startSession();
@@ -335,6 +409,7 @@ export default function LearningFlow() {
       <MissionComplete
         chapter={chapter}
         session={session}
+        theme={theme}
         saveState={saveState}
         onBackToChapter={() => navigate(`/student/chapter/${chapter.id}`)}
         onDashboard={() => navigate("/student/dashboard")}
@@ -360,14 +435,19 @@ export default function LearningFlow() {
   }
 
   return (
-    <div className="relative max-w-5xl mx-auto pb-8">
-      {/* LEFT FLANK (Blue Circles) - Positioned in the outer left gutter (Larger size with gentle floating motion) */}
+    <div className="relative w-full max-w-5xl mx-auto px-12 sm:px-16 md:px-24 xl:px-0 pb-8">
+      {/* Dynamic ambient page glow matching chapter theme */}
+      <div
+        style={{ backgroundColor: theme?.primary }}
+        className="pointer-events-none fixed inset-0 opacity-[0.06] blur-3xl -z-10"
+      />
+      {/* LEFT FLANK (Blue Circles) - Positioned in the outer left gutter (Sized responsively for mobile & desktop) */}
       {(stepAssets?.leftTop || stepAssets?.leftBottom) && (
         <aside
-          className="hidden xl:flex flex-col items-center justify-between absolute right-[calc(100%+1.75rem)] 2xl:right-[calc(100%+3rem)] top-2 bottom-24 w-52 2xl:w-64 pointer-events-none select-none z-10"
+          className="flex flex-col items-center justify-between absolute left-1 sm:left-2 md:left-4 xl:left-auto xl:right-[calc(100%+1.75rem)] 2xl:right-[calc(100%+3rem)] top-2 bottom-24 w-10 sm:w-14 md:w-20 lg:w-28 xl:w-52 2xl:w-64 pointer-events-none select-none z-10"
           aria-hidden="true"
         >
-          {/* Blue Circle 1 (Top Left): Level with Header & Step Progress */}
+          {/* Blue Circle 1 (Top Left) */}
           {stepAssets.leftTop && (
             <motion.div
               key={`lt-${chapter.id}-${currentStep}`}
@@ -382,13 +462,13 @@ export default function LearningFlow() {
               <img
                 src={stepAssets.leftTop}
                 alt=""
-                className="w-44 2xl:w-56 max-h-64 2xl:max-h-72 object-contain drop-shadow-[0_18px_36px_rgba(36,51,45,0.18)]"
+                className="w-10 sm:w-14 md:w-20 lg:w-28 xl:w-44 2xl:w-56 max-h-16 sm:max-h-24 md:max-h-32 lg:max-h-44 xl:max-h-64 2xl:max-h-72 object-contain drop-shadow-[0_12px_24px_rgba(36,51,45,0.15)]"
                 loading="lazy"
               />
             </motion.div>
           )}
 
-          {/* Blue Circle 2 (Bottom Left): Level with lower activity cards */}
+          {/* Blue Circle 2 (Bottom Left) */}
           {stepAssets.leftBottom && (
             <motion.div
               key={`lb-${chapter.id}-${currentStep}`}
@@ -404,7 +484,7 @@ export default function LearningFlow() {
               <img
                 src={stepAssets.leftBottom}
                 alt=""
-                className="w-38 2xl:w-50 max-h-56 2xl:max-h-64 object-contain drop-shadow-[0_14px_28px_rgba(36,51,45,0.15)]"
+                className="w-9 sm:w-12 md:w-18 lg:w-24 xl:w-38 2xl:w-50 max-h-14 sm:max-h-20 md:max-h-28 lg:max-h-36 xl:max-h-56 2xl:max-h-64 object-contain drop-shadow-[0_10px_20px_rgba(36,51,45,0.12)]"
                 loading="lazy"
               />
             </motion.div>
@@ -412,13 +492,13 @@ export default function LearningFlow() {
         </aside>
       )}
 
-      {/* RIGHT FLANK (Red Circles) - Positioned in the outer right gutter (Larger size with gentle floating motion) */}
+      {/* RIGHT FLANK (Red Circles) - Positioned in the outer right gutter (Sized responsively for mobile & desktop) */}
       {(stepAssets?.rightTop || stepAssets?.rightBottom) && (
         <aside
-          className="hidden xl:flex flex-col items-center justify-between absolute left-[calc(100%+1.75rem)] 2xl:left-[calc(100%+3rem)] top-2 bottom-24 w-52 2xl:w-64 pointer-events-none select-none z-10"
+          className="flex flex-col items-center justify-between absolute right-1 sm:right-2 md:right-4 xl:right-auto xl:left-[calc(100%+1.75rem)] 2xl:left-[calc(100%+3rem)] top-2 bottom-24 w-10 sm:w-14 md:w-20 lg:w-28 xl:w-52 2xl:w-64 pointer-events-none select-none z-10"
           aria-hidden="true"
         >
-          {/* Red Circle 1 (Top Right): Level with Header & Step Progress */}
+          {/* Red Circle 1 (Top Right) */}
           {stepAssets.rightTop && (
             <motion.div
               key={`rt-${chapter.id}-${currentStep}`}
@@ -433,13 +513,13 @@ export default function LearningFlow() {
               <img
                 src={stepAssets.rightTop}
                 alt=""
-                className="w-44 2xl:w-56 max-h-64 2xl:max-h-72 object-contain drop-shadow-[0_18px_36px_rgba(36,51,45,0.18)]"
+                className="w-10 sm:w-14 md:w-20 lg:w-28 xl:w-44 2xl:w-56 max-h-16 sm:max-h-24 md:max-h-32 lg:max-h-44 xl:max-h-64 2xl:max-h-72 object-contain drop-shadow-[0_12px_24px_rgba(36,51,45,0.15)]"
                 loading="lazy"
               />
             </motion.div>
           )}
 
-          {/* Red Circle 2 (Bottom Right): Level with lower activity cards */}
+          {/* Red Circle 2 (Bottom Right) */}
           {stepAssets.rightBottom && (
             <motion.div
               key={`rb-${chapter.id}-${currentStep}`}
@@ -455,7 +535,7 @@ export default function LearningFlow() {
               <img
                 src={stepAssets.rightBottom}
                 alt=""
-                className="w-38 2xl:w-50 max-h-56 2xl:max-h-64 object-contain drop-shadow-[0_14px_28px_rgba(36,51,45,0.15)]"
+                className="w-9 sm:w-12 md:w-18 lg:w-24 xl:w-38 2xl:w-50 max-h-14 sm:max-h-20 md:max-h-28 lg:max-h-36 xl:max-h-56 2xl:max-h-64 object-contain drop-shadow-[0_10px_20px_rgba(36,51,45,0.12)]"
                 loading="lazy"
               />
             </motion.div>
@@ -466,8 +546,17 @@ export default function LearningFlow() {
       <section className="border-b border-[#E2E8E4] pb-3">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <span className="ml-eyebrow">Chapter {String(chapter.id).padStart(2, "0")} · Focus session</span>
-            <h1 className="mt-1 text-2xl font-extrabold tracking-[-0.04em] text-[#24332D] sm:text-3xl">
+            <span
+              style={{
+                backgroundColor: theme?.badgeBg,
+                borderColor: theme?.borderSoft,
+                color: theme?.badgeText,
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em]"
+            >
+              Chapter {String(chapter.id).padStart(2, "0")} · Focus session
+            </span>
+            <h1 className="mt-2 text-2xl font-extrabold tracking-[-0.04em] text-[#24332D] sm:text-3xl">
               {chapter.title} · 6-Step Mission
             </h1>
           </div>
@@ -477,27 +566,13 @@ export default function LearningFlow() {
           currentStep={currentStep}
           highestUnlocked={session.highestUnlocked}
           completedSteps={session.completedSteps}
+          theme={theme}
           onSelect={(number) => {
             goToStep(number);
             window.scrollTo({ top: 0, behavior: "smooth" });
           }}
         />
       </section>
-
-      {/* Versi Mobile: Deretan dekorasi step yang ceria di bawah progress bar, rapi dan tidak menutupi tulisan */}
-      {stepAssets?.mobile?.length > 0 && (
-        <div className="xl:hidden flex items-center justify-center gap-4 py-2.5 px-3 my-4 rounded-2xl bg-[#EAF4EF]/60 border border-[#D7E3DC] select-none pointer-events-none overflow-x-auto">
-          {stepAssets.mobile.map((imgSrc, idx) => (
-            <img
-              key={idx}
-              src={imgSrc}
-              alt=""
-              className="h-12 w-12 sm:h-14 sm:w-14 object-contain drop-shadow-sm shrink-0"
-              loading="lazy"
-            />
-          ))}
-        </div>
-      )}
 
       {recovered && (
         <div className="mt-5 flex items-start gap-3 rounded-[18px] border border-[#D2E0D8] bg-[#EAF4EF]/75 px-4 py-3 text-xs leading-5 text-[#597065]">
@@ -523,6 +598,7 @@ export default function LearningFlow() {
                 value={session.data.provide}
                 onChange={(value) => updateStepData("provide", value)}
                 chapterId={chapter.id}
+                theme={theme}
               />
             )}
             {step.key === "restate" && (
@@ -530,6 +606,7 @@ export default function LearningFlow() {
                 content={chapter.marzano.restate}
                 value={session.data.restate}
                 onChange={(value) => updateStepData("restate", value)}
+                theme={theme}
               />
             )}
             {step.key === "visualize" && (
@@ -539,6 +616,7 @@ export default function LearningFlow() {
                 onChange={(value) => updateStepData("visualize", value)}
                 studentId={user?.id}
                 chapterId={chapter.id}
+                theme={theme}
               />
             )}
             {step.key === "engage" && (
@@ -547,6 +625,7 @@ export default function LearningFlow() {
                 value={session.data.engage}
                 onChange={(value) => updateStepData("engage", value)}
                 chapterId={chapter.id}
+                theme={theme}
               />
             )}
             {step.key === "discuss" && (
@@ -554,6 +633,7 @@ export default function LearningFlow() {
                 content={chapter.marzano.discuss}
                 value={session.data.discuss}
                 onChange={(value) => updateStepData("discuss", value)}
+                theme={theme}
               />
             )}
             {step.key === "games" && (
@@ -562,6 +642,7 @@ export default function LearningFlow() {
                 value={session.data.games}
                 onChange={(value) => updateStepData("games", value)}
                 chapterId={chapter.id}
+                theme={theme}
               />
             )}
           </motion.div>
@@ -597,10 +678,20 @@ export default function LearningFlow() {
               transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
             >
               <Button
+                theme={theme}
                 variant={ready ? "primary" : "secondary"}
                 onClick={nextStep}
                 disabled={!ready}
-                className={ready ? "ring-4 ring-emerald-400/40 shadow-xl shadow-emerald-700/25 font-black text-sm px-6" : ""}
+                className={ready ? "shadow-xl font-black text-sm px-6" : ""}
+                style={
+                  ready
+                    ? {
+                        backgroundColor: theme?.primaryDark,
+                        color: "#FFFFFF",
+                        boxShadow: `0 12px 28px ${theme?.primary}66`,
+                      }
+                    : {}
+                }
               >
                 {currentStep === 6 ? (
                   <><Check size={16} /> Complete Mission</>

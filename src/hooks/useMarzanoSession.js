@@ -4,6 +4,7 @@ import {
   loadLearningSession,
   saveLearningSession,
 } from "../services/session";
+import { supabase } from "../services/supabase";
 import { useAuth } from "./useAuth";
 
 const SESSION_VERSION = 1;
@@ -119,25 +120,64 @@ export default function useMarzanoSession(chapterId) {
   }, []);
 
   useEffect(() => {
+    function resetLocally() {
+      if (storageKey) {
+        try {
+          window.localStorage.removeItem(storageKey);
+        } catch (e) {}
+      }
+      setSession(createDefaultState());
+      setRecovered(false);
+    }
+
     function handleResetEvent(event) {
       const { studentId, chapterId: resetChapterId } = event.detail || {};
       if (
         studentId === user?.id &&
         (!resetChapterId || Number(resetChapterId) === Number(chapterId))
       ) {
-        if (storageKey) {
-          try {
-            window.localStorage.removeItem(storageKey);
-          } catch (e) {}
-        }
-        setSession(createDefaultState());
-        setRecovered(false);
+        resetLocally();
+      }
+    }
+
+    function handleStorageEvent(event) {
+      if (
+        event.key === `marzalearn-reset-timestamp:${user?.id}:${chapterId}` ||
+        event.key === `marzalearn-reset-timestamp:${user?.id}:all`
+      ) {
+        resetLocally();
       }
     }
 
     window.addEventListener("marzalearn:session-reset", handleResetEvent);
+    window.addEventListener("storage", handleStorageEvent);
+
+    let bc = null;
+    try {
+      if (typeof BroadcastChannel !== "undefined") {
+        bc = new BroadcastChannel("marzalearn_sync");
+        bc.onmessage = (ev) => {
+          const msg = ev.data;
+          if (
+            msg?.type === "SESSION_RESET" &&
+            msg.studentId === user?.id &&
+            (!msg.chapterId || Number(msg.chapterId) === Number(chapterId))
+          ) {
+            resetLocally();
+          } else if (
+            msg?.type === "SESSION_RESET_ALL" &&
+            msg.studentId === user?.id
+          ) {
+            resetLocally();
+          }
+        };
+      }
+    } catch (e) {}
+
     return () => {
       window.removeEventListener("marzalearn:session-reset", handleResetEvent);
+      window.removeEventListener("storage", handleStorageEvent);
+      if (bc) bc.close();
     };
   }, [user?.id, chapterId, storageKey]);
 
@@ -158,6 +198,52 @@ export default function useMarzanoSession(chapterId) {
         }
       }
 
+      // Check if teacher recently triggered a reset
+      let isTeacherReset = false;
+      try {
+        const overrides = JSON.parse(window.localStorage.getItem("marzalearn-reset-overrides") || "{}");
+        const studentOverrides = overrides[user?.id] || {};
+        const cNum = Number(chapterId);
+        if (studentOverrides["all"] || studentOverrides[cNum] || studentOverrides[cNum + 15]) {
+          isTeacherReset = true;
+        }
+
+        const resetSpecific = window.localStorage.getItem(`marzalearn-reset-timestamp:${user?.id}:${chapterId}`);
+        const resetAll = window.localStorage.getItem(`marzalearn-reset-timestamp:${user?.id}:all`);
+        const latestResetTs = resetSpecific || resetAll;
+        if (latestResetTs && local?.updatedAt) {
+          if (new Date(latestResetTs).getTime() >= new Date(local.updatedAt).getTime()) {
+            isTeacherReset = true;
+          }
+        }
+      } catch (e) {}
+
+      // Check database student_progress for 0% or reset status
+      try {
+        const { data: dbProgRows } = await supabase
+          .from("student_progress")
+          .select("*")
+          .eq("student_id", user?.id)
+          .in("chapter_id", [Number(chapterId), Number(chapterId) + 15]);
+
+        const dbRow = dbProgRows?.[0];
+        if (dbRow && Number(dbRow.percentage || 0) === 0 && !dbRow.provide && !dbRow.restate && !dbRow.visualize && !dbRow.engage && !dbRow.discuss && !dbRow.play) {
+          // If the DB explicitly has 0% and all false, and local is marked completed, DB wins (reset)
+          if (local && (local.status === "completed" || local.completedSteps?.length > 0)) {
+            isTeacherReset = true;
+          }
+        }
+      } catch (e) {}
+
+      if (isTeacherReset) {
+        if (storageKey) {
+          try {
+            window.localStorage.removeItem(storageKey);
+          } catch (e) {}
+        }
+        local = null;
+      }
+
       let cloud = null;
       try {
         cloud = mergeState(await loadLearningSession(user?.id, chapterId));
@@ -167,7 +253,7 @@ export default function useMarzanoSession(chapterId) {
 
       if (!active) return;
 
-      if (cloud?.status === "reset") {
+      if (cloud?.status === "reset" || isTeacherReset) {
         if (storageKey) {
           try {
             window.localStorage.removeItem(storageKey);

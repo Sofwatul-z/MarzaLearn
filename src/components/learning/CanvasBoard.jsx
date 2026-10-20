@@ -62,7 +62,7 @@ async function compressImage(file) {
   }
 }
 
-export default function CanvasBoard({ prompt, value, onSave }) {
+export default function CanvasBoard({ prompt, value, onSave, theme }) {
   const canvasRef = useRef(null);
   const drawingRef = useRef(false);
   const historyRef = useRef([]);
@@ -294,8 +294,9 @@ export default function CanvasBoard({ prompt, value, onSave }) {
             <button
               type="button"
               onClick={() => setTool("pen")}
+              style={tool === "pen" ? { backgroundColor: theme?.primary || "#CFE8DD", color: theme?.primaryDark || "#29483A" } : {}}
               className={`inline-flex h-9 items-center gap-2 rounded-full px-3 text-xs font-bold ${
-                tool === "pen" ? "bg-[#CFE8DD] text-[#29483A]" : "bg-[#F0F4F1] text-[#65736D]"
+                tool === "pen" ? "" : "bg-[#F0F4F1] text-[#65736D]"
               }`}
             >
               <PenLine size={14} /> Pen
@@ -321,7 +322,10 @@ export default function CanvasBoard({ prompt, value, onSave }) {
             </button>
           </div>
 
-          <div className="overflow-hidden rounded-[24px] border-2 border-dashed border-[#BED1C7] bg-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.7)]">
+          <div
+            style={{ borderColor: theme?.borderSoft || "#BED1C7" }}
+            className="overflow-hidden rounded-[24px] border-2 border-dashed bg-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.7)]"
+          >
             <canvas
               ref={canvasRef}
               onPointerDown={pointerDown}
@@ -371,9 +375,9 @@ export default function CanvasBoard({ prompt, value, onSave }) {
               ? "Visual saved. You can replace it before moving on."
               : "Save this visual before continuing."}
         </p>
-        <Button variant={alreadySaved && !dirty ? "secondary" : "pastel"} size="sm" onClick={save} disabled={saveDisabled}>
+        <Button theme={theme} variant={alreadySaved && !dirty ? "secondary" : "pastel"} size="sm" onClick={save} disabled={saveDisabled}>
           {busy ? <RotateCcw size={14} className="animate-spin" /> : <Check size={14} />}
-          {busy ? "Saving..." : alreadySaved && !dirty ? "Saved" : "Save visual"}
+          {busy ? "Saving..." : alreadySaved && !dirty ? "Saved" : "Save Visual"}
         </Button>
       </div>
     </div>

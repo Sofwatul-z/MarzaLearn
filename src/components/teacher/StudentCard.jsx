@@ -32,7 +32,7 @@ export default function StudentCard({ student, index, onView }) {
           </h3>
 
           <p className="text-xs text-[#7B8881]">
-            Active student · 6-Step mission & PjBL video tracking
+            Active student · 6-Step mission & Project video tracking
           </p>
         </div>
       </div>
@@ -42,7 +42,7 @@ export default function StudentCard({ student, index, onView }) {
           variant="secondary"
           size="sm"
           onClick={onView}
-          className="group-hover:bg-[#24332D] group-hover:text-white transition-all"
+          className="group-hover:bg-[#24332D] group-hover:text-white hover:!bg-[#24332D] hover:!text-white transition-all"
         >
           View Progress & Reset <ArrowRight size={14} />
         </Button>

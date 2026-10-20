@@ -4,7 +4,7 @@ import Button from "../../common/Button";
 import VocabularyCard from "../VocabularyCard";
 import SourceNote from "../../common/SourceNote";
 
-export default function ProvideStep({ content, value, onChange }) {
+export default function ProvideStep({ content, value, onChange, theme }) {
   const words = content.vocabulary ?? [];
   const seen = value?.seen ?? [];
   const initialIndex = useMemo(() => {
@@ -42,7 +42,16 @@ export default function ProvideStep({ content, value, onChange }) {
   return (
     <div className="w-full">
       <div className="mb-7">
-        <span className="ml-eyebrow">Step 01 · Provide</span>
+        <span
+          style={{
+            backgroundColor: theme?.badgeBg,
+            borderColor: theme?.borderSoft,
+            color: theme?.primaryDark,
+          }}
+          className="ml-eyebrow"
+        >
+          Step 01 · Provide
+        </span>
         <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl">
           {content.title}
         </h2>
@@ -52,12 +61,24 @@ export default function ProvideStep({ content, value, onChange }) {
       </div>
 
       {/* Student Action Instructions in English */}
-      <div className="mb-6 rounded-2xl border border-[#D7E3DC] bg-[#EAF4EF]/75 p-4 sm:p-5 shadow-xs">
-        <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#355245]">
-          <BookOpen size={16} className="text-[#355245]" />
+      <div
+        style={{
+          borderColor: theme?.borderSoft || "#D7E3DC",
+          backgroundColor: theme?.bgLight || "rgba(234, 244, 239, 0.75)",
+        }}
+        className="mb-6 rounded-2xl border p-4 sm:p-5 shadow-xs"
+      >
+        <div
+          style={{ color: theme?.primaryDark || "#355245" }}
+          className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider"
+        >
+          <BookOpen size={16} />
           <span>What to Do in this Step:</span>
         </div>
-        <ol className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed text-[#4A5D54]">
+        <ol
+          style={{ color: theme?.primaryDark || "#4A5D54" }}
+          className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed opacity-95"
+        >
           <li>1. Click the <strong>Speaker / Audio</strong> button on each card to hear correct English pronunciation.</li>
           <li>2. Read through the definition, word class (noun/adjective/verb), and context sentence.</li>
           <li>3. Click <strong>"Got it"</strong> to move to the next word. Once all {words.length} dots turn green, click <strong>Next Step</strong> at the bottom.</li>
@@ -70,6 +91,7 @@ export default function ProvideStep({ content, value, onChange }) {
           index={index}
           total={words.length}
           onPronounce={pronounce}
+          theme={theme}
         />
       )}
 
@@ -80,12 +102,15 @@ export default function ProvideStep({ content, value, onChange }) {
               key={word.term}
               type="button"
               onClick={() => setIndex(wordIndex)}
-              className={`h-2.5 rounded-full transition-all ${
+              style={
                 wordIndex === index
-                  ? "w-8 bg-[#24332D]"
+                  ? { backgroundColor: theme?.primaryDark || "#24332D" }
                   : seen.includes(wordIndex)
-                    ? "w-2.5 bg-[#8EBEAA]"
-                    : "w-2.5 bg-[#DCE4DF]"
+                    ? { backgroundColor: theme?.primary || "#8EBEAA" }
+                    : { backgroundColor: "#DCE4DF" }
+              }
+              className={`h-2.5 rounded-full transition-all ${
+                wordIndex === index ? "w-8" : "w-2.5"
               }`}
               aria-label={`Open ${word.term}`}
             />
@@ -93,15 +118,16 @@ export default function ProvideStep({ content, value, onChange }) {
         </div>
 
         <div className="flex items-center justify-between gap-2 sm:justify-end">
-          <Button variant="ghost" size="sm" onClick={previousWord} disabled={index === 0}>
+          <Button theme={theme} variant="ghost" size="sm" onClick={previousWord} disabled={index === 0}>
             <ArrowLeft size={14} /> Previous word
           </Button>
           {index < words.length - 1 ? (
-            <Button variant="pastel" size="sm" onClick={nextWord}>
+            <Button theme={theme} variant="pastel" size="sm" onClick={nextWord}>
               Got it <ArrowRight size={14} />
             </Button>
           ) : (
             <Button
+              theme={theme}
               variant={allSeen ? "secondary" : "pastel"}
               size="sm"
               onClick={() => markSeen(index)}
@@ -114,7 +140,14 @@ export default function ProvideStep({ content, value, onChange }) {
       </div>
 
       {allSeen && (
-        <div className="mt-5 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-xs font-bold text-emerald-800 shadow-xs">
+        <div
+          style={{
+            borderColor: theme?.borderSoft,
+            backgroundColor: theme?.badgeBg,
+            color: theme?.primaryDark,
+          }}
+          className="mt-5 flex items-center gap-3 rounded-2xl border px-4 py-3.5 text-xs font-bold shadow-xs"
+        >
           <span className="text-xl">🎉</span>
           <span>Awesome! You have explored all the target vocabulary words. Click <strong>Next Step</strong> below to start writing!</span>
         </div>

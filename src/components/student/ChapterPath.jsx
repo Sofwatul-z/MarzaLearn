@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Button from "../common/Button";
+import { getChapterTheme } from "../../data/chapterThemes";
 
 const missionMeta = {
   not_started: {
@@ -94,6 +95,7 @@ export default function ChapterPath({
 
       <div className="relative">
         {visibleChapters.map((chapter, index) => {
+          const theme = getChapterTheme(chapter.id);
           const mission = missionMeta[chapter.missionStatus] ?? missionMeta.not_started;
           const project = projectMeta[chapter.projectStatus] ?? projectMeta.not_submitted;
           const MissionIcon = mission.icon;
@@ -119,13 +121,14 @@ export default function ChapterPath({
                   />
                 )}
                 <div
-                  className={`relative z-10 grid h-12 w-12 place-items-center rounded-full border text-sm font-extrabold tracking-[-0.03em] transition-transform duration-300 group-hover:scale-[1.04] sm:h-14 sm:w-14 ${
+                  style={
                     chapter.missionStatus === "completed"
-                      ? "border-[#AFCFBE] bg-[#CFE8DD] text-[#24332D]"
+                      ? { backgroundColor: theme.primary, borderColor: theme.primaryDark, color: theme.primaryDark }
                       : chapter.missionStatus === "in_progress"
-                        ? "border-[#24332D] bg-[#24332D] text-white"
-                        : "border-[#DCE4DF] bg-[#FBFCF8] text-[#74817B]"
-                  }`}
+                        ? { backgroundColor: theme.primaryDark, borderColor: theme.primaryDark, color: "#FFFFFF" }
+                        : { borderColor: theme.borderSoft, backgroundColor: theme.heroBg, color: theme.primaryMuted }
+                  }
+                  className="relative z-10 grid h-12 w-12 place-items-center rounded-full border text-sm font-extrabold tracking-[-0.03em] transition-transform duration-300 group-hover:scale-[1.04] sm:h-14 sm:w-14"
                 >
                   {chapter.missionStatus === "completed" ? <Check size={19} /> : chapterNumber}
                 </div>
@@ -140,7 +143,12 @@ export default function ChapterPath({
                   <div className="min-w-0">
                     <div className="mb-3 flex flex-wrap items-center gap-2">
                       <span
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.11em] ${mission.className}`}
+                        style={{
+                          backgroundColor: theme.badgeBg,
+                          borderColor: theme.borderSoft,
+                          color: theme.badgeText,
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.11em]"
                       >
                         <MissionIcon size={12} strokeWidth={2.4} />
                         {mission.label}
@@ -153,7 +161,7 @@ export default function ChapterPath({
                       )}
                     </div>
 
-                    <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#8A9690]">
+                    <p className="text-[11px] font-extrabold uppercase tracking-[0.14em]" style={{ color: theme.primaryMuted }}>
                       Chapter {chapterNumber} · {chapter.focus}
                     </p>
                     <h3 className="mt-1.5 text-2xl font-extrabold tracking-[-0.04em] text-[#24332D] sm:text-[1.8rem]">
@@ -166,7 +174,7 @@ export default function ChapterPath({
                     <div className="mt-5 max-w-xl">
                       <div className="mb-2 flex items-center justify-between gap-3 text-[11px] font-bold">
                         <span className="text-[#68766F]">6-Step Learning Mission</span>
-                        <span className="tabular-nums text-[#506159]">
+                        <span className="tabular-nums" style={{ color: theme.primaryDark }}>
                           {chapter.missionPercent}%
                         </span>
                       </div>
@@ -176,7 +184,8 @@ export default function ChapterPath({
                           whileInView={{ width: `${chapter.missionPercent}%` }}
                           viewport={{ once: true }}
                           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-                          className="h-full rounded-full bg-[#8FBDA9]"
+                          style={{ backgroundColor: theme.primaryDark }}
+                          className="h-full rounded-full"
                         />
                       </div>
                     </div>
@@ -224,7 +233,7 @@ export default function ChapterPath({
                         onClick={() => navigate(`/student/chapter/${chapter.id}/project`)}
                       >
                         <Sparkles size={14} className="text-amber-300" />
-                        Start PjBL Project
+                        Start Project
                       </Button>
                     ) : (
                       <Button
@@ -232,10 +241,10 @@ export default function ChapterPath({
                         size="md"
                         disabled
                         className="w-full whitespace-nowrap border border-[#E3E8E5] bg-[#F4F7F5] text-xs font-bold text-[#8C9892] opacity-75 cursor-not-allowed sm:w-auto"
-                        title="Complete all 6 steps in this chapter to unlock the PjBL Project"
+                        title="Complete all 6 steps in this chapter to unlock the Project"
                       >
                         <Lock size={13} className="text-[#8C9892]" />
-                        PjBL Locked
+                        Project Locked
                       </Button>
                     )}
                   </div>

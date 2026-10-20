@@ -13,6 +13,7 @@ import Loader from "../../components/common/Loader";
 import ChapterPath from "../../components/student/ChapterPath";
 import useStudentJourney from "../../hooks/useStudentJourney";
 import { useAuth } from "../../hooks/useAuth";
+import { getChapterTheme } from "../../data/chapterThemes";
 
 import heroCharacter from "../../assets/chapter 1/step 1/assets/card-character.png";
 import heroMedal from "../../assets/chapter 1/step 6/assets/decoration-gold-medal.png";
@@ -20,19 +21,21 @@ import heroRacket from "../../assets/chapter 1/step 1/assets/decoration-racket-s
 
 const motionWords = ["describe", "retell", "guide", "argue", "imagine"];
 
-function LearningOrbit() {
+function LearningOrbit({ theme }) {
   return (
     <div className="relative mx-auto h-[330px] w-full max-w-[520px] sm:h-[390px]">
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 42, repeat: Infinity, ease: "linear" }}
-        className="absolute left-1/2 top-1/2 h-[270px] w-[270px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-[#BFD2C8] sm:h-[320px] sm:w-[320px]"
+        style={{ borderColor: theme?.borderSoft || "#BFD2C8" }}
+        className="absolute left-1/2 top-1/2 h-[270px] w-[270px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed sm:h-[320px] sm:w-[320px]"
         aria-hidden="true"
       />
       <motion.div
         animate={{ rotate: -360 }}
         transition={{ duration: 55, repeat: Infinity, ease: "linear" }}
-        className="absolute left-1/2 top-1/2 h-[205px] w-[205px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#F0D5C5] sm:h-[245px] sm:w-[245px]"
+        style={{ borderColor: theme?.accent || "#F0D5C5" }}
+        className="absolute left-1/2 top-1/2 h-[205px] w-[205px] -translate-x-1/2 -translate-y-1/2 rounded-full border sm:h-[245px] sm:w-[245px]"
         aria-hidden="true"
       />
 
@@ -61,7 +64,10 @@ function LearningOrbit() {
         className="absolute left-1/2 top-1/2 flex flex-col items-center justify-center -translate-x-1/2 -translate-y-1/2 z-10"
       >
         <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-[#CFE8DD]/60 blur-xl -z-10" />
+          <div
+            style={{ backgroundColor: theme?.primary || "#CFE8DD" }}
+            className="absolute inset-0 rounded-full opacity-60 blur-xl -z-10"
+          />
           <img
             src={heroCharacter}
             alt="MarzaLearn Student Character"
@@ -96,9 +102,18 @@ function LearningOrbit() {
         );
       })}
 
-      <span className="absolute bottom-[4%] left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-[#24332D]" />
-      <span className="absolute left-[20%] top-[43%] h-3 w-3 rounded-full bg-[#F4D7C5]" />
-      <span className="absolute right-[16%] top-[51%] h-2.5 w-2.5 rounded-full bg-[#9FCFBB]" />
+      <span
+        style={{ backgroundColor: theme?.primaryDark || "#24332D" }}
+        className="absolute bottom-[4%] left-1/2 h-2 w-2 -translate-x-1/2 rounded-full"
+      />
+      <span
+        style={{ backgroundColor: theme?.accent || "#F4D7C5" }}
+        className="absolute left-[20%] top-[43%] h-3 w-3 rounded-full"
+      />
+      <span
+        style={{ backgroundColor: theme?.primary || "#9FCFBB" }}
+        className="absolute right-[16%] top-[51%] h-2.5 w-2.5 rounded-full"
+      />
     </div>
   );
 }
@@ -150,6 +165,7 @@ export default function Dashboard() {
   }
 
   const currentChapter = summary.currentChapter ?? chapters[0] ?? null;
+  const currentChapterTheme = getChapterTheme(currentChapter?.id || 1);
 
   return (
     <div>
@@ -168,7 +184,10 @@ export default function Dashboard() {
             Keep your English
             <span className="relative ml-3 inline-block whitespace-nowrap">
               moving.
-              <span className="absolute -bottom-1 left-1 right-0 h-3 -rotate-1 rounded-full bg-[#F4D7C5]/70 -z-10 sm:h-4" />
+              <span
+                style={{ backgroundColor: `${currentChapterTheme?.primary || "#F4D7C5"}B3` }}
+                className="absolute -bottom-1 left-1 right-0 h-3 -rotate-1 rounded-full -z-10 sm:h-4"
+              />
             </span>
           </h1>
 
@@ -178,6 +197,7 @@ export default function Dashboard() {
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button
+              theme={currentChapterTheme}
               size="lg"
               className="group"
               disabled={!currentChapter}
@@ -218,7 +238,7 @@ export default function Dashboard() {
           transition={{ duration: 0.55, delay: 0.08 }}
           className="hidden lg:block"
         >
-          <LearningOrbit />
+          <LearningOrbit theme={currentChapterTheme} />
         </motion.div>
       </section>
 

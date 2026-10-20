@@ -11,7 +11,7 @@ const confettiPieces = Array.from({ length: 18 }, (_, index) => ({
   delay: (index % 6) * 0.025,
 }));
 
-export default function QuizGame({ questions = [], value, onChange, chapterId }) {
+export default function QuizGame({ questions = [], value, onChange, chapterId, theme }) {
   const answers = value?.answers ?? {};
   const firstUnanswered = questions.findIndex((_, index) => !answers[index]);
   const [currentIndex, setCurrentIndex] = useState(firstUnanswered === -1 ? Math.max(0, questions.length - 1) : firstUnanswered);
@@ -58,11 +58,25 @@ export default function QuizGame({ questions = [], value, onChange, chapterId })
 
   if (showSummary) {
     return (
-      <div className="rounded-[30px] border border-[#C9DCD2] bg-[#EAF4EF]/65 px-6 py-9 text-center sm:px-9 sm:py-11">
-        <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-[#24332D] text-white">
+      <div
+        style={{
+          borderColor: theme?.borderSoft || "#C9DCD2",
+          backgroundColor: theme?.bgLight || "rgba(234, 244, 239, 0.65)",
+        }}
+        className="rounded-[30px] border px-6 py-9 text-center sm:px-9 sm:py-11"
+      >
+        <div
+          style={{ backgroundColor: theme?.primaryDark || "#24332D" }}
+          className="mx-auto grid h-12 w-12 place-items-center rounded-full text-white"
+        >
           <Sparkles size={20} />
         </div>
-        <p className="mt-5 text-[10px] font-extrabold uppercase tracking-[0.15em] text-[#668073]">Game finished</p>
+        <p
+          style={{ color: theme?.primaryMuted }}
+          className="mt-5 text-[10px] font-extrabold uppercase tracking-[0.15em]"
+        >
+          Game finished
+        </p>
         <h3 className="mt-2 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D]">
           {score} / {questions.length} correct
         </h3>
@@ -74,7 +88,10 @@ export default function QuizGame({ questions = [], value, onChange, chapterId })
   }
 
   return (
-    <div className="relative overflow-hidden rounded-[30px] border border-[#DDE5E0] bg-white/85 p-6 shadow-[0_16px_45px_rgba(36,51,45,0.05)] sm:p-8">
+    <div
+      style={{ borderColor: theme?.borderSoft || "#DDE5E0" }}
+      className="relative overflow-hidden rounded-[30px] border bg-white/85 p-6 shadow-[0_16px_45px_rgba(36,51,45,0.05)] sm:p-8"
+    >
       <AnimatePresence>
         {celebrate && (
           <div className="pointer-events-none absolute inset-x-0 top-16 z-20 flex justify-center" aria-hidden="true">
@@ -96,13 +113,25 @@ export default function QuizGame({ questions = [], value, onChange, chapterId })
         <span className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#87938D]">
           Question {String(currentIndex + 1).padStart(2, "0")} / {String(questions.length).padStart(2, "0")}
         </span>
-        <span className="text-xs font-extrabold text-[#5F756A]">Score {score}</span>
+        <span
+          style={{
+            backgroundColor: theme?.badgeBg,
+            borderColor: theme?.borderSoft,
+            color: theme?.primaryDark,
+          }}
+          className="rounded-full border px-3 py-1 text-xs font-extrabold"
+        >
+          Score {score}
+        </span>
       </div>
 
       <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-[#EDF1EE]">
         <div
-          className="h-full rounded-full bg-[#9FCFBB] transition-[width] duration-300"
-          style={{ width: `${Math.max(8, (answeredCount / questions.length) * 100)}%` }}
+          className="h-full rounded-full transition-[width] duration-300"
+          style={{
+            backgroundColor: theme?.primary || theme?.accent || "#9FCFBB",
+            width: `${Math.max(8, (answeredCount / questions.length) * 100)}%`,
+          }}
         />
       </div>
 
@@ -149,8 +178,8 @@ export default function QuizGame({ questions = [], value, onChange, chapterId })
               ? "Correct — nice work."
               : `The correct answer is “${current.answer}”.`}
           </p>
-          <Button variant="pastel" size="sm" onClick={nextQuestion}>
-            {currentIndex === questions.length - 1 ? "See result" : "Next question"} <ArrowRight size={14} />
+          <Button theme={theme} variant="pastel" size="sm" onClick={nextQuestion}>
+            {currentIndex === questions.length - 1 ? "See Result" : "Next Question"} <ArrowRight size={14} />
           </Button>
         </motion.div>
       )}

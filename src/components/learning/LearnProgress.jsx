@@ -6,13 +6,16 @@ const steps = [
   { id: "grammar", label: "Grammar Corner", icon: Shapes },
 ];
 
-export default function LearnProgress({ active, completed = [], onSelect }) {
+export default function LearnProgress({ active, completed = [], onSelect, theme }) {
   return (
     <nav
       className="sticky top-[126px] z-30 -mx-1 mb-8 overflow-x-auto px-1 py-2 sm:top-[76px]"
       aria-label="Chapter learn sections"
     >
-      <div className="mx-auto flex min-w-max items-center gap-1 rounded-full border border-[#DDE5E0] bg-[#FBFCF8]/90 p-1.5 shadow-[0_10px_30px_rgba(36,51,45,0.06)] backdrop-blur-xl">
+      <div
+        style={{ borderColor: theme?.borderSoft || "#DDE5E0" }}
+        className="mx-auto flex min-w-max items-center gap-1 rounded-full border bg-[#FBFCF8]/90 p-1.5 shadow-[0_10px_30px_rgba(36,51,45,0.06)] backdrop-blur-xl"
+      >
         {steps.map((step, index) => {
           const Icon = step.icon;
           const isActive = active === step.id;
@@ -23,14 +26,20 @@ export default function LearnProgress({ active, completed = [], onSelect }) {
               key={step.id}
               type="button"
               onClick={() => onSelect(step.id)}
+              style={isActive ? { backgroundColor: theme?.primaryDark || "#24332D", color: "#FFFFFF" } : {}}
               className={`group flex items-center gap-2 rounded-full px-3.5 py-2.5 text-xs font-extrabold transition-all sm:px-4 ${
                 isActive
-                  ? "bg-[#24332D] text-white shadow-[0_8px_20px_rgba(36,51,45,0.14)]"
+                  ? "shadow-[0_8px_20px_rgba(36,51,45,0.14)]"
                   : "text-[#6C7973] hover:bg-white hover:text-[#24332D]"
               }`}
               aria-current={isActive ? "step" : undefined}
             >
               <span
+                style={
+                  !isActive && isComplete && theme?.badgeBg
+                    ? { backgroundColor: theme.badgeBg, color: theme.badgeText }
+                    : {}
+                }
                 className={`grid h-6 w-6 place-items-center rounded-full text-[10px] ${
                   isActive
                     ? "bg-white/12 text-white"

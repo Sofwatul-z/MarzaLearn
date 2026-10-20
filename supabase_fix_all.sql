@@ -6,7 +6,7 @@
 --    so student progress updates and teacher monitoring calculate live percentages.
 -- 2. `chapters` & `chapter_steps` tables: RLS policies allowing teachers to create,
 --    edit, and delete chapters without "Failed to save chapter".
--- 3. `project_submissions` table: Dedicated table for PjBL video submissions,
+-- 3. `project_submissions` table: Dedicated table for Project video submissions,
 --    scripts, and teacher grading.
 -- 4. `visualize-assets` bucket: Cloud storage bucket and policies for digital canvas
 --    and visual drawing uploads.
@@ -178,7 +178,7 @@ BEGIN
 END $$;
 
 -- ------------------------------------------------------------------------------
--- 3. CREATE `project_submissions` TABLE (PJBL VIDEOS & REVIEWS)
+-- 3. CREATE `project_submissions` TABLE (Project VIDEOS & REVIEWS)
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.project_submissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

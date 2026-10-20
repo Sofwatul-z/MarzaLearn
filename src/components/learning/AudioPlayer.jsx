@@ -8,7 +8,7 @@ function formatTime(value) {
   return `${minutes}:${seconds}`;
 }
 
-export default function AudioPlayer({ src, title = "Listening audio" }) {
+export default function AudioPlayer({ src, title = "Listening audio", theme }) {
   const audioRef = useRef(null);
   const [playing, setPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -91,12 +91,21 @@ export default function AudioPlayer({ src, title = "Listening audio" }) {
   const progress = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
 
   return (
-    <div className="rounded-[28px] border border-[#DCE5E0] bg-[#24332D] p-5 text-white shadow-[0_22px_55px_rgba(36,51,45,0.14)] sm:p-6">
+    <div
+      style={{
+        backgroundColor: theme?.primaryDark || "#24332D",
+        borderColor: theme?.borderSoft || "#DCE5E0",
+      }}
+      className="rounded-[28px] border p-5 text-white shadow-[0_22px_55px_rgba(36,51,45,0.14)] sm:p-6"
+    >
       <audio ref={audioRef} src={src} preload="metadata" aria-label={title} />
 
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#B8D5C8]">
+          <p
+            style={{ color: theme?.primary || "#B8D5C8" }}
+            className="text-[10px] font-extrabold uppercase tracking-[0.16em]"
+          >
             Listen to the text
           </p>
           <p className="mt-2 max-w-md text-base font-extrabold leading-snug tracking-[-0.025em] text-white sm:text-lg">
@@ -106,7 +115,8 @@ export default function AudioPlayer({ src, title = "Listening audio" }) {
         <button
           type="button"
           onClick={() => setPlaybackRate((rate) => (rate === 1 ? 0.85 : rate === 0.85 ? 1.15 : 1))}
-          className="shrink-0 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-[11px] font-extrabold text-white transition-colors hover:bg-white/15"
+          style={{ borderColor: theme?.borderSoft || "rgba(255,255,255,0.15)" }}
+          className="shrink-0 rounded-full border bg-white/10 px-3 py-2 text-[11px] font-extrabold text-white transition-colors hover:bg-white/15"
           aria-label={`Playback speed ${playbackRate} times. Change speed.`}
         >
           {playbackRate}×
@@ -117,7 +127,11 @@ export default function AudioPlayer({ src, title = "Listening audio" }) {
         <button
           type="button"
           onClick={togglePlay}
-          className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#CFE8DD] text-[#24332D] shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition-transform hover:scale-[1.04]"
+          style={{
+            backgroundColor: theme?.primary || "#CFE8DD",
+            color: theme?.primaryDark || "#24332D",
+          }}
+          className="grid h-12 w-12 shrink-0 place-items-center rounded-full shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition-transform hover:scale-[1.04]"
           aria-label={playing ? "Pause audio" : "Play audio"}
         >
           {playing ? <Pause size={19} fill="currentColor" /> : <Play size={19} fill="currentColor" className="ml-0.5" />}

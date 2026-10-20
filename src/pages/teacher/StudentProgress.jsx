@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   RotateCcw,
   CheckCircle2,
@@ -20,27 +20,48 @@ export default function StudentProgress({ student, onRefresh }) {
   const [resettingId, setResettingId] = useState(null); // 'all' or chapterId
   const [confirmModal, setConfirmModal] = useState(null); // { type: 'chapter' | 'all', chapterId?: number, chapterTitle?: string }
   const [toastMessage, setToastMessage] = useState(null);
+  const [localRows, setLocalRows] = useState(student?.progress?.rows || []);
 
-  const progress = student?.progress || {};
-  const rows = progress.rows || [];
+  useEffect(() => {
+    setLocalRows(student?.progress?.rows || []);
+  }, [student?.id, student?.progress]);
+
+  const completedChapters = localRows.filter((r) => Number(r.percentage) >= 100).length;
+  const avgScore = localRows.length
+    ? Math.round(
+        localRows.reduce((sum, r) => sum + (Number(r.percentage) || 0), 0) /
+          localRows.length
+      )
+    : 0;
+
+  const activities = localRows.reduce((sum, r) => {
+    let count = 0;
+    if (r.provide) count += 1;
+    if (r.restate) count += 1;
+    if (r.visualize) count += 1;
+    if (r.engage) count += 1;
+    if (r.discuss) count += 1;
+    if (r.play) count += 1;
+    return sum + count;
+  }, 0);
 
   const items = [
     {
       number: "01",
       title: "Chapter Completion",
-      value: `${progress.completed_chapters || 0} Chapters`,
+      value: `${completedChapters} Chapters`,
       description: "Completed learning materials and chapter activities.",
     },
     {
       number: "02",
       title: "Average Score",
-      value: `${progress.average_score || 0}%`,
+      value: `${avgScore}%`,
       description: "Average performance from completed exercises.",
     },
     {
       number: "03",
       title: "Learning Activity",
-      value: `${progress.activities || 0} Activities`,
+      value: `${activities} Activities`,
       description: "Total learning activities completed.",
     },
   ];
@@ -55,6 +76,59 @@ export default function StudentProgress({ student, onRefresh }) {
     const { type, chapterId } = confirmModal;
     setResettingId(type === "all" ? "all" : chapterId);
     setConfirmModal(null);
+
+    // Immediate optimistic UI reset
+    if (type === "all") {
+      setLocalRows((prev) =>
+        prev.map((r) => ({
+          ...r,
+          percentage: 0,
+          provide: false,
+          restate: false,
+          visualize: false,
+          engage: false,
+          discuss: false,
+          play: false,
+        }))
+      );
+    } else {
+      const numCId = Number(chapterId);
+      setLocalRows((prev) => {
+        const exists = prev.some(
+          (r) => Number(r.chapter_id) === numCId || Number(r.chapter_id) === numCId + 15
+        );
+        if (exists) {
+          return prev.map((r) => {
+            if (Number(r.chapter_id) === numCId || Number(r.chapter_id) === numCId + 15) {
+              return {
+                ...r,
+                percentage: 0,
+                provide: false,
+                restate: false,
+                visualize: false,
+                engage: false,
+                discuss: false,
+                play: false,
+              };
+            }
+            return r;
+          });
+        }
+        return [
+          ...prev,
+          {
+            chapter_id: numCId,
+            percentage: 0,
+            provide: false,
+            restate: false,
+            visualize: false,
+            engage: false,
+            discuss: false,
+            play: false,
+          },
+        ];
+      });
+    }
 
     try {
       let res;
@@ -202,7 +276,7 @@ export default function StudentProgress({ student, onRefresh }) {
 
         <div className="space-y-4">
           {CHAPTER_CATALOG.map((cat) => {
-            const row = rows.find(
+            const row = localRows.find(
               (r) =>
                 Number(r.chapter_id) === Number(cat.id) ||
                 Number(r.chapter_id) === Number(cat.databaseId)

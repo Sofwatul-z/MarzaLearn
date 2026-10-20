@@ -1,7 +1,7 @@
 import { CheckCircle2, Lightbulb, PenLine } from "lucide-react";
 import SourceNote from "../../common/SourceNote";
 
-export default function RestateStep({ content, value, onChange }) {
+export default function RestateStep({ content, value, onChange, theme }) {
   const responses = value?.responses ?? {};
   const completed = content.prompts.filter((_, index) => responses[index]?.trim()).length;
 
@@ -16,26 +16,55 @@ export default function RestateStep({ content, value, onChange }) {
     <div>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
         <div className="max-w-3xl">
-          <span className="ml-eyebrow">Step 02 · Restate</span>
+          <span
+            style={{
+              backgroundColor: theme?.badgeBg,
+              borderColor: theme?.borderSoft,
+              color: theme?.primaryDark,
+            }}
+            className="ml-eyebrow"
+          >
+            Step 02 · Restate
+          </span>
           <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl">
             {content.title}
           </h2>
           <p className="mt-4 text-sm leading-7 text-[#65736D] sm:text-base">{content.instructions}</p>
         </div>
-        <div className="border-l-2 border-[#C6DDD2] pl-5">
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#839089]">Writing progress</p>
+        <div
+          style={{ borderColor: theme?.primary || "#C6DDD2" }}
+          className="border-l-4 pl-5"
+        >
+          <p
+            style={{ color: theme?.primaryMuted }}
+            className="text-[10px] font-extrabold uppercase tracking-[0.14em]"
+          >
+            Writing progress
+          </p>
           <p className="mt-1 text-2xl font-extrabold tracking-[-0.04em] text-[#24332D]">{completed}/{content.prompts.length}</p>
           <p className="mt-1 text-xs leading-5 text-[#7A8780]">Complete every response to unlock the next step.</p>
         </div>
       </div>
 
       {/* Student Action Instructions in English */}
-      <div className="mt-6 rounded-2xl border border-[#D7E3DC] bg-[#EAF4EF]/75 p-4 sm:p-5 shadow-xs">
-        <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#355245]">
-          <PenLine size={16} className="text-[#355245]" />
+      <div
+        style={{
+          borderColor: theme?.borderSoft || "#D7E3DC",
+          backgroundColor: theme?.bgLight || "rgba(234, 244, 239, 0.75)",
+        }}
+        className="mt-6 rounded-2xl border p-4 sm:p-5 shadow-xs"
+      >
+        <div
+          style={{ color: theme?.primaryDark || "#355245" }}
+          className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider"
+        >
+          <PenLine size={16} />
           <span>What to Do in this Step:</span>
         </div>
-        <ol className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed text-[#4A5D54]">
+        <ol
+          style={{ color: theme?.primaryDark || "#4A5D54" }}
+          className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed opacity-95"
+        >
           <li>1. Read each vocabulary word prompt on the left.</li>
           <li>2. In the text area, write an original sentence in the <strong>Simple Present Tense</strong> using the target word. <em>(Do not copy directly from the dictionary!)</em></li>
           <li>3. <strong>Challenge:</strong> Try including descriptive adverbs like <em>really, very, extremely,</em> or <em>quite</em> to enhance your writing.</li>

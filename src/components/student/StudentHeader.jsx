@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../common/Logo";
 import Button from "../common/Button";
 import { useAuth } from "../../hooks/useAuth";
+import { getChapterTheme } from "../../data/chapterThemes";
 
 function StudentNavItem({ to, label, active }) {
   return (
@@ -31,6 +32,9 @@ export default function StudentHeader() {
     location.pathname.startsWith("/student/chapter/");
   const focusSession = /\/student\/chapter\/[^/]+\/session\/?$/.test(location.pathname);
 
+  const chapterMatch = location.pathname.match(/\/student\/chapter\/(\d+)/);
+  const theme = getChapterTheme(chapterMatch ? Number(chapterMatch[1]) : 1);
+
   const initials = (profile?.full_name ?? "Student")
     .split(" ")
     .filter(Boolean)
@@ -50,11 +54,14 @@ export default function StudentHeader() {
       <header className="sticky top-0 z-40 -mx-3 mb-5 border-b border-[#E8ECE9]/80 bg-[#FBFCF8]/[0.9] px-3 py-3 backdrop-blur-xl sm:-mx-5 sm:px-5 lg:-mx-7 lg:px-7">
         <div className="mx-auto flex w-full max-w-[1440px] items-center gap-3">
           <Logo to={location.pathname} />
-          <div className="ml-auto flex items-center gap-2 rounded-full border border-[#D7E2DC] bg-white/75 px-3 py-2">
-            <span className="h-2 w-2 rounded-full bg-[#8EBEAA]" aria-hidden="true" />
+          <div
+            style={{ borderColor: theme?.borderSoft || "#D7E2DC", backgroundColor: theme?.badgeBg || "rgba(255,255,255,0.75)" }}
+            className="ml-auto flex items-center gap-2 rounded-full border px-3 py-2"
+          >
+            <span style={{ backgroundColor: theme?.primary || "#8EBEAA" }} className="h-2 w-2 rounded-full" aria-hidden="true" />
             <div className="leading-tight">
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#6F7D76]">Focus session</p>
-              <p className="hidden text-[10px] font-semibold text-[#98A29D] sm:block">Navigation is simplified until the mission is finished.</p>
+              <p style={{ color: theme?.primaryDark || "#6F7D76" }} className="text-[10px] font-extrabold uppercase tracking-[0.12em]">Focus session</p>
+              <p style={{ color: theme?.primaryMuted || "#98A29D" }} className="hidden text-[10px] font-semibold sm:block">Navigation is simplified until the mission is finished.</p>
             </div>
           </div>
         </div>

@@ -21,7 +21,7 @@ export default function TeacherJourney() {
       title: "Student Review & Grading",
       icon: CheckSquare,
       description:
-        "Review PjBL video submissions, evaluate scripts, verify checklists, and deliver scores with personalized feedback.",
+        "Review Project video submissions, evaluate scripts, verify checklists, and deliver scores with personalized feedback.",
       route: "/teacher/review",
       badge: "Evaluation",
     },
@@ -93,7 +93,7 @@ export default function TeacherJourney() {
                   variant="secondary"
                   size="sm"
                   onClick={() => navigate(item.route)}
-                  className="self-start sm:self-center shrink-0 group-hover:bg-[#24332D] group-hover:text-white transition-all"
+                  className="self-start sm:self-center shrink-0 group-hover:bg-[#24332D] group-hover:text-white hover:!bg-[#24332D] hover:!text-white transition-all"
                 >
                   Open <ArrowRight size={15} />
                 </Button>

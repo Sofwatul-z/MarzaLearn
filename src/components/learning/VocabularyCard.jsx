@@ -1,17 +1,35 @@
 import { Volume2 } from "lucide-react";
 
-export default function VocabularyCard({ word, index, total, onPronounce }) {
+export default function VocabularyCard({ word, index, total, onPronounce, theme }) {
   return (
-    <article className="relative min-h-[330px] overflow-hidden rounded-[30px] border border-[#DDE5E0] bg-white/95 px-6 py-7 shadow-[0_18px_50px_rgba(36,51,45,0.055)] sm:min-h-[360px] sm:px-9 sm:py-9">
-      <div className="absolute -right-12 -top-16 h-44 w-44 rounded-full bg-[#EAF4EF] blur-2xl" aria-hidden="true" />
-      <div className="absolute -bottom-16 -left-12 h-40 w-40 rounded-full bg-[#FBEDE4] blur-2xl" aria-hidden="true" />
+    <article
+      style={{ borderColor: theme?.borderSoft || "#DDE5E0" }}
+      className="relative min-h-[330px] overflow-hidden rounded-[30px] border bg-white/95 px-6 py-7 shadow-[0_18px_50px_rgba(36,51,45,0.055)] sm:min-h-[360px] sm:px-9 sm:py-9"
+    >
+      <div
+        style={{ backgroundColor: theme?.primary || "#EAF4EF" }}
+        className="absolute -right-12 -top-16 h-44 w-44 rounded-full opacity-30 blur-2xl"
+        aria-hidden="true"
+      />
+      <div
+        style={{ backgroundColor: theme?.accent || "#FBEDE4" }}
+        className="absolute -bottom-16 -left-12 h-40 w-40 rounded-full opacity-25 blur-2xl"
+        aria-hidden="true"
+      />
 
       <div className="relative flex h-full flex-col">
         <div className="flex items-center justify-between gap-4">
           <span className="text-xs font-black uppercase tracking-wider text-[#68766F]">
             Word {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
           </span>
-          <span className="rounded-full bg-[#EAF4EF] px-3.5 py-1 text-xs font-black uppercase tracking-wider text-[#2E4A3E]">
+          <span
+            style={{
+              backgroundColor: theme?.badgeBg || "#EAF4EF",
+              color: theme?.badgeText || "#2E4A3E",
+              borderColor: theme?.borderSoft,
+            }}
+            className="rounded-full border px-3.5 py-1 text-xs font-black uppercase tracking-wider"
+          >
             {word.partOfSpeech}
           </span>
         </div>
@@ -24,7 +42,12 @@ export default function VocabularyCard({ word, index, total, onPronounce }) {
             <button
               type="button"
               onClick={() => onPronounce?.(word.term)}
-              className="grid h-11 w-11 place-items-center rounded-full border border-[#C9D9D1] bg-[#F8FBF9] text-[#496658] transition hover:-translate-y-0.5 hover:bg-[#EAF4EF]"
+              style={{
+                borderColor: theme?.borderSoft || "#C9D9D1",
+                backgroundColor: theme?.bgLight || "#F8FBF9",
+                color: theme?.primaryDark || "#496658",
+              }}
+              className="grid h-11 w-11 place-items-center rounded-full border transition hover:-translate-y-0.5"
               aria-label={`Hear pronunciation of ${word.term}`}
               title="Hear pronunciation"
             >

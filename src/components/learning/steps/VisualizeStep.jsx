@@ -10,6 +10,7 @@ export default function VisualizeStep({
   onChange,
   studentId,
   chapterId,
+  theme,
 }) {
   const items = value?.items ?? {};
   const firstIncomplete = content.prompts.findIndex((_, index) => !items[index]?.savedAt);
@@ -44,7 +45,16 @@ export default function VisualizeStep({
     <div>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
         <div className="max-w-3xl">
-          <span className="ml-eyebrow">Step 03 · Visualize</span>
+          <span
+            style={{
+              backgroundColor: theme?.badgeBg,
+              borderColor: theme?.borderSoft,
+              color: theme?.primaryDark,
+            }}
+            className="ml-eyebrow"
+          >
+            Step 03 · Visualize
+          </span>
           <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl">
             {content.title}
           </h2>
@@ -53,20 +63,40 @@ export default function VisualizeStep({
             <p className="mt-2 text-xs font-semibold leading-5 text-[#849089]">Example: {content.example}</p>
           )}
         </div>
-        <div className="border-l-2 border-[#E8CDBD] pl-5">
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#8E776A]">Visual progress</p>
+        <div
+          style={{ borderColor: theme?.primary || "#E8CDBD" }}
+          className="border-l-4 pl-5"
+        >
+          <p
+            style={{ color: theme?.primaryMuted }}
+            className="text-[10px] font-extrabold uppercase tracking-[0.14em]"
+          >
+            Visual progress
+          </p>
           <p className="mt-1 text-2xl font-extrabold tracking-[-0.04em] text-[#24332D]">{savedCount}/{content.prompts.length}</p>
           <p className="mt-1 text-xs leading-5 text-[#7A8780]">Draw directly or upload an image for each prompt.</p>
         </div>
       </div>
 
       {/* Student Action Instructions in English */}
-      <div className="mt-6 rounded-2xl border border-[#D7E3DC] bg-[#EAF4EF]/75 p-4 sm:p-5 shadow-xs">
-        <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#355245]">
-          <Brush size={16} className="text-[#355245]" />
+      <div
+        style={{
+          borderColor: theme?.borderSoft || "#D7E3DC",
+          backgroundColor: theme?.bgLight || "rgba(234, 244, 239, 0.75)",
+        }}
+        className="mt-6 rounded-2xl border p-4 sm:p-5 shadow-xs"
+      >
+        <div
+          style={{ color: theme?.primaryDark || "#355245" }}
+          className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider"
+        >
+          <Brush size={16} />
           <span>What to Do in this Step:</span>
         </div>
-        <ol className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed text-[#4A5D54]">
+        <ol
+          style={{ color: theme?.primaryDark || "#4A5D54" }}
+          className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed opacity-95"
+        >
           <li>1. Select each word prompt using the pill buttons below (e.g. <em>{content.prompts[0]}</em>).</li>
           <li>2. Create your visual: either <strong>draw directly</strong> with the digital canvas brush and shapes, OR <strong>upload an image</strong> from your device.</li>
           <li>3. Click the <strong>Save Visual</strong> button inside the canvas card to save your work.</li>
@@ -82,11 +112,26 @@ export default function VisualizeStep({
               key={prompt}
               type="button"
               onClick={() => setActiveIndex(index)}
+              style={
+                activeIndex === index
+                  ? {
+                      backgroundColor: theme?.primaryDark || "#24332D",
+                      borderColor: theme?.primaryDark || "#24332D",
+                      color: "#FFFFFF",
+                    }
+                  : saved
+                    ? {
+                        backgroundColor: theme?.badgeBg || "#EAF4EF",
+                        borderColor: theme?.borderSoft || "#BBD4C8",
+                        color: theme?.badgeText || "#496759",
+                      }
+                    : {}
+              }
               className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-xs font-extrabold transition ${
                 activeIndex === index
-                  ? "border-[#24332D] bg-[#24332D] text-white"
+                  ? "shadow-sm"
                   : saved
-                    ? "border-[#BBD4C8] bg-[#EAF4EF] text-[#496759]"
+                    ? ""
                     : "border-[#D9E1DD] bg-white/80 text-[#718078] hover:border-[#BFCFC7]"
               }`}
             >
@@ -98,12 +143,16 @@ export default function VisualizeStep({
         })}
       </div>
 
-      <div className="mt-3 rounded-[30px] border border-[#DDE5E0] bg-white/75 p-5 shadow-[0_16px_45px_rgba(36,51,45,0.045)] sm:p-7">
+      <div
+        style={{ borderColor: theme?.borderSoft || "#DDE5E0" }}
+        className="mt-3 rounded-[30px] border bg-white/75 p-5 shadow-[0_16px_45px_rgba(36,51,45,0.045)] sm:p-7"
+      >
         <CanvasBoard
           key={`${activeIndex}-${items[activeIndex]?.savedAt ?? "new"}`}
           prompt={content.prompts[activeIndex]}
           value={items[activeIndex]}
           onSave={saveVisual}
+          theme={theme}
         />
       </div>
       <SourceNote source={content.source} />

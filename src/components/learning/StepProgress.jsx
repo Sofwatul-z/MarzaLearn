@@ -16,7 +16,14 @@ export default function StepProgress({
   onSelect,
   steps = defaultSteps,
   rightDecorator = null,
+  theme = null,
 }) {
+  const activeColor = theme?.primary || "#24332D";
+  const activeDark = theme?.primaryDark || "#24332D";
+  const completeColor = theme?.accent || "#8EBEAA";
+  const completeBg = theme?.badgeBg || "#CFE8DD";
+  const completeText = theme?.primaryDark || "#29483A";
+
   return (
     <nav aria-label="6-Step learning progress" className="py-5 sm:py-6">
       <div className="hidden items-start md:grid md:grid-cols-6">
@@ -30,9 +37,10 @@ export default function StepProgress({
             <div key={label} className="relative flex min-w-0 flex-col items-center">
               {index < steps.length - 1 && (
                 <span
-                  className={`absolute left-1/2 right-[-50%] top-[18px] h-px ${
-                    complete ? "bg-[#8EBEAA]" : "bg-[#D9E1DD]"
-                  }`}
+                  className="absolute left-1/2 right-[-50%] top-[18px] h-px transition-colors"
+                  style={{
+                    backgroundColor: complete ? completeColor : "#D9E1DD",
+                  }}
                   aria-hidden="true"
                 />
               )}
@@ -41,21 +49,27 @@ export default function StepProgress({
                 disabled={!unlocked}
                 onClick={() => unlocked && onSelect?.(number)}
                 aria-current={active ? "step" : undefined}
+                style={
+                  active
+                    ? { backgroundColor: activeColor, borderColor: activeDark, color: "#FFFFFF" }
+                    : complete
+                      ? { backgroundColor: completeBg, borderColor: completeColor, color: completeText }
+                      : {}
+                }
                 className={`relative z-10 grid h-9 w-9 place-items-center rounded-full border text-xs font-extrabold transition-all ${
-                  complete
-                    ? "border-[#8EBEAA] bg-[#CFE8DD] text-[#29483A]"
-                    : active
-                      ? "border-[#24332D] bg-[#24332D] text-white shadow-[0_8px_20px_rgba(36,51,45,0.17)]"
-                      : unlocked
-                        ? "border-[#C9D6CF] bg-white text-[#66766E] hover:border-[#9FB9AC]"
-                        : "cursor-not-allowed border-[#E1E6E3] bg-[#F5F7F5] text-[#A8B1AC]"
+                  active
+                    ? "shadow-[0_8px_20px_rgba(36,51,45,0.17)]"
+                    : unlocked
+                      ? "border-[#C9D6CF] bg-white text-[#66766E] hover:border-[#9FB9AC]"
+                      : "cursor-not-allowed border-[#E1E6E3] bg-[#F5F7F5] text-[#A8B1AC]"
                 }`}
               >
                 {complete ? <Check size={15} strokeWidth={3} /> : unlocked ? number : <LockKeyhole size={13} />}
               </button>
               <span
+                style={active ? { color: activeDark } : complete ? { color: completeText } : {}}
                 className={`mt-2 truncate px-1 text-[10px] font-extrabold uppercase tracking-[0.08em] ${
-                  active ? "text-[#24332D]" : complete ? "text-[#547265]" : "text-[#8A9690]"
+                  !active && !complete ? "text-[#8A9690]" : ""
                 }`}
               >
                 {label}
@@ -80,7 +94,10 @@ export default function StepProgress({
               {steps[currentStep - 1]}
             </p>
           </div>
-          <span className="rounded-full border border-[#D6E0DB] bg-white/80 px-3 py-1.5 text-xs font-extrabold text-[#607069]">
+          <span
+            style={theme ? { backgroundColor: completeBg, borderColor: theme.border, color: completeText } : {}}
+            className="rounded-full border border-[#D6E0DB] bg-white/80 px-3 py-1.5 text-xs font-extrabold text-[#607069]"
+          >
             {completedSteps.length}/6 done
           </span>
         </div>
@@ -92,8 +109,15 @@ export default function StepProgress({
             return (
               <span
                 key={number}
+                style={
+                  active
+                    ? { backgroundColor: activeColor }
+                    : complete
+                      ? { backgroundColor: completeColor }
+                      : {}
+                }
                 className={`h-1.5 flex-1 rounded-full ${
-                  complete ? "bg-[#8EBEAA]" : active ? "bg-[#24332D]" : "bg-[#DFE5E1]"
+                  !active && !complete ? "bg-[#DFE5E1]" : ""
                 }`}
               />
             );

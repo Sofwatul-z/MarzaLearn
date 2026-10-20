@@ -19,6 +19,7 @@ import {
 import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import { getPjblChapter } from "../../data/pjblData";
+import { getChapterTheme } from "../../data/chapterThemes";
 import { useAuth } from "../../hooks/useAuth";
 import {
   getProjectSubmission,
@@ -34,6 +35,7 @@ export default function PjblWorkspace() {
   const { user, profile } = useAuth();
   const chapterId = Number(id) || 1;
   const pjbl = getPjblChapter(chapterId);
+  const theme = useMemo(() => getChapterTheme(chapterId), [chapterId]);
 
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("modeling"); // 'modeling' | 'script' | 'create' | 'submit'
@@ -141,7 +143,7 @@ export default function PjblWorkspace() {
     }
   }
 
-  if (loading) return <Loader label="Opening PjBL Project Workspace..." />;
+  if (loading) return <Loader label="Opening Project Workspace..." />;
 
   if (!missionComplete) {
     return (
@@ -154,7 +156,7 @@ export default function PjblWorkspace() {
           Complete the 6-Step Mission First
         </h1>
         <p className="mt-4 text-sm leading-relaxed text-[#617269]">
-          The Ultimate PjBL Video Project for Chapter {chapterId} ({pjbl?.title}) requires concepts, vocabulary, and speaking practice from all 6 Marzano steps. Finish your 6-step mission to unlock this workspace!
+          The Ultimate Project Video for Chapter {chapterId} ({pjbl?.title}) requires concepts, vocabulary, and speaking practice from all 6 Marzano steps. Finish your 6-step mission to unlock this workspace!
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Button variant="primary" size="lg" onClick={() => navigate(`/student/chapter/${chapterId}/session`)}>
@@ -171,7 +173,13 @@ export default function PjblWorkspace() {
   const isReviewed = existingSubmission?.status === "reviewed";
 
   return (
-    <div className="pb-16 pt-3">
+    <div className="relative pb-16 pt-3">
+      {/* Dynamic ambient page glow matching chapter theme */}
+      <div
+        style={{ backgroundColor: theme?.primary }}
+        className="pointer-events-none fixed inset-0 opacity-[0.05] blur-3xl -z-10"
+      />
+
       {/* Back button */}
       <button
         type="button"
@@ -182,14 +190,30 @@ export default function PjblWorkspace() {
       </button>
 
       {/* Hero Banner with joyful vibes */}
-      <section className="relative overflow-hidden rounded-[36px] bg-gradient-to-br from-[#24332D] via-[#2F443B] to-[#1E2B25] px-6 py-9 text-white shadow-[0_24px_60px_rgba(36,51,45,0.14)] sm:px-10 sm:py-11">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 left-1/4 h-64 w-64 rounded-full bg-amber-400/10 blur-3xl" />
+      <section
+        style={{ borderColor: theme?.borderSoft }}
+        className="relative overflow-hidden rounded-[36px] bg-gradient-to-br from-[#24332D] via-[#2F443B] to-[#1E2B25] px-6 py-9 text-white shadow-[0_24px_60px_rgba(36,51,45,0.14)] sm:px-10 sm:py-11 border"
+      >
+        <div
+          style={{ backgroundColor: theme?.primary }}
+          className="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full opacity-20 blur-3xl"
+        />
+        <div
+          style={{ backgroundColor: theme?.accent || "#FBBF24" }}
+          className="pointer-events-none absolute -bottom-20 left-1/4 h-64 w-64 rounded-full opacity-15 blur-3xl"
+        />
 
         <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-emerald-300 backdrop-blur-md">
-              <Sparkles size={12} className="text-yellow-300" /> Chapter {String(chapterId).padStart(2, "0")} · Ultimate PjBL
+            <span
+              style={{
+                backgroundColor: theme?.badgeBg,
+                borderColor: theme?.borderSoft,
+                color: theme?.badgeText,
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-[11px] font-black uppercase tracking-[0.14em]"
+            >
+              <Sparkles size={12} className="text-yellow-500" /> Chapter {String(chapterId).padStart(2, "0")} · Ultimate Project
             </span>
             <h1 className="mt-3.5 text-3xl font-black tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
               {pjbl.title}
@@ -214,7 +238,7 @@ export default function PjblWorkspace() {
               <div className="absolute inset-0 rounded-full bg-emerald-400/20 blur-xl" />
               <img
                 src={pjblMedalist}
-                alt="Ultimate PjBL"
+                alt="Ultimate Project"
                 className="w-48 xl:w-56 h-auto max-h-60 object-contain drop-shadow-[0_20px_45px_rgba(0,0,0,0.4)]"
               />
             </div>
@@ -273,9 +297,17 @@ export default function PjblWorkspace() {
               key={tab.key}
               type="button"
               onClick={() => setActiveTab(tab.key)}
+              style={
+                isActive
+                  ? {
+                      backgroundColor: theme?.primaryDark || "#24332D",
+                      color: "#FFFFFF",
+                    }
+                  : {}
+              }
               className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-black transition-all ${
                 isActive
-                  ? "bg-[#24332D] text-white shadow-md shadow-[#24332D]/15"
+                  ? "shadow-md shadow-[#24332D]/15"
                   : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >

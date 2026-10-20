@@ -22,7 +22,7 @@ export default function ChapterCard({ chapter, index, onEdit, onDelete }) {
                 6 Marzano Steps
               </span>
               <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-700">
-                PjBL Project
+               Project
               </span>
             </div>
 
@@ -63,7 +63,7 @@ export default function ChapterCard({ chapter, index, onEdit, onDelete }) {
             variant="secondary"
             size="md"
             onClick={() => navigate(`/teacher/chapters/${chapter.databaseId ?? chapter.id}`)}
-            className="group-hover:bg-[#24332D] group-hover:text-white transition-all"
+            className="group-hover:bg-[#24332D] group-hover:text-white hover:!bg-[#24332D] hover:!text-white transition-all"
           >
             Open Materials <ArrowRight size={15} />
           </Button>
