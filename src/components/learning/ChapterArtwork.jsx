@@ -7,12 +7,18 @@ import {
   TimerReset,
 } from "lucide-react";
 
-const chapterIcons = {
-  1: Activity,
-  2: TimerReset,
-  3: ListChecks,
-  4: MessageSquareQuote,
-  5: BookOpenCheck,
+import ch1Hero from "../../assets/chapter 1/step 1/assets/card-character.png";
+import ch2Hero from "../../assets/chapter 2/step 1/assets/card-friends-group.png";
+import ch3Hero from "../../assets/chapter 3/step 1/assets/card-healthy-girl.png";
+import ch4Hero from "../../assets/chapter 1/step 6/assets/card-medalist.png";
+import ch5Hero from "../../assets/chapter 1/step 4/assets/card-handshake-pair.png";
+
+const chapterImages = {
+  1: ch1Hero,
+  2: ch2Hero,
+  3: ch3Hero,
+  4: ch4Hero,
+  5: ch5Hero,
 };
 
 const words = {
@@ -24,11 +30,11 @@ const words = {
 };
 
 export default function ChapterArtwork({ chapterId, title }) {
-  const Icon = chapterIcons[chapterId] ?? BookOpenCheck;
+  const heroImage = chapterImages[chapterId] ?? ch1Hero;
   const orbitWords = words[chapterId] ?? ["learn", "practice", "grow"];
 
   return (
-    <div className="relative mx-auto h-[300px] w-full max-w-[470px] sm:h-[350px]">
+    <div className="relative mx-auto h-[320px] w-full max-w-[470px] sm:h-[370px]">
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 44, ease: "linear", repeat: Infinity }}
@@ -40,31 +46,34 @@ export default function ChapterArtwork({ chapterId, title }) {
         className="absolute left-1/2 top-1/2 h-[190px] w-[190px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#EBD6C9] sm:h-[220px] sm:w-[220px]"
       />
 
+      {/* Floating Center Artwork */}
       <motion.div
-        animate={{ y: [0, -7, 0], rotate: [0, 1.2, 0] }}
-        transition={{ duration: 5.8, ease: "easeInOut", repeat: Infinity }}
-        className="absolute left-1/2 top-1/2 grid h-40 w-40 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[42%_58%_56%_44%/46%_43%_57%_54%] bg-[#CFE8DD] shadow-[0_26px_70px_rgba(72,104,90,0.16)] sm:h-48 sm:w-48"
+        animate={{ y: [0, -8, 0], rotate: [0, 1.2, 0] }}
+        transition={{ duration: 5.2, ease: "easeInOut", repeat: Infinity }}
+        className="absolute left-1/2 top-1/2 flex flex-col items-center justify-center -translate-x-1/2 -translate-y-1/2 z-10"
       >
-        <div className="text-center">
-          <Icon size={38} strokeWidth={1.8} className="mx-auto text-[#24332D]" />
-          <span className="mt-3 block text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#5A7165]">
-            Chapter {String(chapterId).padStart(2, "0")}
-          </span>
+        <div className="relative">
+          <div className="absolute inset-0 rounded-full bg-[#CFE8DD]/60 blur-xl -z-10" />
+          <img
+            src={heroImage}
+            alt={title}
+            className="w-40 sm:w-48 h-auto max-h-56 object-contain drop-shadow-[0_22px_45px_rgba(36,51,45,0.22)] select-none pointer-events-none"
+          />
         </div>
       </motion.div>
 
       {orbitWords.map((word, index) => {
         const positions = [
-          "left-[2%] top-[18%]",
-          "right-[2%] top-[22%]",
-          "bottom-[9%] left-1/2 -translate-x-1/2",
+          "left-[1%] top-[18%]",
+          "right-[1%] top-[20%]",
+          "bottom-[8%] left-1/2 -translate-x-1/2",
         ];
         return (
           <motion.span
             key={word}
             animate={{ y: [0, index % 2 === 0 ? -5 : 5, 0] }}
             transition={{ duration: 4.5 + index * 0.5, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 }}
-            className={`absolute ${positions[index]} rounded-full border border-[#DDE5E0] bg-white/80 px-3 py-2 text-[10px] font-extrabold uppercase tracking-[0.1em] text-[#607068] shadow-[0_10px_26px_rgba(36,51,45,0.05)] backdrop-blur-sm`}
+            className={`absolute ${positions[index]} z-20 rounded-full border border-[#DDE5E0] bg-white/90 px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.1em] text-[#55675E] shadow-[0_10px_26px_rgba(36,51,45,0.06)] backdrop-blur-sm select-none pointer-events-none`}
           >
             {word}
           </motion.span>

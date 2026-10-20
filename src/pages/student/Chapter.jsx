@@ -19,10 +19,13 @@ import ChapterArtwork from "../../components/learning/ChapterArtwork";
 import GrammarExplorer from "../../components/learning/GrammarExplorer";
 import LearnProgress from "../../components/learning/LearnProgress";
 import { getChapterContent } from "../../data/chapters";
+import { getStepAssets } from "../../data/stepAssets";
 import { getChapterById } from "../../services/chapter";
 import { getStudentProgressRows } from "../../services/progress";
 import { useAuth } from "../../hooks/useAuth";
 import SourceNote from "../../components/common/SourceNote";
+
+import pjblMedal from "../../assets/chapter 1/step 6/assets/card-medalist.png";
 
 const stageOrder = ["introduction", "listen", "grammar"];
 
@@ -131,9 +134,11 @@ function ListenSection({ chapter }) {
 }
 
 function MissionHandoff({ chapter, onStart }) {
+  const assets = getStepAssets(chapter.id, 1);
   return (
-    <div className="overflow-hidden rounded-[34px] bg-[#24332D] text-white shadow-[0_28px_75px_rgba(36,51,45,0.15)]">
-      <div className="grid gap-8 p-7 sm:p-9 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:p-10">
+    <div className="overflow-hidden rounded-[34px] bg-[#24332D] text-white shadow-[0_28px_75px_rgba(36,51,45,0.15)] relative">
+      <div className="pointer-events-none absolute -right-10 -bottom-10 h-56 w-56 rounded-full bg-[#CFE8DD]/10 blur-2xl" />
+      <div className="grid gap-8 p-7 sm:p-9 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center lg:p-10 relative z-10">
         <div>
           <span className="inline-flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#B9D8CA]">
             <CheckCircle2 size={14} /> Learn section complete
@@ -150,7 +155,22 @@ function MissionHandoff({ chapter, onStart }) {
             <span>Autosave-ready flow</span>
           </div>
         </div>
-        <Button variant="pastel" size="lg" onClick={onStart} className="w-full lg:w-auto">
+
+        {assets?.leftTop && (
+          <motion.div
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+            className="hidden lg:flex justify-center shrink-0 select-none pointer-events-none"
+          >
+            <img
+              src={assets.leftTop}
+              alt=""
+              className="h-36 w-auto object-contain drop-shadow-[0_16px_30px_rgba(0,0,0,0.35)]"
+            />
+          </motion.div>
+        )}
+
+        <Button variant="pastel" size="lg" onClick={onStart} className="w-full lg:w-auto shrink-0">
           Start 6-Step Mission <ArrowRight size={17} />
         </Button>
       </div>
@@ -167,7 +187,7 @@ function PjblHandoff({ chapter, onStartProject, isComplete }) {
           : "border-[#E2E8E4] bg-[#F7F9F8] opacity-85"
       }`}
     >
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center">
         <div>
           <span
             className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] ${
@@ -195,8 +215,23 @@ function PjblHandoff({ chapter, onStartProject, isComplete }) {
               : "This video project is locked. You must complete all 6 steps of the Marzano Learning Mission (Provide, Restate, Visualize, Engage, Discuss, Games) to unlock this project."}
           </p>
         </div>
+
+        {isComplete && (
+          <motion.div
+            animate={{ y: [0, -6, 0] }}
+            transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut" }}
+            className="hidden lg:flex justify-center shrink-0 select-none pointer-events-none"
+          >
+            <img
+              src={pjblMedal}
+              alt=""
+              className="h-32 w-auto object-contain drop-shadow-md"
+            />
+          </motion.div>
+        )}
+
         {isComplete ? (
-          <Button variant="primary" size="lg" onClick={onStartProject} className="w-full whitespace-nowrap lg:w-auto">
+          <Button variant="primary" size="lg" onClick={onStartProject} className="w-full whitespace-nowrap lg:w-auto shrink-0">
             Open PjBL Project <ArrowRight size={17} />
           </Button>
         ) : (
@@ -204,7 +239,7 @@ function PjblHandoff({ chapter, onStartProject, isComplete }) {
             variant="ghost"
             size="lg"
             disabled
-            className="w-full whitespace-nowrap border border-[#DDE4DF] bg-white/70 text-[#7A8881] cursor-not-allowed opacity-75 lg:w-auto"
+            className="w-full whitespace-nowrap border border-[#DDE4DF] bg-white/70 text-[#7A8881] cursor-not-allowed opacity-75 lg:w-auto shrink-0"
           >
             <Lock size={15} /> Locked (Finish 6 Steps First)
           </Button>

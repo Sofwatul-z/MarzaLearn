@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import GradientBlob from "../components/ui/GradientBlob";
+import TeacherHeader from "../components/teacher/TeacherHeader";
 
 export default function TeacherLayout() {
   return (
@@ -13,24 +14,24 @@ export default function TeacherLayout() {
 
       <GradientBlob
         tone="mint"
-        size={380}
-        className="-right-40 top-10 -z-20"
-        opacity={0.34}
+        size={430}
+        className="-right-44 top-16 -z-20 sm:-right-28"
+        opacity={0.4}
       />
       <GradientBlob
         tone="peach"
-        size={360}
-        className="-left-52 top-[46%] -z-20"
-        opacity={0.25}
-        delay={1}
+        size={330}
+        className="-left-48 bottom-8 -z-20"
+        opacity={0.28}
+        delay={1.5}
       />
 
-      <main
-        id="teacher-content"
-        className="ml-page-container relative z-10 py-5 sm:py-7 lg:py-9"
-      >
-        <Outlet />
-      </main>
+      <div className="ml-page-container relative z-10">
+        <TeacherHeader />
+        <main id="teacher-content" className="pb-12 sm:pb-16 lg:pb-20">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

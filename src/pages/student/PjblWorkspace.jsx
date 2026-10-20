@@ -26,6 +26,8 @@ import {
   submitStudentProject,
 } from "../../services/progress";
 
+import pjblMedalist from "../../assets/chapter 1/step 6/assets/card-medalist.png";
+
 export default function PjblWorkspace() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -184,22 +186,39 @@ export default function PjblWorkspace() {
         <div className="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-20 left-1/4 h-64 w-64 rounded-full bg-amber-400/10 blur-3xl" />
 
-        <div className="relative max-w-3xl">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-emerald-300 backdrop-blur-md">
-            <Sparkles size={12} className="text-yellow-300" /> Chapter {String(chapterId).padStart(2, "0")} · Ultimate PjBL
-          </span>
-          <h1 className="mt-3.5 text-3xl font-black tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
-            {pjbl.title}
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
-            {pjbl.mission}
-          </p>
+        <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="max-w-2xl">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-emerald-300 backdrop-blur-md">
+              <Sparkles size={12} className="text-yellow-300" /> Chapter {String(chapterId).padStart(2, "0")} · Ultimate PjBL
+            </span>
+            <h1 className="mt-3.5 text-3xl font-black tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
+              {pjbl.title}
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
+              {pjbl.mission}
+            </p>
 
-          <div className="mt-6 flex flex-wrap gap-4 text-xs font-bold text-white/70">
-            <span className="rounded-full bg-white/10 px-3 py-1">⏱ Duration: {pjbl.duration}</span>
-            <span className="rounded-full bg-white/10 px-3 py-1">🎬 Tools: Canva, CapCut, YouTube</span>
-            <span className="rounded-full bg-white/10 px-3 py-1">🏷 Class: {studentClass}</span>
+            <div className="mt-6 flex flex-wrap gap-4 text-xs font-bold text-white/70">
+              <span className="rounded-full bg-white/10 px-3 py-1">⏱ Duration: {pjbl.duration}</span>
+              <span className="rounded-full bg-white/10 px-3 py-1">🎬 Tools: Canva, CapCut, YouTube</span>
+              <span className="rounded-full bg-white/10 px-3 py-1">🏷 Class: {studentClass}</span>
+            </div>
           </div>
+
+          <motion.div
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+            className="hidden lg:flex flex-col items-center justify-center shrink-0 select-none pointer-events-none"
+          >
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-emerald-400/20 blur-xl" />
+              <img
+                src={pjblMedalist}
+                alt="Ultimate PjBL"
+                className="w-48 xl:w-56 h-auto max-h-60 object-contain drop-shadow-[0_20px_45px_rgba(0,0,0,0.4)]"
+              />
+            </div>
+          </motion.div>
         </div>
       </section>
 

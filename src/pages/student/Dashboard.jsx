@@ -14,6 +14,10 @@ import ChapterPath from "../../components/student/ChapterPath";
 import useStudentJourney from "../../hooks/useStudentJourney";
 import { useAuth } from "../../hooks/useAuth";
 
+import heroCharacter from "../../assets/chapter 1/step 1/assets/card-character.png";
+import heroMedal from "../../assets/chapter 1/step 6/assets/decoration-gold-medal.png";
+import heroRacket from "../../assets/chapter 1/step 1/assets/decoration-racket-shuttle.png";
+
 const motionWords = ["describe", "retell", "guide", "argue", "imagine"];
 
 function LearningOrbit() {
@@ -32,28 +36,47 @@ function LearningOrbit() {
         aria-hidden="true"
       />
 
+      {/* Orbiting Medal decoration */}
+      <motion.img
+        src={heroMedal}
+        alt=""
+        animate={{ y: [0, -8, 0], rotate: [0, 5, 0] }}
+        transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-2 right-12 w-16 h-16 object-contain drop-shadow-md select-none pointer-events-none z-20"
+      />
+
+      {/* Orbiting Racket decoration */}
+      <motion.img
+        src={heroRacket}
+        alt=""
+        animate={{ y: [0, 8, 0], rotate: [0, -6, 0] }}
+        transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+        className="absolute bottom-4 left-6 w-16 h-16 object-contain drop-shadow-md select-none pointer-events-none z-20"
+      />
+
+      {/* Central Character & Orb */}
       <motion.div
-        animate={{ y: [0, -7, 0] }}
-        transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute left-1/2 top-1/2 grid h-40 w-40 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[42%_58%_55%_45%/45%_42%_58%_55%] bg-[#CFE8DD] shadow-[0_28px_70px_rgba(76,112,95,0.15)] sm:h-48 sm:w-48"
+        animate={{ y: [0, -8, 0] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute left-1/2 top-1/2 flex flex-col items-center justify-center -translate-x-1/2 -translate-y-1/2 z-10"
       >
-        <div className="text-center">
-          <p className="text-5xl font-extrabold tracking-[-0.085em] text-[#24332D] sm:text-6xl">
-            Aa
-          </p>
-          <p className="mt-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#61786D]">
-            English lab
-          </p>
+        <div className="relative">
+          <div className="absolute inset-0 rounded-full bg-[#CFE8DD]/60 blur-xl -z-10" />
+          <img
+            src={heroCharacter}
+            alt="MarzaLearn Student Character"
+            className="w-40 sm:w-48 h-auto object-contain drop-shadow-[0_20px_35px_rgba(36,51,45,0.20)] select-none pointer-events-none"
+          />
         </div>
       </motion.div>
 
       {motionWords.map((word, index) => {
         const positions = [
-          "left-[3%] top-[18%]",
-          "right-[1%] top-[15%]",
-          "left-[7%] bottom-[14%]",
-          "right-[3%] bottom-[18%]",
-          "left-1/2 top-[3%] -translate-x-1/2",
+          "left-[1%] top-[24%]",
+          "right-[1%] top-[22%]",
+          "left-[4%] bottom-[12%]",
+          "right-[4%] bottom-[16%]",
+          "left-1/2 top-[1%] -translate-x-1/2",
         ];
 
         return (
@@ -66,7 +89,7 @@ function LearningOrbit() {
               ease: "easeInOut",
               delay: index * 0.22,
             }}
-            className={`absolute ${positions[index]} rounded-full border border-[#DDE5E0] bg-white/[0.78] px-3 py-2 text-[11px] font-extrabold tracking-[-0.01em] text-[#52625B] shadow-[0_10px_28px_rgba(36,51,45,0.06)] backdrop-blur-sm`}
+            className={`absolute ${positions[index]} z-20 rounded-full border border-[#DDE5E0] bg-white/[0.88] px-3 py-1.5 text-[11px] font-extrabold tracking-[-0.01em] text-[#52625B] shadow-[0_10px_28px_rgba(36,51,45,0.08)] backdrop-blur-sm select-none pointer-events-none`}
           >
             {word}
           </motion.span>

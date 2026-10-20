@@ -93,6 +93,8 @@ function SaveIndicator({ state }) {
 }
 
 function MissionIntro({ chapter, recovered, onStart, onBack }) {
+  const introAsset = getStepAssets(chapter?.id, 1);
+
   return (
     <div className="pb-8">
       <button
@@ -107,7 +109,7 @@ function MissionIntro({ chapter, recovered, onStart, onBack }) {
         <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-[#CFE8DD]/15 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-[#F4D7C5]/10 blur-3xl" />
 
-        <div className="relative grid gap-9 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
+        <div className="relative grid gap-9 lg:grid-cols-[minmax(0,1fr)_auto_260px] lg:items-center">
           <div>
             <span className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#B9D8CA]">
               Chapter {String(chapter.id).padStart(2, "0")} · 6-Step Mission
@@ -119,6 +121,20 @@ function MissionIntro({ chapter, recovered, onStart, onBack }) {
               Move from vocabulary discovery to your own sentences, visuals, matching, discussion, and a final game. Each next step opens only after the current activity is complete.
             </p>
           </div>
+
+          {introAsset?.leftTop && (
+            <motion.div
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
+              className="hidden lg:flex justify-center shrink-0"
+            >
+              <img
+                src={introAsset.leftTop}
+                alt=""
+                className="h-44 w-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.35)]"
+              />
+            </motion.div>
+          )}
 
           <div className="rounded-[24px] border border-white/10 bg-white/[0.07] p-5">
             <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-white/45">Session rule</p>
@@ -345,25 +361,28 @@ export default function LearningFlow() {
 
   return (
     <div className="relative max-w-5xl mx-auto pb-8">
-      {/* LEFT FLANK (Blue Circles) - Positioned in the outer left gutter */}
+      {/* LEFT FLANK (Blue Circles) - Positioned in the outer left gutter (Larger size with gentle floating motion) */}
       {(stepAssets?.leftTop || stepAssets?.leftBottom) && (
         <aside
-          className="hidden xl:flex flex-col items-center justify-between absolute right-[calc(100%+1.5rem)] 2xl:right-[calc(100%+2.5rem)] top-4 bottom-28 w-36 2xl:w-44 pointer-events-none select-none z-10"
+          className="hidden xl:flex flex-col items-center justify-between absolute right-[calc(100%+1.75rem)] 2xl:right-[calc(100%+3rem)] top-2 bottom-24 w-52 2xl:w-64 pointer-events-none select-none z-10"
           aria-hidden="true"
         >
           {/* Blue Circle 1 (Top Left): Level with Header & Step Progress */}
           {stepAssets.leftTop && (
             <motion.div
               key={`lt-${chapter.id}-${currentStep}`}
-              initial={{ opacity: 0, scale: 0.85, x: -12 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              transition={{ duration: 0.35 }}
+              initial={{ opacity: 0, scale: 0.85, x: -16 }}
+              animate={{ opacity: 1, scale: 1, x: 0, y: [0, -10, 0] }}
+              transition={{
+                duration: 0.35,
+                y: { duration: 4.6, repeat: Infinity, ease: "easeInOut" },
+              }}
               className="flex flex-col items-center"
             >
               <img
                 src={stepAssets.leftTop}
                 alt=""
-                className="w-32 2xl:w-40 max-h-48 object-contain drop-shadow-[0_12px_24px_rgba(36,51,45,0.14)]"
+                className="w-44 2xl:w-56 max-h-64 2xl:max-h-72 object-contain drop-shadow-[0_18px_36px_rgba(36,51,45,0.18)]"
                 loading="lazy"
               />
             </motion.div>
@@ -373,15 +392,19 @@ export default function LearningFlow() {
           {stepAssets.leftBottom && (
             <motion.div
               key={`lb-${chapter.id}-${currentStep}`}
-              initial={{ opacity: 0, scale: 0.85, x: -12 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              transition={{ duration: 0.35, delay: 0.1 }}
+              initial={{ opacity: 0, scale: 0.85, x: -16 }}
+              animate={{ opacity: 1, scale: 1, x: 0, y: [0, -8, 0] }}
+              transition={{
+                duration: 0.35,
+                delay: 0.1,
+                y: { duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.5 },
+              }}
               className="flex flex-col items-center mt-auto pt-16"
             >
               <img
                 src={stepAssets.leftBottom}
                 alt=""
-                className="w-28 2xl:w-36 max-h-40 object-contain drop-shadow-[0_10px_20px_rgba(36,51,45,0.12)]"
+                className="w-38 2xl:w-50 max-h-56 2xl:max-h-64 object-contain drop-shadow-[0_14px_28px_rgba(36,51,45,0.15)]"
                 loading="lazy"
               />
             </motion.div>
@@ -389,25 +412,28 @@ export default function LearningFlow() {
         </aside>
       )}
 
-      {/* RIGHT FLANK (Red Circles) - Positioned in the outer right gutter */}
+      {/* RIGHT FLANK (Red Circles) - Positioned in the outer right gutter (Larger size with gentle floating motion) */}
       {(stepAssets?.rightTop || stepAssets?.rightBottom) && (
         <aside
-          className="hidden xl:flex flex-col items-center justify-between absolute left-[calc(100%+1.5rem)] 2xl:left-[calc(100%+2.5rem)] top-4 bottom-28 w-36 2xl:w-44 pointer-events-none select-none z-10"
+          className="hidden xl:flex flex-col items-center justify-between absolute left-[calc(100%+1.75rem)] 2xl:left-[calc(100%+3rem)] top-2 bottom-24 w-52 2xl:w-64 pointer-events-none select-none z-10"
           aria-hidden="true"
         >
           {/* Red Circle 1 (Top Right): Level with Header & Step Progress */}
           {stepAssets.rightTop && (
             <motion.div
               key={`rt-${chapter.id}-${currentStep}`}
-              initial={{ opacity: 0, scale: 0.85, x: 12 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              transition={{ duration: 0.35 }}
+              initial={{ opacity: 0, scale: 0.85, x: 16 }}
+              animate={{ opacity: 1, scale: 1, x: 0, y: [0, -10, 0] }}
+              transition={{
+                duration: 0.35,
+                y: { duration: 5.0, repeat: Infinity, ease: "easeInOut", delay: 0.2 },
+              }}
               className="flex flex-col items-center"
             >
               <img
                 src={stepAssets.rightTop}
                 alt=""
-                className="w-32 2xl:w-40 max-h-48 object-contain drop-shadow-[0_12px_24px_rgba(36,51,45,0.14)]"
+                className="w-44 2xl:w-56 max-h-64 2xl:max-h-72 object-contain drop-shadow-[0_18px_36px_rgba(36,51,45,0.18)]"
                 loading="lazy"
               />
             </motion.div>
@@ -417,15 +443,19 @@ export default function LearningFlow() {
           {stepAssets.rightBottom && (
             <motion.div
               key={`rb-${chapter.id}-${currentStep}`}
-              initial={{ opacity: 0, scale: 0.85, x: 12 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              transition={{ duration: 0.35, delay: 0.1 }}
+              initial={{ opacity: 0, scale: 0.85, x: 16 }}
+              animate={{ opacity: 1, scale: 1, x: 0, y: [0, -8, 0] }}
+              transition={{
+                duration: 0.35,
+                delay: 0.1,
+                y: { duration: 5.4, repeat: Infinity, ease: "easeInOut", delay: 0.7 },
+              }}
               className="flex flex-col items-center mt-auto pt-16"
             >
               <img
                 src={stepAssets.rightBottom}
                 alt=""
-                className="w-28 2xl:w-36 max-h-40 object-contain drop-shadow-[0_10px_20px_rgba(36,51,45,0.12)]"
+                className="w-38 2xl:w-50 max-h-56 2xl:max-h-64 object-contain drop-shadow-[0_14px_28px_rgba(36,51,45,0.15)]"
                 loading="lazy"
               />
             </motion.div>

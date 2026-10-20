@@ -111,73 +111,81 @@ export default function ChapterManagement() {
     await loadChapters();
   }
 
+  const [selectedSemester, setSelectedSemester] = useState(1);
+
   if (loading) {
     return <div className="p-10 text-sm text-slate-500">Loading chapters...</div>;
   }
 
-  const semester1 = chapters.filter((c) => c.semester === 1).sort((a, b) => (a.chapter_number ?? a.id) - (b.chapter_number ?? b.id));
-  const semester2 = chapters.filter((c) => c.semester === 2).sort((a, b) => (a.chapter_number ?? a.id) - (b.chapter_number ?? b.id));
+  const visibleChapters = chapters
+    .filter((c) => Number(c.semester) === Number(selectedSemester))
+    .sort((a, b) => (a.chapter_number ?? a.id) - (b.chapter_number ?? b.id));
 
   return (
-    <section className="min-h-screen bg-[#FBFCF8] py-10">
-      <div className="max-w-5xl mx-auto px-8">
-        
-        <button
-          type="button"
-          onClick={() => window.history.back()}
-          className="mb-8 inline-flex items-center gap-2 text-xs font-extrabold text-[#6B7972] transition-colors hover:text-[#24332D]"
-        >
-          &larr; Back to Dashboard
-        </button>
+    <div>
+      <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+        <div>
+          <span className="ml-eyebrow">Curriculum library</span>
+          <h1 className="mt-3 text-4xl sm:text-5xl font-extrabold tracking-[-0.055em] text-[#24332D]">
+            Chapter Library
+          </h1>
+          <p className="mt-3 max-w-lg text-sm sm:text-base leading-7 text-[#67776F]">
+            Organize learning chapters, review the 6 Marzano steps, and manage classroom materials.
+          </p>
+        </div>
 
-        <div className="mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.2em] font-semibold text-slate-400">Teacher Workspace</p>
-            <h1 className="mt-3 text-5xl md:text-[64px] leading-[0.95] tracking-[-0.05em] font-bold text-[#23332e]">
-              Chapter Library
-            </h1>
-            <p className="mt-5 max-w-lg text-sm md:text-base text-slate-500">
-              Organize learning chapters and manage classroom materials.
-            </p>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Semester Switcher Pill (Matching Student ChapterPath) */}
+          <div className="inline-flex rounded-full border border-[#DCE4DF] bg-white/80 p-1 shadow-[0_8px_24px_rgba(36,51,45,0.04)]">
+            {[1, 2].map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setSelectedSemester(value)}
+                className={`rounded-full px-4 py-2 text-xs font-extrabold transition-all sm:px-5 ${
+                  selectedSemester === value
+                    ? "bg-[#24332D] text-white shadow-[0_6px_16px_rgba(36,51,45,0.14)]"
+                    : "text-[#6C7973] hover:bg-[#F4F7F5] hover:text-[#24332D]"
+                }`}
+              >
+                Semester {value}
+              </button>
+            ))}
           </div>
 
           <Button variant="primary" onClick={() => setIsModalOpen(true)}>
             <Plus size={16} /> New Chapter
           </Button>
         </div>
+      </div>
 
-        {error && (
-          <div className="mb-8 rounded-xl bg-red-50 p-4 text-sm text-red-600">{error}</div>
-        )}
-
-        <div className="space-y-12">
-          {semester1.length > 0 && (
-            <div>
-              <h2 className="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-4 ml-3">Semester 1</h2>
-              <div className="flex flex-col gap-2">
-                {semester1.map((chapter, index) => (
-                  <ChapterCard key={chapter.databaseId ?? chapter.id} chapter={chapter} index={index} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {semester2.length > 0 && (
-            <div>
-              <h2 className="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-4 ml-3">Semester 2</h2>
-              <div className="flex flex-col gap-2">
-                {semester2.map((chapter, index) => (
-                  <ChapterCard key={chapter.databaseId ?? chapter.id} chapter={chapter} index={index} />
-                ))}
-              </div>
-            </div>
-          )}
+      {error && (
+        <div className="mb-8 rounded-2xl border border-[#E9C8C3] bg-[#FAECE9] p-4 text-sm font-semibold text-[#944A40]">
+          {error}
         </div>
+      )}
+
+      {/* Chapters list rendered in unified card style */}
+      <div className="space-y-4">
+        {visibleChapters.length > 0 ? (
+          visibleChapters.map((chapter, index) => (
+            <ChapterCard
+              key={chapter.databaseId ?? chapter.id}
+              chapter={chapter}
+              index={index}
+            />
+          ))
+        ) : (
+          <div className="rounded-[28px] border border-dashed border-[#DDE5E0] bg-white/50 p-12 text-center">
+            <p className="text-base font-extrabold text-[#24332D]">No chapters in Semester {selectedSemester} yet</p>
+            <p className="mt-1 text-xs text-[#7B8881]">Click &ldquo;New Chapter&rdquo; above to add a learning chapter.</p>
+          </div>
+        )}
       </div>
 
       {isModalOpen && (
         <ChapterModal existingChapters={chapters} onClose={() => setIsModalOpen(false)} onSave={handleCreate} />
       )}
-    </section>
+    </div>
   );
 }
