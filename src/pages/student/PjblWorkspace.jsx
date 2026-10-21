@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -24,6 +24,7 @@ import { useAuth } from "../../hooks/useAuth";
 import {
   getProjectSubmission,
   getStudentProgressRows,
+  getStudentLearningSessions,
   submitStudentProject,
 } from "../../services/progress";
 
@@ -33,7 +34,8 @@ export default function PjblWorkspace() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const chapterId = Number(id) || 1;
+  const rawId = Number(id) || 1;
+  const chapterId = rawId > 15 ? rawId - 15 : rawId;
   const pjbl = getPjblChapter(chapterId);
   const theme = useMemo(() => getChapterTheme(chapterId), [chapterId]);
 
@@ -51,11 +53,15 @@ export default function PjblWorkspace() {
   useEffect(() => {
     let active = true;
     async function loadData() {
-      if (!user?.id) return;
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
       try {
-        const [sub, progressRows] = await Promise.all([
+        const [sub, progressRows, sessions] = await Promise.all([
           getProjectSubmission(user.id, chapterId),
           getStudentProgressRows(user.id),
+          getStudentLearningSessions(user.id),
         ]);
 
         if (active && sub) {
@@ -67,16 +73,88 @@ export default function PjblWorkspace() {
           }
         }
 
-        if (active && progressRows) {
+        let isDone = false;
+
+        // 1. Check sessions (cloud & local)
+        if (sessions && Array.isArray(sessions)) {
+          const s = sessions.find(
+            (item) =>
+              Number(item.chapter_id) === Number(chapterId) ||
+              Number(item.chapter_id) === Number(rawId) ||
+              Number(item.chapter_id) === Number(chapterId) + 15
+          );
+          if (s) {
+            if (s.status === "completed" || Number(s.current_step) >= 6) {
+              isDone = true;
+            }
+          }
+        }
+
+        // 2. Check student_progress rows
+        if (!isDone && progressRows && Array.isArray(progressRows)) {
           const row = progressRows.find(
-            (r) => Number(r.chapter_id) === Number(chapterId) || Number(r.chapter_id) === 15 + Number(chapterId)
+            (r) =>
+              Number(r.chapter_id) === Number(chapterId) ||
+              Number(r.chapter_id) === Number(rawId) ||
+              Number(r.chapter_id) === Number(chapterId) + 15 ||
+              Number(r.chapter_id) === Number(chapterId) - 15
           );
           if (row) {
-            const done =
-              row.percentage >= 100 ||
-              (row.provide && row.restate && row.visualize && row.engage && row.discuss && row.play);
-            setMissionComplete(Boolean(done));
+            let stepCount = 0;
+            if (row.provide) stepCount++;
+            if (row.restate) stepCount++;
+            if (row.visualize) stepCount++;
+            if (row.engage) stepCount++;
+            if (row.discuss) stepCount++;
+            if (row.play) stepCount++;
+
+            if (
+              Number(row.percentage) >= 100 ||
+              Number(row.steps_completed) >= 6 ||
+              stepCount >= 6 ||
+              (row.provide && row.restate && row.visualize && row.engage && row.discuss && row.play)
+            ) {
+              isDone = true;
+            }
           }
+        }
+
+        // 3. Check direct localStorage session fallback
+        if (!isDone) {
+          try {
+            const keys = [
+              `marzalearn-session-v1:${user.id}:${chapterId}`,
+              `marzalearn-session:${user.id}:${chapterId}`,
+              `marzalearn-session-v1:${user.id}:${rawId}`,
+              `marzalearn-session:${user.id}:${rawId}`,
+            ];
+            for (const k of keys) {
+              const raw = localStorage.getItem(k);
+              if (raw) {
+                const s = JSON.parse(raw);
+                if (
+                  s?.status === "completed" ||
+                  (Array.isArray(s?.completedSteps) && s.completedSteps.length >= 6)
+                ) {
+                  isDone = true;
+                  break;
+                }
+              }
+            }
+          } catch (e) {}
+        }
+
+        // 4. Verify teacher has not reset this student's progress
+        try {
+          const overrides = JSON.parse(localStorage.getItem("marzalearn-reset-overrides") || "{}");
+          const studentOverrides = overrides[user.id] || {};
+          if (studentOverrides["all"] || studentOverrides[chapterId] || studentOverrides[chapterId + 15]) {
+            isDone = false;
+          }
+        } catch (e) {}
+
+        if (active) {
+          setMissionComplete(Boolean(isDone));
         }
       } catch (e) {
         console.warn("Could not load PjBL prerequisites or submission:", e);
@@ -88,7 +166,7 @@ export default function PjblWorkspace() {
     return () => {
       active = false;
     };
-  }, [user?.id, chapterId]);
+  }, [user?.id, chapterId, rawId]);
 
   const studentName = profile?.full_name || "Student";
   const studentClass = profile?.class_name || "XC";

@@ -98,9 +98,9 @@ export default function VisualizeStep({
           className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed opacity-95"
         >
           <li>1. Select each word prompt using the pill buttons below (e.g. <em>{content.prompts[0]}</em>).</li>
-          <li>2. Create your visual: either <strong>draw directly</strong> with the digital canvas brush and shapes, OR <strong>upload an image</strong> from your device.</li>
+          <li>2. Create a visual that you feel <strong>represents</strong> the words below: either draw directly using brushes and shapes on a digital canvas, OR <strong>upload an image</strong> from your device.</li>
           <li>3. Click the <strong>Save Visual</strong> button inside the canvas card to save your work.</li>
-          <li>4. Save artwork for all {content.prompts.length} words ({savedCount}/{content.prompts.length} saved) to unlock the next step!</li>
+          <li>4. Save artwork for all {content.prompts.length} words to unlock the next step!</li>
         </ol>
       </div>
 

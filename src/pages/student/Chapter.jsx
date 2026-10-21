@@ -370,15 +370,53 @@ export default function Chapter() {
     async function checkMission() {
       if (!user?.id || !id) return;
       try {
+        const cNum = Number(id);
         const rows = await getStudentProgressRows(user.id);
         const row = rows.find(
-          (r) => Number(r.chapter_id) === Number(id) || Number(r.chapter_id) === 15 + Number(id)
+          (r) =>
+            Number(r.chapter_id) === cNum ||
+            Number(r.chapter_id) === 15 + cNum ||
+            Number(r.chapter_id) === cNum - 15
         );
         if (mounted) {
-          const done =
+          let done =
             row &&
             (Number(row.percentage) >= 100 ||
+              Number(row.steps_completed) >= 6 ||
               (row.provide && row.restate && row.visualize && row.engage && row.discuss && row.play));
+
+          if (!done) {
+            const keys = [
+              `marzalearn-session-v1:${user.id}:${cNum}`,
+              `marzalearn-session:${user.id}:${cNum}`,
+              `marzalearn-session-v1:${user.id}:${cNum + 15}`,
+              `marzalearn-session:${user.id}:${cNum + 15}`,
+            ];
+            for (const k of keys) {
+              const raw = localStorage.getItem(k);
+              if (raw) {
+                try {
+                  const s = JSON.parse(raw);
+                  if (
+                    s?.status === "completed" ||
+                    (Array.isArray(s?.completedSteps) && s.completedSteps.length >= 6)
+                  ) {
+                    done = true;
+                    break;
+                  }
+                } catch (err) {}
+              }
+            }
+          }
+
+          try {
+            const overrides = JSON.parse(localStorage.getItem("marzalearn-reset-overrides") || "{}");
+            const studentOverrides = overrides[user.id] || {};
+            if (studentOverrides["all"] || studentOverrides[cNum] || studentOverrides[cNum + 15]) {
+              done = false;
+            }
+          } catch (err) {}
+
           setMissionComplete(Boolean(done));
         }
       } catch (e) {}

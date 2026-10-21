@@ -68,7 +68,7 @@ export default function RestateStep({ content, value, onChange, theme }) {
           <li>1. Read each vocabulary word prompt on the left.</li>
           <li>2. In the text area, write an original sentence in the <strong>Simple Present Tense</strong> using the target word. <em>(Do not copy directly from the dictionary!)</em></li>
           <li>3. <strong>Challenge:</strong> Try including descriptive adverbs like <em>really, very, extremely,</em> or <em>quite</em> to enhance your writing.</li>
-          <li>4. Complete all {content.prompts.length} sentences ({completed}/{content.prompts.length} completed) to unlock the next step!</li>
+          <li>4. Complete all {content.prompts.length} sentences to unlock the next step!</li>
         </ol>
       </div>
 

@@ -6,7 +6,7 @@ const chapter = {
   "kicker": "Describe with detail",
   "focus": "People & personality",
   "duration": "45–60 min",
-  "heroLine": "Notice the details. Choose the words. Make the person come alive.",
+  "heroLine": "Notice the details. Choose the words. Make them see.",
   "overview": {
     "source": "Adaptasi materi Descriptive Text — Ruangguru & Buku Bahasa Inggris 'Work in Progress' Kelas X Kemdikbudristek, Chapter 1",
     "definition": "Descriptive text is a text that explains and describes a person, place, or thing.",

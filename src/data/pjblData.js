@@ -96,9 +96,9 @@ export const PJBL_CHAPTERS = {
     tools: ["Canva", "CapCut", "InShot", "Premiere", "Any video editor"],
     formatExample: "Putri Nirmala_01_XD",
     taskModeling: {
-      title: "Sample Personal Recount — Sharing a Past Experience",
-      videoUrl: "https://www.youtube.com/watch?v=Pk5xGP5pn4Q",
-      embedId: "Pk5xGP5pn4Q",
+      title: "Personal Recount — Sharing a Past Experience",
+      videoUrl: "https://youtu.be/nSWNhb8EEVA?si=cTKH_xnZ2RyAC9m9",
+      embedId: "nSWNhb8EEVA",
       observations: [
         "Introduces the past experience with clear context (who, when, where)",
         "Explains what happened in chronological order",
@@ -190,7 +190,7 @@ export const PJBL_CHAPTERS = {
     tools: ["Canva", "CapCut", "InShot", "Premiere", "Any video editor"],
     formatExample: "Putri Nirmala_01_XD",
     taskModeling: {
-      title: "Sample Procedure Tutorial — How to Make Fresh Fruit Salad",
+      title: "Procedure Text — How to Make Fruit Salad",
       videoUrl: "https://youtu.be/lmgRt30XIz0?si=s8f17eyfrMdY6wz8",
       embedId: "lmgRt30XIz0",
       observations: [
@@ -287,9 +287,9 @@ export const PJBL_CHAPTERS = {
     tools: ["Canva", "CapCut", "InShot", "Premiere", "Any video editor"],
     formatExample: "Putri Nirmala_01_XD",
     taskModeling: {
-      title: "Sample Persuasive Speech — School Uniforms Are Beneficial",
-      videoUrl: "https://www.youtube.com/watch?v=Pk5xGP5pn4Q",
-      embedId: "Pk5xGP5pn4Q",
+      title: "Sample Persuasive Speech — School Uniforms Are Good",
+      videoUrl: "https://www.youtube.com/watch?v=LmdrLG7TBM0",
+      embedId: "LmdrLG7TBM0",
       observations: [
         "Introduces the topic with an attention-grabbing hook and thesis statement",
         "Presents two strong, well-reasoned arguments supported by facts",
@@ -385,7 +385,7 @@ export const PJBL_CHAPTERS = {
     tools: ["Canva", "CapCut", "InShot", "Premiere", "Any video editor"],
     formatExample: "Putri Nirmala_01_XD",
     taskModeling: {
-      title: "Sample Storytelling — 1st Place National Storytelling of Malin Kundang",
+      title: "Juara 1 Story Telling of “Malin Kundang”",
       videoUrl: "https://youtu.be/739H3dYSiGI?si=A2GRW2H1vK2iBJO9",
       embedId: "739H3dYSiGI",
       observations: [
@@ -481,6 +481,7 @@ export const PJBL_CHAPTERS = {
 };
 
 export function getPjblChapter(chapterId) {
-  const ch = Number(chapterId) || 1;
+  const raw = Number(chapterId) || 1;
+  const ch = raw > 15 ? raw - 15 : raw;
   return PJBL_CHAPTERS[ch] ?? PJBL_CHAPTERS[1];
 }

@@ -254,19 +254,26 @@ export async function submitStudentProject({
 export async function getProjectSubmission(studentId, chapterId) {
   if (!studentId || !chapterId) return null;
 
+  const cNum = Number(chapterId);
+  const possibleIds = [cNum, cNum + 15, cNum - 15].filter((x) => x > 0);
+
   const { data } = await supabase
     .from("project_submissions")
     .select("*")
     .eq("student_id", studentId)
-    .eq("chapter_id", Number(chapterId))
+    .in("chapter_id", possibleIds)
+    .order("submitted_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   if (data) return data;
 
   try {
-    const key = `marzalearn-project:${studentId}:${chapterId}`;
-    const raw = localStorage.getItem(key);
-    if (raw) return JSON.parse(raw);
+    for (const cid of possibleIds) {
+      const key = `marzalearn-project:${studentId}:${cid}`;
+      const raw = localStorage.getItem(key);
+      if (raw) return JSON.parse(raw);
+    }
   } catch (e) {}
 
   return null;

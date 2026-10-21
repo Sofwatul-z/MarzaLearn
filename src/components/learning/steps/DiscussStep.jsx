@@ -49,8 +49,8 @@ export default function DiscussStep({ content, value, onChange, theme }) {
         >
           <li>1. Read the discussion question in the prompt box below.</li>
           <li>2. Read the <strong>Example</strong> card on the right to see good sentence structure and flow.</li>
-          <li>3. Write your own paragraph (minimum 20 characters). Try using the target vocabulary you learned!</li>
-          <li>4. Once written, advance to the final step: Games & Quiz!</li>
+          <li>3. Write your own paragraph (minimum 20 words). Try using the target vocabulary you just learned (e.g., hydrate, exercise, rest)!</li>
+          <li>4. Once written, click "Submit" to save your answer, then advance to the final step: Games & Quiz!</li>
         </ol>
       </div>
 

@@ -114,10 +114,10 @@ export default function EngageStep({ content, value, onChange, chapterId, theme 
           style={{ color: theme?.primaryDark || "#4A5D54" }}
           className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed opacity-95"
         >
-          <li>1. Click on a vocabulary word in the <strong>Words</strong> column on the left (highlighted in chapter theme).</li>
-          <li>2. Read the definitions in the <strong>Matches</strong> column on the right and click the correct meaning.</li>
-          <li>3. <strong>Single Attempt Rule:</strong> You have only 1 attempt per word! If correct, it locks in green. If incorrect, it locks as missed and saves immediately.</li>
-          <li>4. Complete all {pairs.length} pairs ({matched.length + failed.length}/{pairs.length} completed) to unlock the next step!</li>
+          <li>1. Click any <strong>Words</strong> in the left column.</li>
+          <li>2. Click its <strong>matching synonym</strong> on the right.</li>
+          <li>3. ⚠️Single Attempt Rule: Choose carefully! You only <strong>get 1 try per word.</strong> Correct matches turn green, while mistakes are permanently locked in.</li>
+          <li>4. Complete all {pairs.length} pairs to unlock the next level. A mistake won't stop you, so match every pair to finish!</li>
         </ol>
       </div>
 
