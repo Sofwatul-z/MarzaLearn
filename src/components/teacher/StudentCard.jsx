@@ -42,7 +42,7 @@ export default function StudentCard({ student, index, onView }) {
           variant="secondary"
           size="sm"
           onClick={onView}
-          className="group-hover:bg-[#24332D] group-hover:text-white hover:!bg-[#24332D] hover:!text-white transition-all"
+          className="group-hover:bg-[#24332D] group-hover:text-white hover:bg-[#24332D] hover:text-white transition-all"
         >
           View Progress & Reset <ArrowRight size={14} />
         </Button>

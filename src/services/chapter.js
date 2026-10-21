@@ -154,11 +154,9 @@ export async function getChapterDetail(id) {
     console.warn("MarzaLearn: failed to load chapter steps", stepsError);
   }
 
-  const steps = stepsData?.length
-    ? stepsData
-    : localChapter
-      ? generateLocalSteps(localChapter)
-      : generateEmptySteps(databaseId);
+  const steps = localChapter
+    ? generateLocalSteps(localChapter)
+    : generateEmptySteps(databaseId);
 
   return {
     ...normalizeChapter({

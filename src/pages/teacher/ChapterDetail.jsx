@@ -22,6 +22,7 @@ import {
   X,
   Save,
   ChevronDown,
+  Layers3,
 } from "lucide-react";
 import Button from "../../components/common/Button";
 import {
@@ -288,7 +289,7 @@ export default function ChapterDetail() {
           <p className="text-sm text-[#67776F]">{description}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => setEditChapter(true)}><Pencil size={16} /> Edit</Button>
+          <Button variant="secondary" onClick={() => setEditChapter(true)} className="text-[#24332D] hover:text-[#24332D]"><Pencil size={16} /> Edit</Button>
           <Button variant="destructive" onClick={async () => {
             if (window.confirm("Delete this chapter?")) {
               await deleteChapter(id);
