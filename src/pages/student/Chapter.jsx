@@ -409,14 +409,6 @@ export default function Chapter() {
             }
           }
 
-          try {
-            const overrides = JSON.parse(localStorage.getItem("marzalearn-reset-overrides") || "{}");
-            const studentOverrides = overrides[user.id] || {};
-            if (studentOverrides["all"] || studentOverrides[cNum] || studentOverrides[cNum + 15]) {
-              done = false;
-            }
-          } catch (err) {}
-
           setMissionComplete(Boolean(done));
         }
       } catch (e) {}

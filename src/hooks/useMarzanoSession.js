@@ -3,6 +3,7 @@ import {
   getVisualAssetUrl,
   loadLearningSession,
   saveLearningSession,
+  upliftLocalDraftsToCloud,
 } from "../services/session";
 import { supabase } from "../services/supabase";
 import { useAuth } from "./useAuth";
@@ -199,24 +200,8 @@ export default function useMarzanoSession(chapterId) {
       }
 
       // Check if teacher recently triggered a reset
+      // Reset logic now handled via RPC; cloud state is authoritative.
       let isTeacherReset = false;
-      try {
-        const overrides = JSON.parse(window.localStorage.getItem("marzalearn-reset-overrides") || "{}");
-        const studentOverrides = overrides[user?.id] || {};
-        const cNum = Number(chapterId);
-        if (studentOverrides["all"] || studentOverrides[cNum] || studentOverrides[cNum + 15]) {
-          isTeacherReset = true;
-        }
-
-        const resetSpecific = window.localStorage.getItem(`marzalearn-reset-timestamp:${user?.id}:${chapterId}`);
-        const resetAll = window.localStorage.getItem(`marzalearn-reset-timestamp:${user?.id}:all`);
-        const latestResetTs = resetSpecific || resetAll;
-        if (latestResetTs && local?.updatedAt) {
-          if (new Date(latestResetTs).getTime() >= new Date(local.updatedAt).getTime()) {
-            isTeacherReset = true;
-          }
-        }
-      } catch (e) {}
 
       // Check database student_progress for 0% or reset status
       try {
@@ -274,6 +259,35 @@ export default function useMarzanoSession(chapterId) {
         chosen = await hydrateVisualPreviews(mergeState(chosen));
         if (!active) return;
         setRecovered(chosen.status === "in_progress");
+
+        // AUTO-UPLIFT: If local draft has work not yet synced or newer than cloud,
+        // automatically push it to Supabase cloud to guarantee cross-device consistency.
+        const localCompleted = local?.completedSteps?.length || 0;
+        const cloudCompleted = cloud?.completedSteps?.length || 0;
+        const localTime = new Date(local?.updatedAt || 0).getTime();
+        const cloudTime = new Date(cloud?.updatedAt || 0).getTime();
+        const needsUplift =
+          hasLocal &&
+          (!hasCloud ||
+            localCompleted > cloudCompleted ||
+            (localCompleted === cloudCompleted && localTime > cloudTime));
+
+        if (needsUplift && user?.id && chapterId) {
+          setSaveState("saving");
+          saveLearningSession(user.id, chapterId, chosen).then((result) => {
+            if (mounted.current) {
+              setSaveState(result.ok ? "saved" : "offline");
+            }
+          });
+        } else if (hasCloud) {
+          // If we loaded from cloud cleanly, mark as saved in cloud
+          setSaveState("saved");
+        }
+      }
+
+      // Background check to uplift any drafts from other chapters on this device
+      if (user?.id) {
+        upliftLocalDraftsToCloud(user.id).catch(() => {});
       }
 
       setSession(chosen);
@@ -305,7 +319,7 @@ export default function useMarzanoSession(chapterId) {
     if (session.status === "completed") {
       saveLearningSession(user?.id, chapterId, session).then((result) => {
         if (!mounted.current) return;
-        setSaveState(result.ok ? "saved" : "local");
+        setSaveState(result.ok ? "saved" : "offline");
       });
       return;
     }
@@ -313,9 +327,26 @@ export default function useMarzanoSession(chapterId) {
     persistTimer.current = setTimeout(async () => {
       const result = await saveLearningSession(user?.id, chapterId, session);
       if (!mounted.current) return;
-      setSaveState(result.ok ? "saved" : "local");
+      setSaveState(result.ok ? "saved" : "offline");
     }, 700);
   }, [session, loading, storageKey, user?.id, chapterId]);
+
+  // Online auto-reconnect listener to sync offline drafts as soon as network returns
+  useEffect(() => {
+    function handleOnline() {
+      if (session.status !== "not_started" && user?.id && chapterId) {
+        setSaveState("saving");
+        saveLearningSession(user.id, chapterId, session).then((result) => {
+          if (mounted.current) {
+            setSaveState(result.ok ? "saved" : "offline");
+          }
+        });
+      }
+    }
+
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+  }, [session, user?.id, chapterId]);
 
   const startSession = useCallback(() => {
     setSession((current) => {

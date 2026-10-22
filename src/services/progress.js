@@ -1,6 +1,6 @@
 import { supabase } from "./supabase";
 import { CHAPTER_CATALOG } from "../data/chapterCatalog";
-import { getStudentsByClass, getResetOverrides } from "./teacher";
+import { getStudentsByClass } from "./teacher";
 
 function isMissingOptionalTable(error) {
   if (!error) return false;
@@ -83,14 +83,7 @@ function mergeSessionProgress(cloudSessions, localSessions) {
 
 export async function getStudentLearningSessions(studentId) {
   if (!studentId) return [];
-
-  let overrides = {};
-  try {
-    overrides = JSON.parse(localStorage.getItem("marzalearn-reset-overrides") || "{}");
-  } catch (e) {}
-  const studentOverrides = overrides[studentId] || {};
-  const isAllReset = Boolean(studentOverrides["all"]);
-
+  // Load cloud sessions
   const cloud = await safelyLoad(
     supabase
       .from("learning_sessions")
@@ -99,27 +92,18 @@ export async function getStudentLearningSessions(studentId) {
       .order("started_at", { ascending: false }),
     "learning sessions"
   );
-
-  return mergeSessionProgress(cloud, getLocalLearningSessions(studentId))
-    .filter((session) => {
-      const cId = Number(session.chapter_id);
-      const isReset =
-        isAllReset ||
-        Boolean(studentOverrides[cId]) ||
-        Boolean(studentOverrides[cId - 15]) ||
-        Boolean(studentOverrides[cId + 15]);
-      return !isReset;
-    })
-    .map((session) => {
-      const catalogChapter = CHAPTER_CATALOG.find(
-        (chapter) => chapter.id === Number(session.chapter_id) || chapter.databaseId === Number(session.chapter_id)
-      );
-      return catalogChapter ? { ...session, chapter_id: catalogChapter.id } : session;
-    });
+  // Merge with any local drafts; no reset overrides are applied (cloud is source of truth)
+  return mergeSessionProgress(cloud, getLocalLearningSessions(studentId)).map((session) => {
+    const catalogChapter = CHAPTER_CATALOG.find(
+      (chapter) => chapter.id === Number(session.chapter_id) || chapter.databaseId === Number(session.chapter_id)
+    );
+    return catalogChapter ? { ...session, chapter_id: catalogChapter.id } : session;
+  });
 }
 
 export async function getStudentProgressRows(studentId) {
   if (!studentId) return [];
+  // Directly fetch from Supabase; no reset overrides applied
   const rows = await safelyLoad(
     supabase
       .from("student_progress")
@@ -127,47 +111,11 @@ export async function getStudentProgressRows(studentId) {
       .eq("student_id", studentId),
     "student_progress table"
   );
-
-  let overrides = {};
-  try {
-    overrides = JSON.parse(localStorage.getItem("marzalearn-reset-overrides") || "{}");
-  } catch (e) {}
-  const studentOverrides = overrides[studentId] || {};
-  const isAllReset = Boolean(studentOverrides["all"]);
-
-  return rows.map((r) => {
-    const cId = Number(r.chapter_id);
-    const isReset =
-      isAllReset ||
-      Boolean(studentOverrides[cId]) ||
-      Boolean(studentOverrides[cId - 15]) ||
-      Boolean(studentOverrides[cId + 15]);
-
-    if (isReset) {
-      return {
-        ...r,
-        percentage: 0,
-        provide: false,
-        restate: false,
-        visualize: false,
-        engage: false,
-        discuss: false,
-        play: false,
-      };
-    }
-    return r;
-  });
+  return rows;
 }
 
 export async function getStudentProjectSubmissions(studentId) {
   if (!studentId) return [];
-
-  let overrides = {};
-  try {
-    overrides = JSON.parse(localStorage.getItem("marzalearn-reset-overrides") || "{}");
-  } catch (e) {}
-  const studentOverrides = overrides[studentId] || {};
-  const isAllReset = Boolean(studentOverrides["all"]);
 
   const cloud = await safelyLoad(
     supabase
@@ -185,15 +133,7 @@ export async function getStudentProjectSubmissions(studentId) {
   } catch (e) {}
 
   const seen = new Set(cloud.map((p) => Number(p.chapter_id)));
-  return [...cloud, ...local.filter((p) => !seen.has(Number(p.chapter_id)))].filter((p) => {
-    const cId = Number(p.chapter_id);
-    const isReset =
-      isAllReset ||
-      Boolean(studentOverrides[cId]) ||
-      Boolean(studentOverrides[cId - 15]) ||
-      Boolean(studentOverrides[cId + 15]);
-    return !isReset;
-  });
+  return [...cloud, ...local.filter((p) => !seen.has(Number(p.chapter_id)))];
 }
 
 export async function submitStudentProject({
@@ -297,20 +237,6 @@ export async function getAllProjectSubmissions(className = "XC") {
     });
   } catch (e) {}
 
-  // Filter out any submissions that have active reset overrides
-  const overrides = getResetOverrides();
-  list = list.filter((p) => {
-    const studentOverrides = overrides[p.student_id] || {};
-    const isAllReset = Boolean(studentOverrides["all"]);
-    const cId = Number(p.chapter_id);
-    const isReset =
-      isAllReset ||
-      Boolean(studentOverrides[cId]) ||
-      Boolean(studentOverrides[cId - 15]) ||
-      Boolean(studentOverrides[cId + 15]);
-    return !isReset;
-  });
-
   if (className) {
     list = list.filter(
       (p) => !p.class_name || p.class_name.toUpperCase() === className.toUpperCase()
@@ -389,7 +315,7 @@ export async function getAllStepMissionSubmissions(className = "XC") {
     dbSessions = sData || [];
   } catch (e) {}
 
-  const overrides = getResetOverrides();
+  
 
   let storedGrades = {};
   try {
@@ -399,18 +325,7 @@ export async function getAllStepMissionSubmissions(className = "XC") {
   const results = [];
 
   for (const student of students) {
-    const studentOverrides = overrides[student.id] || {};
-    const isAllReset = Boolean(studentOverrides["all"]);
-
     for (let cId = 1; cId <= 5; cId++) {
-      const isReset =
-        isAllReset ||
-        Boolean(studentOverrides[cId]) ||
-        Boolean(studentOverrides[cId - 15]) ||
-        Boolean(studentOverrides[cId + 15]);
-
-      if (isReset) continue;
-
       const catalogChapter = CHAPTER_CATALOG.find((c) => c.id === cId);
       const dbChapterId = catalogChapter?.databaseId ?? (cId + 15);
 
@@ -567,14 +482,43 @@ export async function gradeStepMissionSubmission({
     const dbCId = catalogChapter?.databaseId ?? (numChapterId + 15);
     const targetIds = [numChapterId, dbCId, numChapterId + 15];
 
+    // Persist grade directly to Supabase cloud tables so all devices see it
     await supabase
       .from("student_progress")
       .update({
+        score: Number(score),
+        feedback: feedback || "",
         updated_at: new Date().toISOString(),
       })
       .eq("student_id", studentId)
       .in("chapter_id", targetIds);
-  } catch (e) {}
+
+    // Also update session_data.grade in learning_sessions
+    const { data: currentSession } = await supabase
+      .from("learning_sessions")
+      .select("session_data")
+      .eq("student_id", studentId)
+      .in("chapter_id", targetIds)
+      .limit(1)
+      .maybeSingle();
+
+    if (currentSession) {
+      const nextSessionData = {
+        ...(currentSession.session_data || {}),
+        grade: gradePayload,
+      };
+      await supabase
+        .from("learning_sessions")
+        .update({
+          session_data: nextSessionData,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("student_id", studentId)
+        .in("chapter_id", targetIds);
+    }
+  } catch (e) {
+    console.warn("MarzaLearn: failed to persist grade to Supabase:", e);
+  }
 
   if (typeof window !== "undefined") {
     try {
@@ -730,18 +674,8 @@ export async function saveStudentProgress(studentId, chapterId, state) {
     };
   }
 
-  if (completedNames.size > 0 && typeof window !== "undefined") {
-    try {
-      const overrides = JSON.parse(window.localStorage.getItem("marzalearn-reset-overrides") || "{}");
-      if (overrides[studentId]) {
-        const num = Number(chapterId);
-        delete overrides[studentId][num];
-        delete overrides[studentId][num + 15];
-        delete overrides[studentId]["all"];
-        window.localStorage.setItem("marzalearn-reset-overrides", JSON.stringify(overrides));
-      }
-    } catch (e) {}
-  }
+  // Legacy reset-override cleanup removed — cloud is source of truth.
+  // Any leftover "marzalearn-reset-overrides" in localStorage is ignored.
 
   return { ok: true };
 }

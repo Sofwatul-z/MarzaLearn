@@ -57,13 +57,18 @@ function getDatabaseChapterId(chapterId) {
 export async function loadLearningSession(studentId, chapterId) {
   if (!studentId || !chapterId) return null;
 
+  const dbCId = getDatabaseChapterId(chapterId);
+  const targetIds = Array.from(new Set([Number(chapterId), dbCId, Number(chapterId) + 15])).filter(Boolean);
+
   const { data, error } = await supabase
     .from("learning_sessions")
     .select(
       "student_id,chapter_id,status,current_step,session_data,started_at,completed_at,updated_at"
     )
     .eq("student_id", studentId)
-    .eq("chapter_id", getDatabaseChapterId(chapterId))
+    .in("chapter_id", targetIds)
+    .order("updated_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   if (error) {
@@ -95,7 +100,7 @@ export async function loadLearningSession(studentId, chapterId) {
 
 export async function saveLearningSession(studentId, chapterId, state) {
   if (!studentId || !chapterId || !state) {
-    return { ok: false, reason: "missing-data" };
+    return { ok: false, reason: "missing-data", sessionSaved: false, progressSaved: false };
   }
 
   const payload = {
@@ -109,9 +114,20 @@ export async function saveLearningSession(studentId, chapterId, state) {
     updated_at: state.updatedAt ?? new Date().toISOString(),
   };
 
-  const { error } = await supabase
+  let { error } = await supabase
     .from("learning_sessions")
     .upsert(payload, { onConflict: "student_id,chapter_id" });
+
+  // If upsert failed due to foreign key or constraint on databaseChapterId, retry with raw numeric chapterId
+  if (error && Number(chapterId) !== payload.chapter_id) {
+    const fallbackPayload = { ...payload, chapter_id: Number(chapterId) };
+    const retry = await supabase
+      .from("learning_sessions")
+      .upsert(fallbackPayload, { onConflict: "student_id,chapter_id" });
+    if (!retry.error) {
+      error = null;
+    }
+  }
 
   const progressResult = await saveStudentProgress(
     studentId,
@@ -129,7 +145,7 @@ export async function saveLearningSession(studentId, chapterId, state) {
         : "session-save-error",
       error,
       sessionSaved: false,
-      progressSaved: progressResult.ok,
+      progressSaved: Boolean(progressResult.ok),
     };
   }
 
@@ -153,19 +169,6 @@ export async function saveLearningSession(studentId, chapterId, state) {
     sessionSaved: true,
     progressSaved: true,
   };
-
-  if (error) {
-    if (!isMissingOptionalResource(error)) {
-      console.warn("MarzaLearn: session cloud save failed", error);
-    }
-    return {
-      ok: progressResult.ok,
-      reason: isMissingOptionalResource(error) ? "unavailable" : "error",
-      error,
-    };
-  }
-
-  return { ok: true };
 }
 
 export async function uploadVisualAsset({
@@ -210,4 +213,88 @@ export async function getVisualAssetUrl(path, expiresIn = 60 * 60) {
   }
 
   return data?.signedUrl ?? null;
+}
+
+/**
+ * Auto-uplift mechanism: Scans localStorage for student's local session drafts
+ * and saves any un-synced or newer work directly to Supabase cloud.
+ * This guarantees cross-device consistency so other devices & teacher review immediately see the student's work.
+ */
+export async function upliftLocalDraftsToCloud(studentId) {
+  if (!studentId || typeof window === "undefined") return { uplifted: 0 };
+
+  let upliftedCount = 0;
+  const prefixes = [
+    `marzalearn-session-v1:${studentId}:`,
+    `marzalearn-session:${studentId}:`,
+  ];
+
+  try {
+    const keysToCheck = [];
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const key = window.localStorage.key(i);
+      if (prefixes.some((p) => key?.startsWith(p))) {
+        keysToCheck.push(key);
+      }
+    }
+
+    for (const key of keysToCheck) {
+      const raw = window.localStorage.getItem(key);
+      if (!raw) continue;
+
+      let localSession = null;
+      try {
+        localSession = JSON.parse(raw);
+      } catch (e) {
+        continue;
+      }
+
+      if (
+        !localSession ||
+        localSession.status === "not_started" ||
+        localSession.status === "reset"
+      ) {
+        continue;
+      }
+
+      // Extract chapterId from key
+      const parts = key.split(":");
+      const rawCId = parts[parts.length - 1];
+      const chapterId = Number(rawCId);
+      if (!chapterId || isNaN(chapterId)) continue;
+
+      // Check cloud state
+      const cloudSession = await loadLearningSession(studentId, chapterId);
+      if (cloudSession?.status === "reset") {
+        // Teacher has reset this chapter in cloud; discard stale local draft
+        try {
+          window.localStorage.removeItem(key);
+        } catch (e) {}
+        continue;
+      }
+
+      const localCompleted = localSession.completedSteps?.length || 0;
+      const cloudCompleted = cloudSession?.completedSteps?.length || 0;
+      const localTime = new Date(localSession.updatedAt || 0).getTime();
+      const cloudTime = new Date(cloudSession?.updatedAt || 0).getTime();
+
+      // Uplift if cloud has nothing or local is more complete / newer
+      const shouldUplift =
+        !cloudSession ||
+        cloudSession.status === "not_started" ||
+        localCompleted > cloudCompleted ||
+        (localCompleted === cloudCompleted && localTime > cloudTime);
+
+      if (shouldUplift) {
+        const res = await saveLearningSession(studentId, chapterId, localSession);
+        if (res.ok) {
+          upliftedCount++;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("MarzaLearn: auto-uplift failed", err);
+  }
+
+  return { uplifted: upliftedCount };
 }

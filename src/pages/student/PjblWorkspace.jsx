@@ -144,15 +144,6 @@ export default function PjblWorkspace() {
           } catch (e) {}
         }
 
-        // 4. Verify teacher has not reset this student's progress
-        try {
-          const overrides = JSON.parse(localStorage.getItem("marzalearn-reset-overrides") || "{}");
-          const studentOverrides = overrides[user.id] || {};
-          if (studentOverrides["all"] || studentOverrides[chapterId] || studentOverrides[chapterId + 15]) {
-            isDone = false;
-          }
-        } catch (e) {}
-
         if (active) {
           setMissionComplete(Boolean(isDone));
         }

@@ -81,16 +81,58 @@ function isStepReady(chapter, session, stepNumber) {
 
 function SaveIndicator({ state }) {
   const content = {
-    saving: { icon: RefreshCw, text: "Saving", className: "text-[#718078]" },
-    saved: { icon: Cloud, text: "Saved", className: "text-[#557466]" },
-    local: { icon: CloudOff, text: "Saved on device", className: "text-[#8C6D5D]" },
-    idle: { icon: ShieldCheck, text: "Autosave ready", className: "text-[#718078]" },
-  }[state] ?? { icon: ShieldCheck, text: "Autosave ready", className: "text-[#718078]" };
+    saving: {
+      icon: RefreshCw,
+      text: "Saving",
+      className: "border-[#F4D7C5] bg-[#FFF8F3] text-[#B86B3E]",
+      spin: true,
+    },
+    saved: {
+      icon: Cloud,
+      text: "Cloud Saved",
+      className: "border-[#CFE8DD] bg-[#EAF4EF] text-[#2D5A46]",
+      spin: false,
+    },
+    offline: {
+      icon: CloudOff,
+      text: "Offline Draft",
+      className: "border-[#F8D7DA] bg-[#FDF2F2] text-[#9C3838]",
+      spin: false,
+    },
+    local: {
+      icon: CloudOff,
+      text: "Offline Draft",
+      className: "border-[#F8D7DA] bg-[#FDF2F2] text-[#9C3838]",
+      spin: false,
+    },
+    idle: {
+      icon: ShieldCheck,
+      text: "Autosave Ready",
+      className: "border-[#D4E1DA] bg-white/70 text-[#718078]",
+      spin: false,
+    },
+  }[state] ?? {
+    icon: ShieldCheck,
+    text: "Autosave Ready",
+    className: "border-[#D4E1DA] bg-white/70 text-[#718078]",
+    spin: false,
+  };
 
   const Icon = content.icon;
   return (
-    <span className={`inline-flex items-center gap-1.5 text-[11px] font-extrabold ${content.className}`}>
-      <Icon size={13} className={state === "saving" ? "animate-spin" : ""} /> {content.text}
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-extrabold tracking-wide shadow-xs transition-colors ${content.className}`}
+      title={
+        content.text === "Cloud Saved"
+          ? "All your answers are safely stored in Supabase cloud and accessible from any device."
+          : content.text === "Offline Draft"
+          ? "Answers saved locally on this device. Will automatically sync to cloud when connected."
+          : content.text === "Saving"
+          ? "Saving progress to cloud..."
+          : "Changes will be automatically saved."
+      }
+    >
+      <Icon size={13} className={content.spin ? "animate-spin" : ""} /> {content.text}
     </span>
   );
 }
