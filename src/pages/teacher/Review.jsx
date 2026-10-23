@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import {
   ExternalLink,
   CheckCircle2,
@@ -15,6 +15,10 @@ import {
   MessageSquareText,
   Gamepad2,
   Layers,
+  ChevronDown,
+  ChevronUp,
+  User,
+  Check,
 } from "lucide-react";
 import Button from "../../components/common/Button";
 import {
@@ -23,8 +27,64 @@ import {
   getAllStepMissionSubmissions,
   gradeStepMissionSubmission,
 } from "../../services/progress";
+import { getVisualAssetUrl } from "../../services/session";
 import { CHAPTER_CATALOG } from "../../data/chapterCatalog";
 import { getChapterTheme } from "../../data/chapterThemes";
+
+function VisualArtworkPreview({ item, idx }) {
+  const [url, setUrl] = useState(item?.preview || null);
+  const [loading, setLoading] = useState(Boolean(!item?.preview && item?.storagePath));
+
+  useEffect(() => {
+    if (item?.preview) {
+      setUrl(item.preview);
+      setLoading(false);
+      return;
+    }
+
+    if (item?.storagePath) {
+      setLoading(true);
+      getVisualAssetUrl(item.storagePath)
+        .then((signed) => {
+          if (signed) setUrl(signed);
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [item?.preview, item?.storagePath]);
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-[#F8FAF9] p-2.5 text-center transition hover:border-slate-300">
+      <p className="text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">
+        Visual #{Number(idx) + 1} ({item?.mode || "draw"})
+      </p>
+      {url ? (
+        <div className="relative group">
+          <img
+            src={url}
+            alt={`Visual artwork #${Number(idx) + 1}`}
+            className="h-36 w-full object-contain rounded-lg bg-white border border-slate-100 shadow-2xs transition group-hover:scale-[1.02]"
+          />
+          <a
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+            className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 text-white rounded px-1.5 py-0.5 text-[9px] font-semibold"
+          >
+            Zoom
+          </a>
+        </div>
+      ) : loading ? (
+        <div className="h-32 grid place-items-center text-[11px] text-slate-400 italic bg-white rounded-lg">
+          Loading artwork image...
+        </div>
+      ) : (
+        <div className="h-32 grid place-items-center text-[11px] text-slate-400 italic bg-white rounded-lg">
+          Artwork saved (no preview file)
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Review() {
   const [activeTab, setActiveTab] = useState("mission"); // "mission" | "project"
@@ -32,6 +92,9 @@ export default function Review() {
   const [projectSubmissions, setProjectSubmissions] = useState([]);
   const [missionSubmissions, setMissionSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Grouping accordion state: Set of student IDs that are expanded
+  const [expandedStudents, setExpandedStudents] = useState({});
 
   // Modal state
   const [selectedItem, setSelectedItem] = useState(null);
@@ -169,6 +232,39 @@ export default function Review() {
 
   const currentList = activeTab === "mission" ? missionSubmissions : projectSubmissions;
 
+  // Group submissions by student
+  const studentGroups = useMemo(() => {
+    const map = new Map();
+    currentList.forEach((item) => {
+      const studentId = item.student_id;
+      if (!map.has(studentId)) {
+        map.set(studentId, {
+          student_id: studentId,
+          student_name: item.student_name,
+          class_name: item.class_name,
+          attendance_number: item.attendance_number,
+          items: [],
+        });
+      }
+      map.get(studentId).items.push(item);
+    });
+
+    map.forEach((student) => {
+      student.items.sort((a, b) => Number(a.chapter_id) - Number(b.chapter_id));
+    });
+
+    return Array.from(map.values()).sort((a, b) =>
+      (a.attendance_number || "").localeCompare(b.attendance_number || "", undefined, { numeric: true })
+    );
+  }, [currentList]);
+
+  const toggleStudent = (studentId) => {
+    setExpandedStudents((prev) => ({
+      ...prev,
+      [studentId]: !prev[studentId],
+    }));
+  };
+
   return (
     <div>
       <div className="mb-8">
@@ -226,12 +322,12 @@ export default function Review() {
         </div>
       </div>
 
-      {/* List */}
+      {/* List grouped by student */}
       {loading ? (
         <div className="py-16 text-center text-sm font-semibold text-[#83928B]">
           Loading {activeTab === "mission" ? "learning missions" : "project submissions"}...
         </div>
-      ) : currentList.length === 0 ? (
+      ) : studentGroups.length === 0 ? (
         <div className="rounded-[30px] border border-dashed border-[#DDE5E0] bg-white/60 p-12 text-center">
           <Clock size={32} className="mx-auto text-[#A0AAA5] mb-3" />
           <h3 className="text-lg font-extrabold text-[#24332D]">
@@ -244,75 +340,123 @@ export default function Review() {
           </p>
         </div>
       ) : (
-        <div className="space-y-3.5">
-          {currentList.map((item, index) => {
-            const chapterMeta = CHAPTER_CATALOG.find(
-              (c) => c.id === Number(item.chapter_id)
-            );
-            const theme = getChapterTheme(item.chapter_id);
-            const isReviewed = item.status === "reviewed" || item.score != null;
+        <div className="space-y-4">
+          {studentGroups.map((group, index) => {
+            const isExpanded = expandedStudents[group.student_id] ?? true; // expanded by default or toggled
+            const pendingCount = group.items.filter((i) => i.status !== "reviewed" && i.score == null).length;
+            const reviewedCount = group.items.filter((i) => i.status === "reviewed" || i.score != null).length;
 
             return (
               <div
-                key={item.id || `${item.student_id}-${item.chapter_id}`}
-                className="group flex flex-col sm:flex-row sm:items-center justify-between gap-5 rounded-[26px] border border-[#DCE4DF] bg-white/85 p-5 shadow-[0_8px_20px_rgba(36,51,45,0.03)] transition-all hover:border-[#9FB9AC] hover:shadow-md sm:p-6"
+                key={group.student_id}
+                className="overflow-hidden rounded-[26px] border border-[#DCE4DF] bg-white shadow-[0_8px_20px_rgba(36,51,45,0.03)] transition-all hover:border-[#9FB9AC]"
               >
-                <div className="flex items-start gap-4">
-                  <div
-                    style={{
-                      backgroundColor: isReviewed ? theme?.badgeBg : "#EAF4EF",
-                      color: isReviewed ? theme?.primaryDark : "#4B6B5B",
-                    }}
-                    className="w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center text-sm font-extrabold shadow-xs"
-                  >
-                    {String(index + 1).padStart(2, "0")}
-                  </div>
-
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-[#EAF4EF] px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#486B5C]">
-                        Class {item.class_name} · No. {item.attendance_number || "01"}
-                      </span>
-                      <span
-                        style={{ backgroundColor: theme?.badgeBg, color: theme?.primaryDark }}
-                        className="rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider"
-                      >
-                        Chapter {item.chapter_id}
-                      </span>
-                      {activeTab === "mission" && (
-                        <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-extrabold text-[#6F7D76]">
-                          {item.completed_steps?.length ?? 0}/6 Steps Finished
-                        </span>
-                      )}
-                      {isReviewed ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100/80 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-800">
-                          <CheckCircle2 size={11} /> Score: {item.score}/100
-                        </span>
-                      ) : (
-                        <span className="rounded-full bg-amber-100/70 px-2.5 py-0.5 text-[10px] font-extrabold text-amber-800">
-                          Pending Review
-                        </span>
-                      )}
+                {/* Student Summary Header with toggle button */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-white">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 shrink-0 rounded-2xl bg-[#EAF4EF] text-[#24332D] flex items-center justify-center text-sm font-extrabold shadow-xs">
+                      {String(index + 1).padStart(2, "0")}
                     </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-[#EAF4EF] px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#486B5C]">
+                          Class {group.class_name} · No. {group.attendance_number || "01"}
+                        </span>
+                        <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-extrabold text-[#5B6D64]">
+                          {group.items.length} {group.items.length === 1 ? "Chapter" : "Chapters"} Submitted
+                        </span>
+                        {pendingCount > 0 ? (
+                          <span className="rounded-full bg-amber-100/80 px-2.5 py-0.5 text-[10px] font-extrabold text-amber-800">
+                            {pendingCount} Pending Review
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100/80 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-800">
+                            <CheckCircle2 size={11} /> All Graded ({reviewedCount})
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="mt-1.5 text-xl font-extrabold text-[#24332D]">
+                        {group.student_name}
+                      </h3>
+                    </div>
+                  </div>
 
-                    <h3 className="mt-2 text-lg font-extrabold text-[#24332D]">
-                      {item.student_name}
-                    </h3>
-                    <p className="text-xs text-[#7B8881]">
-                      {chapterMeta?.title || `Chapter ${item.chapter_id}`} {activeTab === "mission" ? "· 6-Step Mission" : "· Project"}
-                    </p>
+                  <div className="flex items-center gap-3 self-end sm:self-center">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => toggleStudent(group.student_id)}
+                      className="inline-flex items-center gap-1.5"
+                    >
+                      {isExpanded ? "Tutup Pekerjaan" : "Buka Pekerjaan Siswa"}
+                      {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </Button>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 self-start sm:self-center shrink-0">
-                  <Button
-                    variant={isReviewed ? "secondary" : "primary"}
-                    size="sm"
-                    onClick={() => handleOpenReview(item)}
-                  >
-                    {isReviewed ? "Update Grade" : "Review & Grade"}
-                  </Button>
-                </div>
+                {/* Submissions List per Student */}
+                {isExpanded && (
+                  <div className="border-t border-[#EEF2F0] bg-[#FAFBFB] p-4 sm:p-5 space-y-3">
+                    <p className="text-[11px] font-extrabold uppercase tracking-wider text-[#73847C] px-1">
+                      Daftar Pekerjaan Siswa:
+                    </p>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {group.items.map((item) => {
+                        const chapterMeta = CHAPTER_CATALOG.find(
+                          (c) => c.id === Number(item.chapter_id)
+                        );
+                        const theme = getChapterTheme(item.chapter_id);
+                        const isReviewed = item.status === "reviewed" || item.score != null;
+
+                        return (
+                          <div
+                            key={item.id || `${item.student_id}-${item.chapter_id}`}
+                            className="flex flex-col justify-between gap-3 rounded-2xl border border-[#DCE4DF] bg-white p-4 transition hover:border-[#9FB9AC] hover:shadow-xs"
+                          >
+                            <div>
+                              <div className="flex items-center justify-between gap-2">
+                                <span
+                                  style={{ backgroundColor: theme?.badgeBg, color: theme?.primaryDark }}
+                                  className="rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider"
+                                >
+                                  Chapter {item.chapter_id}
+                                </span>
+                                {isReviewed ? (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100/90 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800">
+                                    <CheckCircle2 size={11} /> Score: {item.score}/100
+                                  </span>
+                                ) : (
+                                  <span className="rounded-full bg-amber-100/80 px-2 py-0.5 text-[10px] font-extrabold text-amber-800">
+                                    Pending Review
+                                  </span>
+                                )}
+                              </div>
+
+                              <h4 className="mt-2 text-sm font-extrabold text-[#24332D]">
+                                {chapterMeta?.title || `Chapter ${item.chapter_id}`}
+                              </h4>
+                              <p className="text-xs text-[#7B8881]">
+                                {activeTab === "mission"
+                                  ? `${item.completed_steps?.length ?? 0}/6 steps finished`
+                                  : "Ultimate Video Project"}
+                              </p>
+                            </div>
+
+                            <div className="pt-2 border-t border-slate-100 flex justify-end">
+                              <Button
+                                variant={isReviewed ? "secondary" : "primary"}
+                                size="sm"
+                                onClick={() => handleOpenReview(item)}
+                              >
+                                {isReviewed ? "Update Grade" : "Review & Grade"}
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -411,14 +555,7 @@ export default function Review() {
                     <div className="grid grid-cols-2 gap-3">
                       {Object.entries(selectedItem.session_data.visualize?.items ?? {}).map(
                         ([idx, item]) => (
-                          <div key={idx} className="rounded-xl border border-slate-200 bg-[#F8FAF9] p-2 text-center">
-                            <p className="text-[10px] font-bold text-slate-500 mb-1">Visual #{Number(idx) + 1} ({item?.mode})</p>
-                            {item?.preview ? (
-                              <img src={item.preview} alt="Visual artwork" className="h-28 w-full object-contain rounded-lg bg-white" />
-                            ) : (
-                              <div className="h-28 grid place-items-center text-[11px] text-slate-400 italic bg-white rounded-lg">Artwork saved</div>
-                            )}
-                          </div>
+                          <VisualArtworkPreview key={idx} item={item} idx={idx} />
                         )
                       )}
                     </div>

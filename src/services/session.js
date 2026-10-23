@@ -23,6 +23,7 @@ function stripVisualPreviews(items = {}) {
       item
         ? {
             mode: item.mode ?? "draw",
+            preview: item.preview ?? null, // Preserve visual artwork so teacher review and other devices display the real drawing!
             storagePath: item.storagePath ?? null,
             pendingUpload: Boolean(item.pendingUpload && !item.storagePath),
             savedAt: item.savedAt ?? null,

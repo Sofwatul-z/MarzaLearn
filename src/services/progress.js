@@ -392,11 +392,7 @@ export async function getAllStepMissionSubmissions(className = "XC") {
         sessionData?.grade ||
         (progressRow?.score != null ? { score: progressRow.score, feedback: progressRow.feedback || "" } : null);
 
-      const hasWork =
-        completedSteps.length > 0 ||
-        percentage > 0 ||
-        status === "completed" ||
-        status === "in_progress" ||
+      const hasRealAnswers =
         (sessionData.provide?.seen?.length ?? 0) > 0 ||
         Object.keys(sessionData.restate?.responses ?? {}).length > 0 ||
         Object.keys(sessionData.visualize?.items ?? {}).length > 0 ||
@@ -404,12 +400,31 @@ export async function getAllStepMissionSubmissions(className = "XC") {
         (sessionData.discuss?.response?.trim().length ?? 0) > 0 ||
         Object.keys(sessionData.games?.answers ?? {}).length > 0;
 
+      // Only show in review list if the student has actually completed steps or entered real answers
+      const hasWork =
+        completedSteps.length > 0 ||
+        percentage > 0 ||
+        status === "completed" ||
+        hasRealAnswers;
+
       if (hasWork) {
+        // Merge visual items and preserve actual previews
+        let visualData = sessionData.visualize;
+        if (visualData?.items && localSession?.data?.visualize?.items) {
+          const mergedItems = { ...visualData.items };
+          Object.entries(localSession.data.visualize.items).forEach(([k, localItem]) => {
+            if (localItem?.preview && !mergedItems[k]?.preview) {
+              mergedItems[k] = { ...mergedItems[k], preview: localItem.preview };
+            }
+          });
+          visualData = { ...visualData, items: mergedItems };
+        }
+
         // Ensure sessionData has presentable structure for all completed steps
         const displaySessionData = {
           provide: sessionData.provide || (completedStepsSet.has("Provide") ? { seen: ["vocabulary-completed"] } : null),
           restate: sessionData.restate || (completedStepsSet.has("Restate") ? { responses: { 0: "Student completed sentence restatements." } } : null),
-          visualize: sessionData.visualize || (completedStepsSet.has("Visualize") ? { items: { 0: { mode: "draw", preview: null } } } : null),
+          visualize: visualData || (completedStepsSet.has("Visualize") ? { items: { 0: { mode: "draw", preview: null } } } : null),
           engage: sessionData.engage || (completedStepsSet.has("Engage") ? { matched: ["All pairs matched"], failed: [] } : null),
           discuss: sessionData.discuss || (completedStepsSet.has("Discuss") ? { response: "Student discussion reflection completed." } : null),
           games: sessionData.games || (completedStepsSet.has("Games") ? { answers: { 0: { correct: true } } } : null),
