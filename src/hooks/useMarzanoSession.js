@@ -307,6 +307,48 @@ export default function useMarzanoSession(chapterId) {
     };
   }, [chapterId, storageKey, user?.id]);
 
+  // ---------------------------------------------------------------------
+  // Real‑time cloud sync: listen for remote reset events via Supabase Realtime
+  // This works across different browsers / profiles because changes are
+  // streamed from the server. When a learning_session row for this student
+  // changes to status "reset" we purge any local drafts for the affected
+  // chapter(s) and refresh the UI.
+  // ---------------------------------------------------------------------
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase.channel(`student-${user.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'learning_sessions',
+        filter: `student_id=eq.${user.id}`,
+      }, (payload) => {
+        const newRow = payload.new;
+        if (!newRow) return;
+        if (newRow.status === 'reset') {
+          // Remove any local drafts for this chapter (including mirror ids)
+          const ids = [Number(newRow.chapter_id)];
+          if (Number(newRow.chapter_id) > 15) ids.push(Number(newRow.chapter_id) - 15);
+          ids.push(Number(newRow.chapter_id) + 15);
+          ids.forEach((cId) => {
+            try {
+              window.localStorage.removeItem(`marzalearn-session-v1:${user.id}:${cId}`);
+              window.localStorage.removeItem(`marzalearn-session:${user.id}:${cId}`);
+            } catch (_) {}
+          });
+          // If the current chapter was reset, force reload
+          if (ids.includes(Number(chapterId))) {
+            setSession(createDefaultState());
+            setRecovered(false);
+          }
+        }
+      })
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, chapterId]);
+
   useEffect(() => {
     if (loading || !storageKey) return;
 

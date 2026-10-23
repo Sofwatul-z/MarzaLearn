@@ -60,16 +60,39 @@ function getLocalLearningSessions(studentId) {
   return sessions;
 }
 
-function mergeSessionProgress(cloudSessions, localSessions) {
+function mergeSessionProgress(cloudSessions, localSessions, studentId) {
   const byChapter = new Map();
 
-  [...cloudSessions, ...localSessions].forEach((session) => {
+  // 1. Cloud sessions are single source of truth
+  cloudSessions.forEach((session) => {
+    const key = Number(session.chapter_id);
+    byChapter.set(key, session);
+
+    // If cloud marks this chapter as reset, purge stale local session from browser
+    if (session.status === "reset" && studentId && typeof localStorage !== "undefined") {
+      try {
+        localStorage.removeItem(`marzalearn-session-v1:${studentId}:${key}`);
+        localStorage.removeItem(`marzalearn-session:${studentId}:${key}`);
+        if (key > 15) {
+          localStorage.removeItem(`marzalearn-session-v1:${studentId}:${key - 15}`);
+        }
+      } catch (e) {}
+    }
+  });
+
+  // 2. Only consider local drafts if cloud doesn't explicitly have a reset session for it
+  localSessions.forEach((session) => {
     const key = Number(session.chapter_id);
     const existing = byChapter.get(key);
+
     if (!existing) {
+      // Only keep local session if not reset in cloud
       byChapter.set(key, session);
       return;
     }
+
+    // Never let local storage revive a cloud-reset session
+    if (existing.status === "reset") return;
 
     const existingTime = new Date(existing.updated_at ?? existing.completed_at ?? existing.started_at ?? 0).getTime();
     const candidateTime = new Date(session.updated_at ?? session.completed_at ?? session.started_at ?? 0).getTime();
@@ -93,7 +116,7 @@ export async function getStudentLearningSessions(studentId) {
     "learning sessions"
   );
   // Merge with any local drafts; no reset overrides are applied (cloud is source of truth)
-  return mergeSessionProgress(cloud, getLocalLearningSessions(studentId)).map((session) => {
+  return mergeSessionProgress(cloud, getLocalLearningSessions(studentId), studentId).map((session) => {
     const catalogChapter = CHAPTER_CATALOG.find(
       (chapter) => chapter.id === Number(session.chapter_id) || chapter.databaseId === Number(session.chapter_id)
     );
@@ -702,6 +725,30 @@ export function buildStudentChapterProgress(
         Number(row.chapter_id) === Number(chapter.id) ||
         Number(row.chapter_id) === Number(chapter.databaseId)
     );
+
+    const isCloudReset =
+      latestSession?.status === "reset" ||
+      (dbRow &&
+        Number(dbRow.percentage || 0) === 0 &&
+        !dbRow.provide &&
+        !dbRow.restate &&
+        !dbRow.visualize &&
+        !dbRow.engage &&
+        !dbRow.discuss &&
+        !dbRow.play);
+
+    if (isCloudReset) {
+      return {
+        ...chapter,
+        missionStatus: "not_started",
+        currentStep: 0,
+        missionPercent: 0,
+        projectStatus: "not_submitted",
+        startedAt: null,
+        completedAt: null,
+        submittedAt: null,
+      };
+    }
 
     const sessionMissionStatus = normalizeMissionStatus(latestSession);
     const sessionStep = Math.min(

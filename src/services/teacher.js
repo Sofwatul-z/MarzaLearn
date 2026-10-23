@@ -202,21 +202,49 @@ export async function resetStudentChapterProgress(studentId, chapterId) {
     } catch (e) {}
   }
 
-  // 2. Direct database cleanup (always execute to guarantee cloud cleanliness)
+  // 2. Direct database cleanup: explicitly write reset state to cloud
   try {
-    // Delete or zero out student_progress
-    await supabase
-      .from("student_progress")
-      .delete()
-      .eq("student_id", studentId)
-      .in("chapter_id", targetChapterIds);
+    // Write explicit 0% to student_progress so any device checking cloud knows it's reset
+    for (const cId of targetChapterIds) {
+      await supabase
+        .from("student_progress")
+        .upsert(
+          {
+            student_id: studentId,
+            chapter_id: cId,
+            percentage: 0,
+            provide: false,
+            restate: false,
+            visualize: false,
+            engage: false,
+            discuss: false,
+            play: false,
+            score: null,
+            feedback: null,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "student_id,chapter_id" }
+        );
+    }
 
-    // Also delete learning_sessions so old answers (like draft sentences) are completely wiped from cloud
-    await supabase
-      .from("learning_sessions")
-      .delete()
-      .eq("student_id", studentId)
-      .in("chapter_id", targetChapterIds);
+    // Mark learning_sessions as reset with wiped answers so all devices see empty session
+    for (const cId of targetChapterIds) {
+      await supabase
+        .from("learning_sessions")
+        .upsert(
+          {
+            student_id: studentId,
+            chapter_id: cId,
+            status: "reset",
+            current_step: 1,
+            started_at: null,
+            completed_at: null,
+            session_data: { reset: true, resetAt: new Date().toISOString() },
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "student_id,chapter_id" }
+        );
+    }
 
     // Clear project submissions
     await supabase
