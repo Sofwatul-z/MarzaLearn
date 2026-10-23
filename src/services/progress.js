@@ -227,16 +227,6 @@ export async function getAllProjectSubmissions(className = "XC") {
 
   let list = data || [];
 
-  try {
-    const local = JSON.parse(localStorage.getItem("marzalearn-all-projects") || "[]");
-    const ids = new Set(list.map((p) => `${p.student_id}-${p.chapter_id}`));
-    local.forEach((lp) => {
-      if (!ids.has(`${lp.student_id}-${lp.chapter_id}`)) {
-        list.push(lp);
-      }
-    });
-  } catch (e) {}
-
   if (className) {
     list = list.filter(
       (p) => !p.class_name || p.class_name.toUpperCase() === className.toUpperCase()
@@ -329,7 +319,7 @@ export async function getAllStepMissionSubmissions(className = "XC") {
       const catalogChapter = CHAPTER_CATALOG.find((c) => c.id === cId);
       const dbChapterId = catalogChapter?.databaseId ?? (cId + 15);
 
-      // Check student_progress row
+      // Check student_progress row from cloud
       const progressRow = progressRows.find(
         (r) =>
           r.student_id === student.id &&
@@ -339,22 +329,35 @@ export async function getAllStepMissionSubmissions(className = "XC") {
            Number(r.chapter_id) === (cId - 15))
       );
 
-      // Check learning_sessions row
+      // Check learning_sessions row from cloud
       const dbSession = dbSessions.find(
         (s) =>
           s.student_id === student.id &&
           (Number(s.chapter_id) === cId || Number(s.chapter_id) === dbChapterId)
       );
 
-      // Check localStorage session
-      let localSession = null;
-      try {
-        const key = `marzalearn-session-v1:${student.id}:${cId}`;
-        const raw = localStorage.getItem(key);
-        if (raw) localSession = JSON.parse(raw);
-      } catch (e) {}
+      // Check if this chapter was reset in cloud
+      const isCloudReset =
+        dbSession?.status === "reset" ||
+        (progressRow &&
+          Number(progressRow.percentage || 0) === 0 &&
+          !progressRow.provide &&
+          !progressRow.restate &&
+          !progressRow.visualize &&
+          !progressRow.engage &&
+          !progressRow.discuss &&
+          !progressRow.play);
 
-      // Collect completed steps from student_progress boolean flags and session
+      // If chapter is reset or has zero progress in cloud, clean up any stale local cache
+      const localKey = `marzalearn-session-v1:${student.id}:${cId}`;
+      if (isCloudReset && typeof localStorage !== "undefined") {
+        try {
+          localStorage.removeItem(localKey);
+          localStorage.removeItem(`marzalearn-session:${student.id}:${cId}`);
+        } catch (e) {}
+      }
+
+      // Collect completed steps strictly from cloud truth
       const completedStepsSet = new Set();
       if (progressRow) {
         if (progressRow.provide) completedStepsSet.add("Provide");
@@ -365,10 +368,7 @@ export async function getAllStepMissionSubmissions(className = "XC") {
         if (progressRow.play) completedStepsSet.add("Games");
       }
 
-      const rawCompletedSteps =
-        dbSession?.session_data?.completedSteps ||
-        localSession?.completedSteps ||
-        [];
+      const rawCompletedSteps = dbSession?.session_data?.completedSteps || [];
       rawCompletedSteps.forEach((st) => {
         const stepName = typeof st === "string" ? st : st?.step_name || st?.name;
         if (stepName) completedStepsSet.add(stepName);
@@ -376,12 +376,15 @@ export async function getAllStepMissionSubmissions(className = "XC") {
 
       const completedSteps = Array.from(completedStepsSet);
       const percentage = Number(progressRow?.percentage ?? 0);
-      const sessionData = dbSession?.session_data?.data || localSession?.data || {};
+      const sessionData = dbSession?.session_data?.data || {};
       const status =
         progressRow?.status ||
         dbSession?.status ||
-        localSession?.status ||
-        (completedSteps.length >= 6 || percentage >= 100 ? "completed" : completedSteps.length > 0 ? "in_progress" : "not_started");
+        (completedSteps.length >= 6 || percentage >= 100
+          ? "completed"
+          : completedSteps.length > 0
+            ? "in_progress"
+            : "not_started");
 
       const gradeKey1 = `${student.id}-${cId}`;
       const gradeKey2 = `${student.id}-${dbChapterId}`;
@@ -390,35 +393,17 @@ export async function getAllStepMissionSubmissions(className = "XC") {
         storedGrades[gradeKey2] ||
         dbSession?.session_data?.grade ||
         sessionData?.grade ||
-        (progressRow?.score != null ? { score: progressRow.score, feedback: progressRow.feedback || "" } : null);
+        (progressRow?.score != null
+          ? { score: progressRow.score, feedback: progressRow.feedback || "" }
+          : null);
 
-      const hasRealAnswers =
-        (sessionData.provide?.seen?.length ?? 0) > 0 ||
-        Object.keys(sessionData.restate?.responses ?? {}).length > 0 ||
-        Object.keys(sessionData.visualize?.items ?? {}).length > 0 ||
-        (sessionData.engage?.matched?.length ?? 0) > 0 ||
-        (sessionData.discuss?.response?.trim().length ?? 0) > 0 ||
-        Object.keys(sessionData.games?.answers ?? {}).length > 0;
-
-      // Only show in review list if the student has actually completed steps or entered real answers
+      // A chapter must have actual work and must NOT be reset in cloud
       const hasWork =
-        completedSteps.length > 0 ||
-        percentage > 0 ||
-        status === "completed" ||
-        hasRealAnswers;
+        !isCloudReset &&
+        (completedSteps.length > 0 || percentage > 0 || status === "completed");
 
       if (hasWork) {
-        // Merge visual items and preserve actual previews
         let visualData = sessionData.visualize;
-        if (visualData?.items && localSession?.data?.visualize?.items) {
-          const mergedItems = { ...visualData.items };
-          Object.entries(localSession.data.visualize.items).forEach(([k, localItem]) => {
-            if (localItem?.preview && !mergedItems[k]?.preview) {
-              mergedItems[k] = { ...mergedItems[k], preview: localItem.preview };
-            }
-          });
-          visualData = { ...visualData, items: mergedItems };
-        }
 
         // Ensure sessionData has presentable structure for all completed steps
         const displaySessionData = {

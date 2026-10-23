@@ -202,71 +202,31 @@ export async function resetStudentChapterProgress(studentId, chapterId) {
     } catch (e) {}
   }
 
-  // 2. Direct database updates (fallback or complementary)
-  if (!rpcSucceeded) {
-    try {
-      await supabase
-        .from("student_progress")
-        .update({
-          provide: false,
-          restate: false,
-          visualize: false,
-          engage: false,
-          discuss: false,
-          play: false,
-          percentage: 0,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("student_id", studentId)
-        .in("chapter_id", targetChapterIds);
-    } catch (e) {}
-
-    for (const cId of targetChapterIds) {
-      const progressPayload = {
-        student_id: studentId,
-        chapter_id: cId,
-        provide: false,
-        restate: false,
-        visualize: false,
-        engage: false,
-        discuss: false,
-        play: false,
-        percentage: 0,
-        updated_at: new Date().toISOString(),
-      };
-
-      try {
-        await supabase
-          .from("student_progress")
-          .upsert(progressPayload, { onConflict: "student_id,chapter_id" });
-      } catch (e) {}
-    }
-
-    for (const cId of targetChapterIds) {
-      try {
-        await supabase
-          .from("learning_sessions")
-          .update({
-            status: "reset",
-            current_step: 1,
-            completed_at: null,
-            session_data: { reset: true, resetAt: new Date().toISOString() },
-            updated_at: new Date().toISOString(),
-          })
-          .eq("student_id", studentId)
-          .eq("chapter_id", cId);
-      } catch (e) {}
-    }
-  }
-
-  // 3. Clear related project submissions in Supabase
+  // 2. Direct database cleanup (always execute to guarantee cloud cleanliness)
   try {
+    // Delete or zero out student_progress
+    await supabase
+      .from("student_progress")
+      .delete()
+      .eq("student_id", studentId)
+      .in("chapter_id", targetChapterIds);
+
+    // Also delete learning_sessions so old answers (like draft sentences) are completely wiped from cloud
+    await supabase
+      .from("learning_sessions")
+      .delete()
+      .eq("student_id", studentId)
+      .in("chapter_id", targetChapterIds);
+
+    // Clear project submissions
     await supabase
       .from("project_submissions")
       .delete()
       .eq("student_id", studentId)
       .in("chapter_id", targetChapterIds);
-  } catch (e) {}
+  } catch (err) {
+    console.warn("Direct database reset warning:", err);
+  }
 
   // 4. Remove local browser artifacts & ensure overrides are completely deleted
   if (typeof window !== "undefined") {

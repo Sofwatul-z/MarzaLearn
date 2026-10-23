@@ -212,11 +212,18 @@ export default function useMarzanoSession(chapterId) {
           .in("chapter_id", [Number(chapterId), Number(chapterId) + 15]);
 
         const dbRow = dbProgRows?.[0];
-        if (dbRow && Number(dbRow.percentage || 0) === 0 && !dbRow.provide && !dbRow.restate && !dbRow.visualize && !dbRow.engage && !dbRow.discuss && !dbRow.play) {
-          // If the DB explicitly has 0% and all false, and local is marked completed, DB wins (reset)
-          if (local && (local.status === "completed" || local.completedSteps?.length > 0)) {
-            isTeacherReset = true;
-          }
+        if (
+          dbRow &&
+          Number(dbRow.percentage || 0) === 0 &&
+          !dbRow.provide &&
+          !dbRow.restate &&
+          !dbRow.visualize &&
+          !dbRow.engage &&
+          !dbRow.discuss &&
+          !dbRow.play
+        ) {
+          // The teacher explicitly reset this chapter to 0% in database
+          isTeacherReset = true;
         }
       } catch (e) {}
 
