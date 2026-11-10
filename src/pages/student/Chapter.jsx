@@ -127,6 +127,9 @@ function IntroductionSection({ chapter, theme }) {
 }
 
 function ListenSection({ chapter, theme }) {
+  const isAudioOnly = chapter.id === 2 || chapter.id === 4;
+  const isReadingOnly = chapter.id === 1 || chapter.id === 3 || chapter.id === 5;
+
   return (
     <div>
       <div className="max-w-3xl">
@@ -138,65 +141,75 @@ function ListenSection({ chapter, theme }) {
           }}
           className="ml-eyebrow"
         >
-          <Headphones size={14} /> Listen & read
+          {isAudioOnly ? (
+            <>
+              <Headphones size={14} /> 02 · Listening
+            </>
+          ) : (
+            <>
+              <BookOpen size={14} /> 02 · Reading
+            </>
+          )}
         </span>
         <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl">
-          Hear the rhythm, then follow the text.
+          {isAudioOnly ? "Listen to the Audio Recording" : "Read and Understand the Text"}
         </h2>
-        <p className="mt-4 text-sm leading-7 text-[#65736D] sm:text-base">
-          Play the narration and read along. You can pause, replay, seek, or change the playback speed whenever you need.
+        <p className="mt-3.5 text-sm leading-7 text-[#65736D] sm:text-base">
+          {isAudioOnly
+            ? "Play the narration carefully to catch pronunciation, rhythm, and key information. Listen actively before moving on."
+            : "Read the story carefully to understand the context, main ideas, and vocabulary. Take your time to absorb the meaning."}
         </p>
       </div>
 
-      <div className="mt-8 grid gap-7 lg:grid-cols-[minmax(300px,0.74fr)_minmax(0,1.26fr)] lg:items-start">
-        <div className="lg:sticky lg:top-[164px]">
+      {/* Case 1: Chapter 2 & 4 -> ONLY AUDIO */}
+      {isAudioOnly && (
+        <div className="mt-8 max-w-2xl">
           <AudioPlayer src={chapter.listening.audioSrc} title={chapter.listening.title} theme={theme} />
           <div className="mt-4 flex items-center gap-2 px-1 text-xs font-semibold text-[#78857F]">
             <Sparkles size={14} style={{ color: theme?.primaryDark }} />
-            Listen once for meaning, then replay while reading.
+            Listen once for overall understanding, then replay to focus on key vocabulary and details.
           </div>
         </div>
+      )}
 
-        <article
-          style={{ borderColor: theme?.borderSoft || "#DDE5E0" }}
-          className="overflow-hidden rounded-[30px] border bg-white/[0.9] shadow-[0_16px_45px_rgba(36,51,45,0.05)]"
-        >
-          <header
-            style={{
-              backgroundColor: theme?.badgeBg || "#F7FAF8",
-              borderColor: theme?.borderSoft || "#E5EBE7",
-              borderLeftWidth: "5px",
-              borderLeftColor: theme?.primary,
-            }}
-            className="border-b px-6 py-5 sm:px-8"
+      {/* Case 2: Chapter 1, 3, 5 -> ONLY READING TEXT in ONE card without numbers */}
+      {isReadingOnly && (
+        <div className="mt-8 max-w-4xl">
+          <article
+            style={{ borderColor: theme?.borderSoft || "#DDE5E0" }}
+            className="overflow-hidden rounded-[30px] border bg-white/[0.94] shadow-[0_16px_45px_rgba(36,51,45,0.06)]"
           >
-            <p
-              style={{ color: theme?.primaryDark }}
-              className="text-[10px] font-extrabold uppercase tracking-[0.15em]"
+            <header
+              style={{
+                backgroundColor: theme?.badgeBg || "#F7FAF8",
+                borderColor: theme?.borderSoft || "#E5EBE7",
+                borderLeftWidth: "5px",
+                borderLeftColor: theme?.primaryDark || theme?.primary,
+              }}
+              className="border-b px-6 py-5 sm:px-8"
             >
-              Reading text
-            </p>
-            <h3 style={{ color: theme?.primaryDark }} className="mt-2 text-xl font-extrabold tracking-[-0.03em] sm:text-2xl">
-              {chapter.listening.title}
-            </h3>
-          </header>
-          <div className="px-6 py-6 sm:px-8 sm:py-8">
-            <div className="ml-reading-width space-y-5">
-              {chapter.listening.paragraphs.map((paragraph, index) => (
-                <div key={index} className="grid grid-cols-[28px_minmax(0,1fr)] gap-3">
-                  <span
-                    style={{ color: theme?.primaryMuted }}
-                    className="pt-1 text-[10px] font-extrabold tabular-nums"
-                  >
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <p className="text-[15px] leading-8 text-[#4F5F57] sm:text-base">{paragraph}</p>
-                </div>
-              ))}
+              <p
+                style={{ color: theme?.primaryDark }}
+                className="text-[10px] font-extrabold uppercase tracking-[0.15em]"
+              >
+                Reading Passage
+              </p>
+              <h3 style={{ color: theme?.primaryDark }} className="mt-1.5 text-xl font-extrabold tracking-[-0.03em] sm:text-2xl">
+                {chapter.listening.title}
+              </h3>
+            </header>
+            <div className="px-6 py-6 sm:px-8 sm:py-8">
+              <div className="space-y-4">
+                {chapter.listening.paragraphs.map((paragraph, index) => (
+                  <p key={index} className="text-[15px] sm:text-base leading-relaxed text-[#35483F]">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
             </div>
-          </div>
-        </article>
-      </div>
+          </article>
+        </div>
+      )}
 
       <SourceNote source={chapter.listening.source} />
     </div>
@@ -211,11 +224,11 @@ function MissionHandoff({ chapter, onStart, theme }) {
         borderColor: theme?.borderSoft,
         backgroundColor: theme?.primaryDark || "#24332D",
       }}
-      className="overflow-hidden rounded-[34px] text-white shadow-[0_28px_75px_rgba(36,51,45,0.15)] relative"
+      className="overflow-hidden rounded-[34px] text-white shadow-[0_28px_75px_rgba(36,51,45,0.18)] relative"
     >
       <div
         style={{ backgroundColor: theme?.primary }}
-        className="pointer-events-none absolute -right-10 -bottom-10 h-56 w-56 rounded-full opacity-30 blur-2xl"
+        className="pointer-events-none absolute -right-10 -bottom-10 h-64 w-64 rounded-full opacity-35 blur-3xl"
       />
       <div className="grid gap-8 p-7 sm:p-9 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center lg:p-10 relative z-10">
         <div>
@@ -229,16 +242,16 @@ function MissionHandoff({ chapter, onStart, theme }) {
           >
             <CheckCircle2 size={14} /> Learn section complete
           </span>
-          <h3 className="mt-3 max-w-2xl text-2xl font-extrabold tracking-[-0.04em] text-white sm:text-3xl">
+          <h3 className="mt-3.5 max-w-3xl text-2xl font-extrabold tracking-[-0.04em] text-white sm:text-3xl lg:text-4xl">
             Ready for the 6-Step Learning Mission?
           </h3>
-          <p className="mt-2 text-sm font-bold text-white/90">
+          <p className="mt-2 text-sm font-bold text-white/95">
             One session. Six connected ways to learn.
           </p>
-          <p className="mt-1.5 max-w-2xl text-sm leading-7 text-white/75">
+          <p className="mt-2 max-w-2xl text-sm leading-7 text-white/85">
             Provide → Restate → Visualize → Engage → Discuss → Games. Once you start the mission, plan to finish all six steps in the same learning session.
           </p>
-          <div className="mt-5 flex flex-wrap gap-4 text-xs font-bold text-white/60">
+          <div className="mt-5 flex flex-wrap gap-4 text-xs font-bold text-white/70">
             <span className="inline-flex items-center gap-2"><Clock3 size={14} /> {chapter.duration}</span>
             <span>6 connected activities</span>
             <span>Autosave-ready flow</span>
@@ -509,14 +522,14 @@ export default function Chapter() {
               <span>•</span>
               <span>{chapter.duration}</span>
               <span>•</span>
-              <span>Listening included</span>
+              <span>{chapter.id === 2 || chapter.id === 4 ? "Listening Audio" : "Reading Text"}</span>
             </div>
           </motion.div>
           <ChapterArtwork chapterId={chapter.id} title={chapter.title} />
         </div>
       </section>
 
-      <LearnProgress active={activeStage} completed={completed} theme={theme} onSelect={goToStage} />
+      <LearnProgress active={activeStage} completed={completed} theme={theme} onSelect={goToStage} chapterId={chapter.id} />
 
       <section className="min-h-[540px] pb-8 pt-2 sm:pb-10">
         <AnimatePresence mode="wait">
@@ -540,7 +553,7 @@ export default function Chapter() {
         </Button>
         {!isGrammar && (
           <Button theme={theme} variant="primary" onClick={next}>
-            Next: {activeStage === "introduction" ? "Listen & Read" : "Grammar Corner"} <ArrowRight size={16} />
+            Next: {activeStage === "introduction" ? (chapter.id === 2 || chapter.id === 4 ? "Listening Audio" : "Reading Text") : "Grammar Corner"} <ArrowRight size={16} />
           </Button>
         )}
       </div>

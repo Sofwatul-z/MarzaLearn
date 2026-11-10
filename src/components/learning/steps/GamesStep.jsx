@@ -3,6 +3,8 @@ import QuizGame from "../QuizGame";
 import SourceNote from "../../common/SourceNote";
 
 export default function GamesStep({ content, value, onChange, chapterId, theme }) {
+  const isSingleSlide = Boolean(content.questions?.some((q) => q.part)) || content.questions?.length > 5;
+
   return (
     <div>
       <div className="mb-6 max-w-3xl">
@@ -19,9 +21,9 @@ export default function GamesStep({ content, value, onChange, chapterId, theme }
         <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl">
           {content.title}
         </h2>
-        <p className="mt-4 text-sm leading-7 text-[#65736D] sm:text-base">
-          One question at a time. Your first answer is final, so read the sentence before you choose.
-        </p>
+        <div className="mt-3 text-sm leading-7 text-[#65736D] sm:text-base whitespace-pre-line">
+          {content.subtitle || "One question at a time. Your first answer is final, so read the sentence before you choose."}
+        </div>
       </div>
 
       {/* Student Action Instructions in English */}
@@ -39,18 +41,35 @@ export default function GamesStep({ content, value, onChange, chapterId, theme }
           <Gamepad2 size={16} />
           <span>What to Do in this Step:</span>
         </div>
-        <ol
-          style={{ color: theme?.primaryDark || "#4A5D54" }}
-          className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed opacity-95"
-        >
-          <li>1. Read each question and the accompanying context sentence carefully.</li>
-          <li>2. Select the best answer option from the multiple-choice list. <em>(Note: Your first selection counts toward your final score!)</em></li>
-          <li>3. Answer all questions to complete the 6-Step Mission.</li>
-          <li>4. When finished, click <strong>"Complete Mission"</strong> at the bottom to finalize your score and unlock your project!</li>
-        </ol>
+        {content.instructions ? (
+          <div
+            style={{ color: theme?.primaryDark || "#4A5D54" }}
+            className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed opacity-95 whitespace-pre-line"
+          >
+            {content.instructions}
+          </div>
+        ) : (
+          <ol
+            style={{ color: theme?.primaryDark || "#4A5D54" }}
+            className="mt-2.5 space-y-1.5 text-xs sm:text-sm font-medium leading-relaxed opacity-95"
+          >
+            <li>1. Read each question and the accompanying context sentence carefully.</li>
+            <li>2. Select the best answer option from the multiple-choice list. <em>(Note: Your first selection counts toward your final score!)</em></li>
+            <li>3. Answer all questions to complete the 6-Step Mission.</li>
+            <li>4. When finished, click <strong>"Complete Mission"</strong> at the bottom to finalize your score and unlock your project!</li>
+          </ol>
+        )}
       </div>
 
-      <QuizGame questions={content.questions} value={value} onChange={onChange} chapterId={chapterId} theme={theme} />
+      <QuizGame
+        questions={content.questions}
+        value={value}
+        onChange={onChange}
+        chapterId={chapterId}
+        theme={theme}
+        singleSlide={isSingleSlide}
+      />
+
       <SourceNote source={content.source} />
     </div>
   );

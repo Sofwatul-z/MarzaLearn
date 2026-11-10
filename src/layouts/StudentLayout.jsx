@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import GradientBlob from "../components/ui/GradientBlob";
 import StudentHeader from "../components/student/StudentHeader";
+import ChapterDecorations from "../components/learning/ChapterDecorations";
 import { getChapterTheme } from "../data/chapterThemes";
 
 export default function StudentLayout() {
@@ -17,6 +18,9 @@ export default function StudentLayout() {
       >
         Skip to content
       </a>
+
+      {/* Grid Background */}
+      <ChapterDecorations />
 
       <GradientBlob
         color={theme?.primary || "#EAC3D5"}

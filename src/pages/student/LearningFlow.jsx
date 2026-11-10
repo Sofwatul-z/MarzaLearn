@@ -47,7 +47,7 @@ function isStepReady(chapter, session, stepNumber) {
   const data = session.data;
 
   if (stepNumber === 1) {
-    return (data.provide?.seen?.length ?? 0) >= chapter.marzano.provide.vocabulary.length;
+    return true;
   }
 
   if (stepNumber === 2) {
@@ -155,56 +155,47 @@ function MissionIntro({ chapter, recovered, onStart, onBack, theme }) {
           borderColor: theme?.borderSoft,
           backgroundColor: theme?.primaryDark || "#24332D",
         }}
-        className="relative overflow-hidden rounded-[34px] px-6 py-8 text-white shadow-[0_28px_75px_rgba(36,51,45,0.15)] sm:px-9 sm:py-10 lg:px-11"
+        className="relative overflow-hidden rounded-[34px] p-6 text-white shadow-[0_28px_75px_rgba(36,51,45,0.18)] sm:p-9 lg:p-11"
       >
         <div
           style={{ backgroundColor: theme?.primary }}
-          className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full opacity-30 blur-3xl"
+          className="pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full opacity-35 blur-3xl"
         />
         <div
           style={{ backgroundColor: theme?.accent || "#F4D7C5" }}
-          className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full opacity-25 blur-3xl"
+          className="pointer-events-none absolute -bottom-24 left-1/3 h-64 w-64 rounded-full opacity-30 blur-3xl"
         />
 
-        <div className="relative grid gap-9 lg:grid-cols-[minmax(0,1fr)_auto_260px] lg:items-center">
-          <div>
+        <div className="relative z-10 flex flex-col gap-6">
+          {/* Top: Eyebrow badge and title spanning HORIZONTALLY to the right */}
+          <div className="w-full">
             <span
               style={{
                 backgroundColor: theme?.badgeBg,
                 borderColor: theme?.border,
-                color: theme?.badgeText,
+                color: theme?.badgeText || theme?.primaryDark,
               }}
-              className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.17em]"
+              className="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em]"
             >
               Chapter {String(chapter.id).padStart(2, "0")} · 6-Step Mission
             </span>
-            <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-[-0.055em] text-white sm:text-5xl">
+            <h1 className="mt-3.5 text-3xl font-extrabold tracking-[-0.035em] text-white sm:text-4xl lg:text-5xl leading-tight">
               One session. Six connected ways to learn.
             </h1>
-            <p className="mt-5 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
-              Move from vocabulary discovery to your own sentences, visuals, matching, discussion, and a final game. Each next step opens only after the current activity is complete.
-            </p>
           </div>
 
-          {introAsset?.leftTop && (
-            <motion.div
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
-              className="hidden lg:flex justify-center shrink-0"
-            >
-              <img
-                src={introAsset.leftTop}
-                alt=""
-                className="h-44 w-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.35)]"
-              />
-            </motion.div>
-          )}
-
-          <div className="rounded-[24px] border border-white/10 bg-white/[0.07] p-5">
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-white/45">Session rule</p>
-            <p className="mt-2 text-sm font-bold leading-6 text-white/85">
-              Plan to finish all six steps in this sitting. Autosave exists for refresh or connection recovery, not as a multi-day workflow.
+          {/* Bottom: Description on left (flowing wide to the right), Session rule box on right */}
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+            <p className="max-w-3xl text-sm leading-7 text-white/85 sm:text-base">
+              Move from vocabulary discovery to your own sentences, visuals, matching, discussion, and a final game. Each next step opens only after the current activity is complete.
             </p>
+
+            <div className="rounded-[22px] border border-white/20 bg-white/[0.12] p-5 backdrop-blur-sm lg:max-w-xs shrink-0 shadow-sm">
+              <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-white/70">Session rule</p>
+              <p className="mt-1.5 text-xs sm:text-sm font-bold leading-relaxed text-white">
+                Plan to finish all six steps in this sitting. Autosave exists for refresh or connection recovery, not as a multi-day workflow.
+              </p>
+            </div>
           </div>
         </div>
       </section>

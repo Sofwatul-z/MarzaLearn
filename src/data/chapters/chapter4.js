@@ -188,35 +188,120 @@ const chapter = {
       "example": "In my opinion, students should not play online games during school break. I believe that it will disrupt their focus for the next lesson. They should use the time to rest."
     },
     "games": {
-      "source": "Adaptasi Langkah 6 Marzano — Gamified Learning untuk evaluasi grammar opini",
-      "title": "Game Time: Check Your Grammar!",
+      "source": "Evaluasi Reading & Grammar: Why Students Should Limit Screen Time Before Bed",
+      "title": "Game Time: Test Your Reading and Grammar Skills! 🎮",
+      "subtitle": "Read carefully, choose wisely, and get the highest score!\nYou will answer 10 multiple-choice questions based on the text “Why Students Should Limit Screen Time Before Bed.” Each question has three answer options. Your first answer is final, so think carefully before choosing!",
+      "instructions": "WHAT TO DO IN THIS STEP:\n1. Read the Text: Understand the main ideas and important details of the text.\n2. Answer the Questions: Complete 7 reading comprehension questions and 3 grammar questions.\n3. Choose the Best Answer: Select one correct answer for each question. Remember, your first choice counts toward your final score!\n4. Complete the Quiz: Answer all 10 questions to finish the challenge.\n5. Finish Your Mission: Click “Complete Mission” to see your final score and unlock the next step!\nGood luck and enjoy the challenge! 🌟",
       "questions": [
         {
-          "question": "________, eating fast food every day is very harmful to our body.",
+          "id": 1,
+          "part": "Part A – Reading Comprehension",
+          "question": "What is the main topic of the text?",
+          "options": [
+            "The benefits of using smartphones at school",
+            "The importance of limiting screen time before bed",
+            "The advantages of social media for teenagers"
+          ],
+          "answer": "The importance of limiting screen time before bed"
+        },
+        {
+          "id": 2,
+          "part": "Part A – Reading Comprehension",
+          "question": "Why is blue light from screens harmful before bedtime?",
+          "options": [
+            "It helps students sleep faster.",
+            "It makes students feel hungry.",
+            "It tricks the brain into thinking it is still daytime."
+          ],
+          "answer": "It tricks the brain into thinking it is still daytime."
+        },
+        {
+          "id": 3,
+          "part": "Part A – Reading Comprehension",
+          "question": "How might students feel the next morning after using screens before bed?",
+          "options": [
+            "Tired",
+            "Excited",
+            "Energetic"
+          ],
+          "answer": "Tired"
+        },
+        {
+          "id": 4,
+          "part": "Part B – Grammar: Complete the Sentence",
+          "question": "Complete the sentence with the correct expression of opinion:\n\"__________, using screens right before bed is very harmful to our health.\"",
           "options": [
             "I am",
             "In my opinion",
-            "I believe in"
+            "I have"
           ],
           "answer": "In my opinion"
         },
         {
-          "question": "I ________ believe that reading books can make us smarter.",
+          "id": 5,
+          "part": "Part B – Grammar: Complete the Sentence",
+          "question": "Choose the correct verb to complete the sentence:\n\"The blue light from the screen __________ our sleep.\"",
           "options": [
-            "am",
-            "strongly",
-            "point of view"
+            "disrupt",
+            "disrupting",
+            "disrupts"
           ],
-          "answer": "strongly"
+          "answer": "disrupts"
         },
         {
-          "question": "From my point of ________, the school needs to build a larger library.",
+          "id": 6,
+          "part": "Part C – Reading Comprehension",
+          "question": "What can happen when students look at social media at night?",
           "options": [
-            "opinion",
-            "think",
-            "view"
+            "They may experience anxiety.",
+            "They become more relaxed.",
+            "They sleep more peacefully."
           ],
-          "answer": "view"
+          "answer": "They may experience anxiety."
+        },
+        {
+          "id": 7,
+          "part": "Part C – Reading Comprehension",
+          "question": "According to the writer, what do students need to rest properly?",
+          "options": [
+            "A new smartphone",
+            "A peaceful mind",
+            "More time on social media"
+          ],
+          "answer": "A peaceful mind"
+        },
+        {
+          "id": 8,
+          "part": "Part D – Grammar: Correct the Sentence",
+          "question": "Which sentence uses the correct grammar?",
+          "options": [
+            "I strongly believes that reading a printed book is better.",
+            "I strongly believing that reading a printed book is better.",
+            "I strongly believe that reading a printed book is better."
+          ],
+          "answer": "I strongly believe that reading a printed book is better."
+        },
+        {
+          "id": 9,
+          "part": "Part E – Reading Comprehension",
+          "question": "What is the purpose of the text?",
+          "options": [
+            "To explain how smartphones are made",
+            "To persuade students to limit screen time before bed",
+            "To describe teenagers' daily activities"
+          ],
+          "answer": "To persuade students to limit screen time before bed"
+        },
+        {
+          "id": 10,
+          "part": "Part E – Reading Comprehension",
+          "question": "What does the writer recommend doing before sleeping?",
+          "options": [
+            "Playing online games",
+            "Watching videos on a smartphone",
+            "Reading a printed book or listening to relaxing music"
+          ],
+          "answer": "Reading a printed book or listening to relaxing music"
         }
       ]
     }

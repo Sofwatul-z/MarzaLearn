@@ -94,9 +94,6 @@ export default function RestateStep({ content, value, onChange, theme }) {
                   placeholder={`Write your own sentence using ${prompt.split(" (")[0]}...`}
                   aria-label={`Your sentence for ${prompt}`}
                 />
-                <div className="mt-2 flex items-center gap-2 text-[11px] font-semibold text-[#8A9690]">
-                  <Lightbulb size={13} /> Make it your sentence, not a copied definition.
-                </div>
               </div>
             </div>
           );

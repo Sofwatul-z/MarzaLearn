@@ -1,12 +1,18 @@
-import { BookOpenText, Headphones, Shapes } from "lucide-react";
+import { BookOpenText, Headphones, Shapes, BookOpen } from "lucide-react";
 
-const steps = [
-  { id: "introduction", label: "Introduction", icon: BookOpenText },
-  { id: "listen", label: "Listen & Read", icon: Headphones },
-  { id: "grammar", label: "Grammar Corner", icon: Shapes },
-];
+export default function LearnProgress({ active, completed = [], onSelect, theme, chapterId }) {
+  const isAudioOnly = chapterId === 2 || chapterId === 4;
 
-export default function LearnProgress({ active, completed = [], onSelect, theme }) {
+  const steps = [
+    { id: "introduction", label: "Introduction", icon: BookOpenText },
+    {
+      id: "listen",
+      label: isAudioOnly ? "Listening" : "Reading",
+      icon: isAudioOnly ? Headphones : BookOpen,
+    },
+    { id: "grammar", label: "Grammar Corner", icon: Shapes },
+  ];
+
   return (
     <nav
       className="sticky top-[126px] z-30 -mx-1 mb-8 overflow-x-auto px-1 py-2 sm:top-[76px]"
@@ -48,10 +54,10 @@ export default function LearnProgress({ active, completed = [], onSelect, theme 
                       : "bg-[#EEF2EF] text-[#7B8882]"
                 }`}
               >
-                {isComplete && !isActive ? "✓" : <Icon size={13} strokeWidth={2.4} />}
+                {index + 1}
               </span>
-              <span className="hidden sm:inline">{String(index + 1).padStart(2, "0")} · </span>
-              {step.label}
+              <Icon size={14} />
+              <span>{step.label}</span>
             </button>
           );
         })}
