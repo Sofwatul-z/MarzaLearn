@@ -244,7 +244,8 @@ a {
 
 @media (max-width: 640px) {
   .ml-page-container {
-    width: min(100% - 0.75rem, 1440px);
+    width: min(100% - 1.5rem, 1440px);
+    padding-inline: 0.25rem;
   }
 }
 

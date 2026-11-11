@@ -66,17 +66,35 @@ export default function StudentHeader() {
             : "border-b border-[#E8ECE9]/80 bg-[#FBFCF8]/[0.9]"
         }`}
       >
-        <div className="mx-auto flex w-full max-w-[1440px] items-center gap-3">
+        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3">
           <Logo to={location.pathname} theme={headerTheme} />
-          <div
-            style={{ borderColor: theme?.borderSoft || "#D7E2DC", backgroundColor: theme?.badgeBg || "rgba(255,255,255,0.75)" }}
-            className="ml-auto flex items-center gap-2 rounded-full border px-3 py-2"
-          >
-            <span style={{ backgroundColor: theme?.primary || "#8EBEAA" }} className="h-2 w-2 rounded-full" aria-hidden="true" />
-            <div className="leading-tight">
-              <p style={{ color: theme?.primaryDark || "#6F7D76" }} className="text-[10px] font-extrabold uppercase tracking-[0.12em]">Focus session</p>
-              <p style={{ color: theme?.primaryMuted || "#98A29D" }} className="hidden text-[10px] font-semibold sm:block">Navigation is simplified until the mission is finished.</p>
+          
+          <div className="flex items-center gap-2">
+            <div
+              style={{ borderColor: theme?.borderSoft || "#D7E2DC", backgroundColor: theme?.badgeBg || "rgba(255,255,255,0.75)" }}
+              className="flex items-center gap-2 rounded-full border px-3 py-1.5"
+            >
+              <span style={{ backgroundColor: theme?.primary || "#8EBEAA" }} className="h-2 w-2 rounded-full" aria-hidden="true" />
+              <div className="leading-tight">
+                <p style={{ color: theme?.primaryDark || "#6F7D76" }} className="text-[10px] font-extrabold uppercase tracking-[0.12em]">Focus session</p>
+                <p style={{ color: theme?.primaryMuted || "#98A29D" }} className="hidden text-[10px] font-semibold sm:block">Navigation is simplified until the mission is finished.</p>
+              </div>
             </div>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition active:scale-95 shadow-2xs ${
+                isChapter4Session
+                  ? "border-violet-300 bg-white/90 text-violet-700 hover:bg-violet-50"
+                  : "border-[#DDE5E0] bg-white text-[#4A5D54] hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200"
+              }`}
+              aria-label="Logout"
+              title="Sign out"
+            >
+              <LogOut size={13} className="text-[#944A40]" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
           </div>
         </div>
       </header>
@@ -90,11 +108,11 @@ export default function StudentHeader() {
           : "border-b border-[#E8ECE9]/80 bg-[#FBFCF8]/[0.82]"
       }`}
     >
-      <div className="mx-auto flex w-full max-w-[1440px] items-center gap-3">
+      <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3">
         <Logo to="/student/dashboard" theme={headerTheme} />
 
         <nav
-          className={`ml-auto hidden items-center gap-1 rounded-full border p-1 sm:flex ${
+          className={`hidden items-center gap-1 rounded-full border p-1 sm:flex ${
             isChapter4Landing
               ? "border-violet-200 bg-white/85 shadow-[0_8px_22px_rgba(91,33,182,0.08)]"
               : "border-[#E3E9E5] bg-white/70 shadow-[0_8px_22px_rgba(36,51,45,0.04)]"
@@ -105,7 +123,8 @@ export default function StudentHeader() {
           <StudentNavItem to="/student/chapters" label="Chapters" active={chaptersActive} night={isChapter4Landing} />
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 sm:ml-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Desktop profile badge */}
           <div
             className={`hidden items-center gap-2.5 rounded-full border py-1.5 pl-1.5 pr-3 sm:flex ${
               isChapter4Landing ? "border-violet-200 bg-white/90" : "border-[#DDE5E0] bg-white/80"
@@ -137,38 +156,66 @@ export default function StudentHeader() {
             </div>
           </div>
 
-          <Button
+          {/* Logout Button (Clear, prominent, visible on BOTH Mobile and Desktop) */}
+          <button
+            type="button"
             onClick={handleLogout}
-            variant="ghost"
-            size="sm"
-            className={`h-10 w-10 px-0 sm:h-auto sm:w-auto sm:px-4 ${
-              isChapter4Landing ? "rounded-full text-violet-600 hover:bg-violet-50 hover:text-[#5B21B6]" : ""
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition active:scale-95 shadow-2xs ${
+              isChapter4Landing
+                ? "border-violet-300 bg-white/90 text-violet-700 hover:bg-violet-50"
+                : "border-[#DDE5E0] bg-white text-[#4A5D54] hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200"
             }`}
-            aria-label="Sign out"
+            aria-label="Logout"
             title="Sign out"
           >
-            <LogOut size={16} />
-            <span className="hidden lg:inline">Sign out</span>
-          </Button>
+            <LogOut size={13} className="text-[#944A40]" />
+            <span>Logout</span>
+          </button>
         </div>
       </div>
 
+      {/* Mobile Row 2: Navigation Pills & Student Information Badge */}
       <nav
-        className="mt-3 flex items-center gap-1 overflow-x-auto pb-0.5 sm:hidden"
+        className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100/80 pt-2.5 sm:hidden"
         aria-label="Student mobile navigation"
       >
-        <StudentNavItem to="/student/dashboard" label="Home" active={homeActive} night={isChapter4Landing} />
-        <StudentNavItem to="/student/chapters" label="Chapters" active={chaptersActive} night={isChapter4Landing} />
-        <span
-          className="ml-auto whitespace-nowrap rounded-full px-3 py-2 text-[11px] font-extrabold uppercase tracking-[0.1em]"
-          style={
-            isChapter4Landing
-              ? { backgroundColor: theme.badgeBg, color: theme.badgeText }
-              : { backgroundColor: "#EAF4EF", color: "#52625B" }
-          }
+        <div className="flex items-center gap-1 shrink-0">
+          <StudentNavItem to="/student/dashboard" label="Home" active={homeActive} night={isChapter4Landing} />
+          <StudentNavItem to="/student/chapters" label="Chapters" active={chaptersActive} night={isChapter4Landing} />
+        </div>
+
+        {/* Mobile Student Profile Badge: Displays Avatar + Full Student Name + Class */}
+        <div
+          className={`flex items-center gap-2 rounded-full border py-1 pl-1.5 pr-2.5 shadow-2xs min-w-0 max-w-[210px] ${
+            isChapter4Landing ? "border-violet-200 bg-white/90" : "border-[#DDE5E0] bg-white/90"
+          }`}
+          title={`${profile?.full_name ?? "Student"} (Class ${profile?.class_name ?? "—"})`}
         >
-          {profile?.class_name ?? "Student"}
-        </span>
+          <span
+            className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[10px] font-extrabold"
+            style={
+              isChapter4Landing
+                ? { backgroundColor: theme.primaryDark, color: "#fff" }
+                : { backgroundColor: "#CFE8DD", color: "#24332D" }
+            }
+          >
+            {initials || "S"}
+          </span>
+          <div className="min-w-0 leading-tight">
+            <p
+              className="truncate text-[11px] font-extrabold"
+              style={{ color: isChapter4Landing ? theme.primaryDark : "#24332D" }}
+            >
+              {profile?.full_name ?? "Student"}
+            </p>
+            <p
+              className="truncate text-[9px] font-bold uppercase tracking-[0.06em]"
+              style={{ color: isChapter4Landing ? theme.primaryMuted : "#7C8983" }}
+            >
+              Class {profile?.class_name ?? "—"}
+            </p>
+          </div>
+        </div>
       </nav>
     </header>
   );
