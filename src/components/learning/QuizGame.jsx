@@ -57,7 +57,7 @@ export default function QuizGame({
     return (
       <div
         style={{ borderColor: theme?.borderSoft || "#DDE5E0" }}
-        className="relative overflow-hidden rounded-[30px] border bg-white/95 p-6 shadow-[0_16px_45px_rgba(36,51,45,0.06)] sm:p-8"
+        className="relative overflow-hidden rounded-[20px] sm:rounded-[30px] border bg-white/95 p-3.5 sm:p-8 shadow-[0_16px_45px_rgba(36,51,45,0.06)]"
       >
         <AnimatePresence>
           {celebrate && (
@@ -77,7 +77,7 @@ export default function QuizGame({
         </AnimatePresence>
 
         {/* Top Quiz Status Header */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4 sm:pb-5">
           <div>
             <span
               style={{
@@ -85,34 +85,34 @@ export default function QuizGame({
                 color: theme?.badgeText || theme?.primaryDark,
                 borderColor: theme?.borderSoft,
               }}
-              className="rounded-full border px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider"
+              className="rounded-full border px-2.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider"
             >
               Multiple Choice Questions
             </span>
-            <p className="mt-1.5 text-xs sm:text-sm font-bold text-[#64748B]">
+            <p className="mt-1 text-xs sm:text-sm font-bold text-[#64748B]">
               Topic: Why Students Should Limit Screen Time Before Bed
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <span
               style={{
                 backgroundColor: theme?.badgeBg,
                 borderColor: theme?.borderSoft,
                 color: theme?.primaryDark,
               }}
-              className="rounded-full border px-3 py-1 text-xs sm:text-sm font-extrabold shadow-xs"
+              className="rounded-full border px-2.5 sm:px-3 py-1 text-xs sm:text-sm font-extrabold shadow-xs"
             >
               Score: {score} / {questions.length}
             </span>
-            <span className="text-xs font-bold text-[#94A3B8]">
+            <span className="text-[11px] sm:text-xs font-bold text-[#94A3B8]">
               ({answeredCount} of {questions.length} answered)
             </span>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
+        <div className="mt-3.5 sm:mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
           <div
             className="h-full rounded-full transition-[width] duration-300"
             style={{
@@ -123,14 +123,14 @@ export default function QuizGame({
         </div>
 
         {/* All Questions in One Unified View */}
-        <div className="mt-8 space-y-9">
+        <div className="mt-6 sm:mt-8 space-y-7 sm:space-y-9">
           {questions.map((q, qIndex) => {
             const answer = answers[qIndex];
             const isAnswered = Boolean(answer);
             const isFirstOfPart = qIndex === 0 || questions[qIndex - 1]?.part !== q.part;
 
             return (
-              <div key={q.id || qIndex} className="space-y-3.5">
+              <div key={q.id || qIndex} className="space-y-3">
                 {/* Part Header Banner if part exists */}
                 {q.part && isFirstOfPart && (
                   <div
@@ -138,14 +138,14 @@ export default function QuizGame({
                       backgroundColor: theme?.badgeBg,
                       borderColor: theme?.borderSoft,
                     }}
-                    className="mb-4 rounded-xl border px-4 py-2 text-xs sm:text-sm font-extrabold text-[#334155]"
+                    className="mb-3.5 rounded-xl border px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-extrabold text-[#334155]"
                   >
                     {q.part}
                   </div>
                 )}
 
                 {/* Question Prompt */}
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2.5 sm:gap-3">
                   <span
                     style={{
                       backgroundColor: isAnswered
@@ -159,19 +159,19 @@ export default function QuizGame({
                           : "#B91C1C"
                         : "#475569",
                     }}
-                    className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-black shadow-xs"
+                    className="grid h-6 w-6 sm:h-7 sm:w-7 shrink-0 place-items-center rounded-full text-xs font-black shadow-xs mt-0.5"
                   >
                     {qIndex + 1}
                   </span>
-                  <div className="flex-1">
-                    <p className="text-base sm:text-lg font-bold leading-relaxed text-[#1E293B] whitespace-pre-line">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm sm:text-base lg:text-lg font-bold leading-snug sm:leading-relaxed text-[#1E293B] whitespace-pre-line">
                       {q.question}
                     </p>
                   </div>
                 </div>
 
-                {/* 3 Options */}
-                <div className="grid gap-2.5 sm:grid-cols-3 pl-10">
+                {/* 3 Options: Aligned directly with question number on mobile (pl-0), indented on desktop (sm:pl-9) */}
+                <div className="grid gap-2 sm:grid-cols-3 pl-0 sm:pl-9 mt-2.5">
                   {q.options.map((option, optIdx) => {
                     const optLetter = String.fromCharCode(65 + optIdx); // A, B, C
                     const isSelected = answer?.selected === option;
@@ -184,7 +184,7 @@ export default function QuizGame({
                         type="button"
                         disabled={isAnswered}
                         onClick={() => chooseAnswer(qIndex, option)}
-                        className={`group relative flex min-h-[58px] items-center justify-between rounded-2xl border p-3.5 text-left text-xs sm:text-sm font-bold transition-all ${
+                        className={`group relative flex min-h-[46px] sm:min-h-[58px] w-full items-center justify-between rounded-xl sm:rounded-2xl border p-2.5 sm:p-3.5 text-left transition-all ${
                           isCorrect
                             ? "border-emerald-400 bg-emerald-50 text-emerald-950 shadow-xs ring-2 ring-emerald-300"
                             : isWrongSelected
@@ -194,9 +194,9 @@ export default function QuizGame({
                             : "border-slate-200 bg-white text-slate-700 hover:-translate-y-0.5 hover:border-purple-300 hover:bg-purple-50/30 hover:shadow-xs"
                         }`}
                       >
-                        <span className="flex items-center gap-2">
+                        <span className="flex items-center gap-2 min-w-0 flex-1">
                           <span
-                            className={`grid h-5 w-5 place-items-center rounded-md text-[11px] font-extrabold ${
+                            className={`grid h-5 w-5 shrink-0 place-items-center rounded-md text-[10px] sm:text-[11px] font-extrabold ${
                               isCorrect
                                 ? "bg-emerald-600 text-white"
                                 : isWrongSelected
@@ -206,18 +206,18 @@ export default function QuizGame({
                           >
                             {optLetter}
                           </span>
-                          <span className="leading-snug">{option}</span>
+                          <span className="leading-snug break-words text-xs sm:text-sm font-bold text-slate-800">{option}</span>
                         </span>
-                        {isCorrect && <CheckCircle2 size={16} className="shrink-0 text-emerald-600 ml-1" />}
-                        {isWrongSelected && <X size={16} className="shrink-0 text-rose-600 ml-1" />}
+                        {isCorrect && <CheckCircle2 size={16} className="shrink-0 text-emerald-600 ml-1.5" />}
+                        {isWrongSelected && <X size={16} className="shrink-0 text-rose-600 ml-1.5" />}
                       </button>
                     );
                   })}
                 </div>
 
-                {/* Feedback line */}
+                {/* Feedback line: Aligned with options */}
                 {isAnswered && (
-                  <div className="pl-10 text-xs font-bold">
+                  <div className="pl-0 sm:pl-9 text-xs font-bold mt-1.5">
                     {answer.correct ? (
                       <span className="text-emerald-700">✓ Correct answer!</span>
                     ) : (
@@ -309,7 +309,7 @@ export default function QuizGame({
   return (
     <div
       style={{ borderColor: theme?.borderSoft || "#DDE5E0" }}
-      className="relative overflow-hidden rounded-[30px] border bg-white/85 p-6 shadow-[0_16px_45px_rgba(36,51,45,0.05)] sm:p-8"
+      className="relative overflow-hidden rounded-[20px] sm:rounded-[30px] border bg-white/85 p-3.5 sm:p-8 shadow-[0_16px_45px_rgba(36,51,45,0.05)]"
     >
       <div className="flex items-center justify-between gap-4">
         <span className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#87938D]">
@@ -321,13 +321,13 @@ export default function QuizGame({
             borderColor: theme?.borderSoft,
             color: theme?.primaryDark,
           }}
-          className="rounded-full border px-3 py-1 text-xs font-extrabold"
+          className="rounded-full border px-2.5 sm:px-3 py-1 text-xs font-extrabold"
         >
           Score {score}
         </span>
       </div>
 
-      <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-[#EDF1EE]">
+      <div className="mt-4 sm:mt-6 h-1.5 overflow-hidden rounded-full bg-[#EDF1EE]">
         <div
           className="h-full rounded-full transition-[width] duration-300"
           style={{
@@ -337,11 +337,11 @@ export default function QuizGame({
         />
       </div>
 
-      <h3 className="mt-8 max-w-3xl text-xl font-extrabold leading-8 tracking-[-0.025em] text-[#24332D] sm:text-2xl whitespace-pre-line">
+      <h3 className="mt-5 sm:mt-8 max-w-3xl text-lg sm:text-2xl font-extrabold leading-snug sm:leading-8 tracking-[-0.025em] text-[#24332D] whitespace-pre-line">
         {current.question}
       </h3>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+      <div className="mt-5 sm:mt-6 grid gap-2.5 sm:grid-cols-3">
         {options.map((option) => {
           const selected = currentAnswer?.selected === option;
           const isCorrectOption = currentAnswer && option === current.answer;
@@ -353,7 +353,7 @@ export default function QuizGame({
               type="button"
               disabled={Boolean(currentAnswer)}
               onClick={() => choose(option)}
-              className={`min-h-[74px] rounded-[18px] border px-4 py-4 text-left text-sm font-extrabold leading-6 transition ${
+              className={`min-h-[48px] sm:min-h-[74px] rounded-[14px] sm:rounded-[18px] border p-2.5 sm:p-4 text-left text-xs sm:text-sm font-extrabold leading-snug sm:leading-6 transition break-words ${
                 isCorrectOption
                   ? "border-[#8FBEA9] bg-[#EAF4EF] text-[#365846]"
                   : wrongSelected
@@ -364,9 +364,9 @@ export default function QuizGame({
               }`}
             >
               <span className="flex items-center justify-between gap-2">
-                {option}
-                {isCorrectOption && <Check size={16} />}
-                {wrongSelected && <X size={16} />}
+                <span>{option}</span>
+                {isCorrectOption && <Check size={16} className="shrink-0" />}
+                {wrongSelected && <X size={16} className="shrink-0" />}
               </span>
             </button>
           );

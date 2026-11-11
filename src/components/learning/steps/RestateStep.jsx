@@ -72,25 +72,25 @@ export default function RestateStep({ content, value, onChange, theme }) {
         </ol>
       </div>
 
-      <div className="mt-8 divide-y divide-[#E3E9E5] border-y border-[#E3E9E5]">
+      <div className="mt-6 sm:mt-8 divide-y divide-[#E3E9E5] border-y border-[#E3E9E5]">
         {content.prompts.map((prompt, index) => {
           const text = responses[index] ?? "";
           const done = Boolean(text.trim());
           return (
-            <div key={prompt} className="grid gap-4 py-6 sm:grid-cols-[190px_minmax(0,1fr)] sm:gap-8 sm:py-7">
+            <div key={prompt} className="grid gap-3 py-4 sm:grid-cols-[190px_minmax(0,1fr)] sm:gap-8 sm:py-7">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-extrabold tabular-nums text-[#98A39D]">{String(index + 1).padStart(2, "0")}</span>
                   {done && <CheckCircle2 size={15} className="text-[#54806B]" />}
                 </div>
-                <p className="mt-2 text-lg font-extrabold tracking-[-0.025em] text-[#24332D]">{prompt}</p>
+                <p className="mt-1.5 sm:mt-2 text-base sm:text-lg font-extrabold tracking-[-0.025em] text-[#24332D] break-words">{prompt}</p>
               </div>
               <div>
                 <textarea
                   value={text}
                   onChange={(event) => update(index, event.target.value)}
                   rows={3}
-                  className="ml-input min-h-[112px] resize-y leading-7"
+                  className="ml-input min-h-[96px] sm:min-h-[112px] resize-y text-xs sm:text-sm leading-relaxed sm:leading-7"
                   placeholder={`Write your own sentence using ${prompt.split(" (")[0]}...`}
                   aria-label={`Your sentence for ${prompt}`}
                 />

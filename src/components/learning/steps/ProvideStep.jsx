@@ -72,7 +72,7 @@ export default function ProvideStep({ content, value, onChange, theme }) {
       </div>
 
       {/* All vocabulary words presented together in one slide / unified grid */}
-      <div className="grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3.5 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {words.map((item, index) => {
           return (
             <article
@@ -80,14 +80,14 @@ export default function ProvideStep({ content, value, onChange, theme }) {
               style={{
                 borderColor: theme?.borderSoft || "#E2E8F0",
               }}
-              className="group relative flex flex-col justify-between overflow-hidden rounded-[24px] border bg-white/95 p-5 sm:p-6 shadow-[0_10px_30px_rgba(36,51,45,0.06)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(36,51,45,0.1)]"
+              className="group relative flex flex-col justify-between overflow-hidden rounded-[20px] sm:rounded-[24px] border bg-white/95 p-4 sm:p-6 shadow-[0_10px_30px_rgba(36,51,45,0.06)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(36,51,45,0.1)]"
             >
               {/* Header: Number and Part of Speech badge */}
               <div>
                 <div className="flex items-center justify-between gap-2">
                   <span
                     style={{ color: theme?.primaryMuted || "#64748B" }}
-                    className="text-xs font-extrabold tracking-wider"
+                    className="text-[11px] sm:text-xs font-extrabold tracking-wider"
                   >
                     #{String(index + 1).padStart(2, "0")}
                   </span>
@@ -104,8 +104,8 @@ export default function ProvideStep({ content, value, onChange, theme }) {
                 </div>
 
                 {/* Term & Audio pronunciation button */}
-                <div className="mt-3.5 flex items-center justify-between gap-3">
-                  <h3 className="text-xl sm:text-2xl font-extrabold tracking-[-0.03em] text-[#1E293B]">
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <h3 className="text-lg sm:text-2xl font-extrabold tracking-[-0.03em] text-[#1E293B]">
                     {item.term}
                   </h3>
                   <button
@@ -115,16 +115,16 @@ export default function ProvideStep({ content, value, onChange, theme }) {
                       backgroundColor: theme?.badgeBg,
                       color: theme?.primaryDark,
                     }}
-                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full transition-transform hover:scale-110 active:scale-95 shadow-xs"
+                    className="grid h-8 w-8 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-full transition-transform hover:scale-110 active:scale-95 shadow-xs"
                     title={`Pronounce ${item.term}`}
                     aria-label={`Pronounce ${item.term}`}
                   >
-                    <Volume2 size={16} />
+                    <Volume2 size={15} />
                   </button>
                 </div>
 
                 {/* Meaning / Definition */}
-                <div className="mt-3.5 rounded-xl bg-slate-50 p-3 text-xs sm:text-sm font-medium leading-relaxed text-[#334155] border border-slate-100">
+                <div className="mt-3 rounded-xl bg-slate-50 p-2.5 sm:p-3 text-xs sm:text-sm font-medium leading-relaxed text-[#334155] border border-slate-100 break-words">
                   <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Meaning</p>
                   <p>{item.definition}</p>
                 </div>
@@ -132,9 +132,9 @@ export default function ProvideStep({ content, value, onChange, theme }) {
 
               {/* Context / Example sentence */}
               {item.example && (
-                <div className="mt-4 pt-3.5 border-t border-slate-100">
+                <div className="mt-3.5 pt-3 border-t border-slate-100">
                   <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Example in context</p>
-                  <p className="text-xs sm:text-[13px] italic leading-relaxed text-[#475569]">
+                  <p className="text-xs sm:text-[13px] italic leading-relaxed text-[#475569] break-words">
                     "{item.example}"
                   </p>
                 </div>

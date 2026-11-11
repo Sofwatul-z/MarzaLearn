@@ -54,20 +54,20 @@ export default function DiscussStep({ content, value, onChange, theme }) {
         </ol>
       </div>
 
-      <div className="mt-8 grid gap-7 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="mt-6 sm:mt-8 grid gap-5 sm:gap-7 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div>
           <div
             style={{
               borderColor: theme?.primary || "#E8C3AE",
               backgroundColor: theme?.bgSurface || "rgba(251, 237, 228, 0.55)",
             }}
-            className="border-l-4 px-5 py-5 sm:px-6"
+            className="border-l-4 px-3.5 py-3.5 sm:px-6 sm:py-5 rounded-r-xl"
           >
-            <div className="flex items-start gap-3">
-              <MessageSquareText size={19} style={{ color: theme?.primaryDark }} className="mt-0.5 shrink-0" />
+            <div className="flex items-start gap-2.5 sm:gap-3">
+              <MessageSquareText size={18} style={{ color: theme?.primaryDark }} className="mt-0.5 shrink-0" />
               <p
                 style={{ color: theme?.primaryDark || "#4D5C55" }}
-                className="text-sm font-bold leading-7 sm:text-base"
+                className="text-xs sm:text-base font-bold leading-relaxed sm:leading-7"
               >
                 {content.prompt}
               </p>
@@ -77,11 +77,11 @@ export default function DiscussStep({ content, value, onChange, theme }) {
           <textarea
             value={response}
             onChange={(event) => onChange?.({ ...value, response: event.target.value })}
-            rows={8}
-            className="ml-input mt-5 min-h-[230px] resize-y text-[15px] leading-7"
+            rows={6}
+            className="ml-input mt-4 sm:mt-5 min-h-[160px] sm:min-h-[230px] resize-y text-xs sm:text-[15px] leading-relaxed sm:leading-7"
             placeholder="Write your response here..."
           />
-          <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold text-[#8A9690]">
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-[11px] font-semibold text-[#8A9690]">
             <span>{words} words · about {sentences} {sentences === 1 ? "sentence" : "sentences"}</span>
             <span>{response.trim().length >= 20 ? "Ready to continue" : "Write a complete response to continue"}</span>
           </div>
@@ -89,17 +89,17 @@ export default function DiscussStep({ content, value, onChange, theme }) {
 
         <aside
           style={{ borderColor: theme?.borderSoft || "#DCE4E0" }}
-          className="rounded-[24px] border bg-white/65 p-5 sm:p-6"
+          className="rounded-[20px] sm:rounded-[24px] border bg-white/65 p-4 sm:p-6"
         >
-          <Quote size={20} style={{ color: theme?.primaryDark }} />
+          <Quote size={18} style={{ color: theme?.primaryDark }} />
           <p
             style={{ color: theme?.primaryMuted }}
-            className="mt-4 text-[10px] font-extrabold uppercase tracking-[0.14em]"
+            className="mt-3 text-[10px] font-extrabold uppercase tracking-[0.14em]"
           >
             Example
           </p>
-          <p className="mt-3 text-sm italic leading-7 text-[#66756E]">“{content.example}”</p>
-          <p className="mt-5 border-t border-[#E4E9E6] pt-4 text-xs leading-5 text-[#8A9690]">Use the example as a guide for structure, not something to copy.</p>
+          <p className="mt-2 text-xs sm:text-sm italic leading-relaxed sm:leading-7 text-[#66756E]">“{content.example}”</p>
+          <p className="mt-4 border-t border-[#E4E9E6] pt-3 text-[11px] sm:text-xs leading-5 text-[#8A9690]">Use the example as a guide for structure, not something to copy.</p>
         </aside>
       </div>
       <SourceNote source={content.source} />

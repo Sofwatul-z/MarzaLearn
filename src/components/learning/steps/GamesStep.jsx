@@ -18,7 +18,7 @@ export default function GamesStep({ content, value, onChange, chapterId, theme }
         >
           Step 06 · Games
         </span>
-        <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl">
+        <h2 className="mt-2.5 sm:mt-3 text-2xl sm:text-4xl font-extrabold tracking-[-0.045em] text-[#24332D]">
           {content.title}
         </h2>
         <div className="mt-3 text-sm leading-7 text-[#65736D] sm:text-base whitespace-pre-line">

@@ -123,15 +123,16 @@ export default function EngageStep({ content, value, onChange, chapterId, theme 
 
       <div
         style={{ borderColor: theme?.borderSoft || "#DDE5E0" }}
-        className="mt-8 rounded-[30px] border bg-white/75 p-5 sm:p-7"
+        className="mt-6 sm:mt-8 rounded-[20px] sm:rounded-[30px] border bg-white/90 p-3 sm:p-7 shadow-xs"
       >
-        <div className="mb-5 flex items-center gap-2 text-xs font-semibold text-[#77847D]">
-          <MousePointer2 size={14} /> Select a word on the left, then choose its match on the right. (Single attempt per word)
+        <div className="mb-4 sm:mb-5 flex items-center gap-2 text-xs font-semibold text-[#77847D]">
+          <MousePointer2 size={14} className="shrink-0" />
+          <span className="leading-snug">Select a word on the left, then choose its match on the right. (Single attempt per word)</span>
         </div>
 
-        <div className="grid grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] gap-3 sm:gap-5">
-          <div className="space-y-2.5">
-            <p className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.13em]" style={{ color: theme?.primaryDark || "#929D97" }}>Words</p>
+        <div className="grid grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] gap-2 sm:gap-5">
+          <div className="space-y-2">
+            <p className="mb-2 sm:mb-3 text-[10px] font-extrabold uppercase tracking-[0.13em]" style={{ color: theme?.primaryDark || "#929D97" }}>Words</p>
             {pairs.map(([term]) => {
               const isMatched = matched.includes(term);
               const isFailed = failed.includes(term);
@@ -167,7 +168,7 @@ export default function EngageStep({ content, value, onChange, chapterId, theme 
                             }
                           : {}
                   }
-                  className={`flex min-h-[56px] w-full items-center justify-between gap-2 rounded-[16px] border px-3 py-3 text-left text-xs font-extrabold transition sm:px-4 sm:text-sm ${
+                  className={`flex min-h-[46px] sm:min-h-[56px] w-full items-center justify-between gap-1 rounded-[12px] sm:rounded-[16px] border px-2 py-2 sm:px-4 sm:py-3 text-left text-[11px] sm:text-sm font-extrabold leading-snug transition break-words ${
                     isDone
                       ? ""
                       : selected
@@ -175,16 +176,16 @@ export default function EngageStep({ content, value, onChange, chapterId, theme 
                         : "border-[#D9E1DD] bg-white text-[#3F5149] hover:border-[#AFC4B9]"
                   }`}
                 >
-                  <span>{term}</span>
-                  {isMatched && <Check size={14} />}
-                  {isFailed && <span className="flex items-center gap-1 text-[11px] font-extrabold text-[#8B4F46]"><X size={13} /> Missed</span>}
+                  <span className="truncate">{term}</span>
+                  {isMatched && <Check size={14} className="shrink-0 text-emerald-700" />}
+                  {isFailed && <span className="flex items-center gap-0.5 text-[10px] font-extrabold text-[#8B4F46] shrink-0"><X size={12} /> Missed</span>}
                 </button>
               );
             })}
           </div>
 
-          <div className="space-y-2.5">
-            <p className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.13em]" style={{ color: theme?.primaryDark || "#929D97" }}>Matches</p>
+          <div className="space-y-2">
+            <p className="mb-2 sm:mb-3 text-[10px] font-extrabold uppercase tracking-[0.13em]" style={{ color: theme?.primaryDark || "#929D97" }}>Matches</p>
             {definitions.map((definition) => {
               const term = definitionToTerm[definition];
               const used = matched.includes(term);
@@ -194,7 +195,7 @@ export default function EngageStep({ content, value, onChange, chapterId, theme 
                   type="button"
                   disabled={used || !selectedTerm}
                   onClick={() => chooseDefinition(definition)}
-                  className={`min-h-[56px] w-full rounded-[16px] border px-3 py-3 text-left text-xs font-bold leading-5 transition sm:px-4 sm:text-sm ${
+                  className={`min-h-[46px] sm:min-h-[56px] w-full rounded-[12px] sm:rounded-[16px] border px-2 py-2 sm:px-4 sm:py-3 text-left text-[11px] sm:text-sm font-bold leading-tight transition break-words ${
                     used
                       ? "border-[#DCE5E0] bg-[#F2F6F3] text-[#9AA49F] line-through"
                       : selectedTerm

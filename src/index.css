@@ -244,7 +244,7 @@ a {
 
 @media (max-width: 640px) {
   .ml-page-container {
-    width: min(100% - 1.25rem, 1440px);
+    width: min(100% - 0.75rem, 1440px);
   }
 }
 

@@ -158,7 +158,7 @@ function MissionIntro({ chapter, recovered, onStart, onBack, theme }) {
           borderColor: theme?.borderSoft,
           backgroundColor: theme?.primaryDark || "#24332D",
         }}
-        className="relative overflow-hidden rounded-[34px] p-6 text-white shadow-[0_28px_75px_rgba(36,51,45,0.18)] sm:p-9 lg:p-11"
+        className="relative overflow-hidden rounded-[24px] sm:rounded-[34px] p-4.5 sm:p-9 lg:p-11 text-white shadow-[0_28px_75px_rgba(36,51,45,0.18)]"
       >
         <div
           style={{ backgroundColor: theme?.primary }}
@@ -477,7 +477,7 @@ export default function LearningFlow() {
   }
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto px-12 sm:px-16 md:px-24 xl:px-0 pb-8">
+    <div className="relative w-full max-w-5xl mx-auto px-1.5 sm:px-6 md:px-16 xl:px-0 pb-8">
       {/* Dynamic ambient page glow matching chapter theme */}
       <div
         style={{ backgroundColor: theme?.primary }}
@@ -486,7 +486,7 @@ export default function LearningFlow() {
       {/* LEFT FLANK (Blue Circles) - Positioned in the outer left gutter (Sized responsively for mobile & desktop) */}
       {(stepAssets?.leftTop || stepAssets?.leftBottom) && (
         <aside
-          className="flex flex-col items-center justify-between absolute left-1 sm:left-2 md:left-4 xl:left-auto xl:right-[calc(100%+1.75rem)] 2xl:right-[calc(100%+3rem)] top-2 bottom-24 w-10 sm:w-14 md:w-20 lg:w-28 xl:w-52 2xl:w-64 pointer-events-none select-none z-10"
+          className="hidden md:flex flex-col items-center justify-between absolute left-1 sm:left-2 md:left-4 xl:left-auto xl:right-[calc(100%+1.75rem)] 2xl:right-[calc(100%+3rem)] top-2 bottom-24 w-10 sm:w-14 md:w-20 lg:w-28 xl:w-52 2xl:w-64 pointer-events-none select-none z-10"
           aria-hidden="true"
         >
           {/* Blue Circle 1 (Top Left) */}
@@ -537,7 +537,7 @@ export default function LearningFlow() {
       {/* RIGHT FLANK (Red Circles) - Positioned in the outer right gutter (Sized responsively for mobile & desktop) */}
       {(stepAssets?.rightTop || stepAssets?.rightBottom) && (
         <aside
-          className="flex flex-col items-center justify-between absolute right-1 sm:right-2 md:right-4 xl:right-auto xl:left-[calc(100%+1.75rem)] 2xl:left-[calc(100%+3rem)] top-2 bottom-24 w-10 sm:w-14 md:w-20 lg:w-28 xl:w-52 2xl:w-64 pointer-events-none select-none z-10"
+          className="hidden md:flex flex-col items-center justify-between absolute right-1 sm:right-2 md:right-4 xl:right-auto xl:left-[calc(100%+1.75rem)] 2xl:left-[calc(100%+3rem)] top-2 bottom-24 w-10 sm:w-14 md:w-20 lg:w-28 xl:w-52 2xl:w-64 pointer-events-none select-none z-10"
           aria-hidden="true"
         >
           {/* Red Circle 1 (Top Right) */}
