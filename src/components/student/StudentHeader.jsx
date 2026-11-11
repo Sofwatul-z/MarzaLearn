@@ -5,14 +5,18 @@ import Button from "../common/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { getChapterTheme } from "../../data/chapterThemes";
 
-function StudentNavItem({ to, label, active }) {
+function StudentNavItem({ to, label, active, night = false }) {
   return (
     <Link
       to={to}
       className={`relative rounded-full px-4 py-2 text-sm font-bold transition-colors ${
         active
-          ? "bg-[#EAF4EF] text-[#24332D]"
-          : "text-[#6C7973] hover:bg-white/70 hover:text-[#24332D]"
+          ? night
+            ? "bg-[#5B21B6] text-white shadow-[0_8px_18px_rgba(91,33,182,0.28)]"
+            : "bg-[#EAF4EF] text-[#24332D]"
+          : night
+            ? "text-[#7C6A99] hover:bg-violet-50 hover:text-[#5B21B6]"
+            : "text-[#6C7973] hover:bg-white/70 hover:text-[#24332D]"
       }`}
       aria-current={active ? "page" : undefined}
     >
@@ -31,9 +35,13 @@ export default function StudentHeader() {
     location.pathname === "/student/chapters" ||
     location.pathname.startsWith("/student/chapter/");
   const focusSession = /\/student\/chapter\/[^/]+\/session\/?$/.test(location.pathname);
+  const isChapter4Landing = /^\/student\/chapter\/4\/?$/.test(location.pathname);
+  const isChapter4Session = /^\/student\/chapter\/4\/session\/?$/.test(location.pathname);
+  const isChapter4Dream = isChapter4Landing || isChapter4Session;
 
   const chapterMatch = location.pathname.match(/\/student\/chapter\/(\d+)/);
   const theme = getChapterTheme(chapterMatch ? Number(chapterMatch[1]) : 1);
+  const headerTheme = isChapter4Dream ? theme : undefined;
 
   const initials = (profile?.full_name ?? "Student")
     .split(" ")
@@ -51,9 +59,15 @@ export default function StudentHeader() {
 
   if (focusSession) {
     return (
-      <header className="sticky top-0 z-40 -mx-3 mb-5 border-b border-[#E8ECE9]/80 bg-[#FBFCF8]/[0.9] px-3 py-3 backdrop-blur-xl sm:-mx-5 sm:px-5 lg:-mx-7 lg:px-7">
+      <header
+        className={`sticky top-0 z-40 -mx-3 mb-5 px-3 py-3 backdrop-blur-xl sm:-mx-5 sm:px-5 lg:-mx-7 lg:px-7 ${
+          isChapter4Session
+            ? "border-b border-violet-200/70 bg-[#F5F3FF]/[0.88]"
+            : "border-b border-[#E8ECE9]/80 bg-[#FBFCF8]/[0.9]"
+        }`}
+      >
         <div className="mx-auto flex w-full max-w-[1440px] items-center gap-3">
-          <Logo to={location.pathname} />
+          <Logo to={location.pathname} theme={headerTheme} />
           <div
             style={{ borderColor: theme?.borderSoft || "#D7E2DC", backgroundColor: theme?.badgeBg || "rgba(255,255,255,0.75)" }}
             className="ml-auto flex items-center gap-2 rounded-full border px-3 py-2"
@@ -69,28 +83,55 @@ export default function StudentHeader() {
     );
   }
   return (
-    <header className="sticky top-0 z-40 -mx-3 mb-7 border-b border-[#E8ECE9]/80 bg-[#FBFCF8]/[0.82] px-3 py-3 backdrop-blur-xl sm:-mx-5 sm:px-5 lg:-mx-7 lg:px-7">
+    <header
+      className={`sticky top-0 z-40 -mx-3 mb-7 px-3 py-3 backdrop-blur-xl sm:-mx-5 sm:px-5 lg:-mx-7 lg:px-7 ${
+        isChapter4Landing
+          ? "border-b border-violet-200/70 bg-[#F5F3FF]/[0.82]"
+          : "border-b border-[#E8ECE9]/80 bg-[#FBFCF8]/[0.82]"
+      }`}
+    >
       <div className="mx-auto flex w-full max-w-[1440px] items-center gap-3">
-        <Logo to="/student/dashboard" />
+        <Logo to="/student/dashboard" theme={headerTheme} />
 
         <nav
-          className="ml-auto hidden items-center gap-1 rounded-full border border-[#E3E9E5] bg-white/70 p-1 shadow-[0_8px_22px_rgba(36,51,45,0.04)] sm:flex"
+          className={`ml-auto hidden items-center gap-1 rounded-full border p-1 sm:flex ${
+            isChapter4Landing
+              ? "border-violet-200 bg-white/85 shadow-[0_8px_22px_rgba(91,33,182,0.08)]"
+              : "border-[#E3E9E5] bg-white/70 shadow-[0_8px_22px_rgba(36,51,45,0.04)]"
+          }`}
           aria-label="Student navigation"
         >
-          <StudentNavItem to="/student/dashboard" label="Home" active={homeActive} />
-          <StudentNavItem to="/student/chapters" label="Chapters" active={chaptersActive} />
+          <StudentNavItem to="/student/dashboard" label="Home" active={homeActive} night={isChapter4Landing} />
+          <StudentNavItem to="/student/chapters" label="Chapters" active={chaptersActive} night={isChapter4Landing} />
         </nav>
 
         <div className="ml-auto flex items-center gap-2 sm:ml-3">
-          <div className="hidden items-center gap-2.5 rounded-full border border-[#DDE5E0] bg-white/80 py-1.5 pl-1.5 pr-3 sm:flex">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-[#CFE8DD] text-[11px] font-extrabold tracking-[-0.03em] text-[#24332D]">
+          <div
+            className={`hidden items-center gap-2.5 rounded-full border py-1.5 pl-1.5 pr-3 sm:flex ${
+              isChapter4Landing ? "border-violet-200 bg-white/90" : "border-[#DDE5E0] bg-white/80"
+            }`}
+          >
+            <span
+              className="grid h-8 w-8 place-items-center rounded-full text-[11px] font-extrabold tracking-[-0.03em]"
+              style={
+                isChapter4Landing
+                  ? { backgroundColor: theme.primaryDark, color: "#fff" }
+                  : { backgroundColor: "#CFE8DD", color: "#24332D" }
+              }
+            >
               {initials || "S"}
             </span>
             <div className="max-w-28 leading-tight lg:max-w-40">
-              <p className="truncate text-xs font-extrabold text-[#24332D]">
+              <p
+                className="truncate text-xs font-extrabold"
+                style={{ color: isChapter4Landing ? theme.primaryDark : "#24332D" }}
+              >
                 {profile?.full_name ?? "Student"}
               </p>
-              <p className="text-[10px] font-bold uppercase tracking-[0.11em] text-[#7C8983]">
+              <p
+                className="text-[10px] font-bold uppercase tracking-[0.11em]"
+                style={{ color: isChapter4Landing ? theme.primaryMuted : "#7C8983" }}
+              >
                 Class {profile?.class_name ?? "—"}
               </p>
             </div>
@@ -100,7 +141,9 @@ export default function StudentHeader() {
             onClick={handleLogout}
             variant="ghost"
             size="sm"
-            className="h-10 w-10 px-0 sm:h-auto sm:w-auto sm:px-4"
+            className={`h-10 w-10 px-0 sm:h-auto sm:w-auto sm:px-4 ${
+              isChapter4Landing ? "rounded-full text-violet-600 hover:bg-violet-50 hover:text-[#5B21B6]" : ""
+            }`}
             aria-label="Sign out"
             title="Sign out"
           >
@@ -114,9 +157,16 @@ export default function StudentHeader() {
         className="mt-3 flex items-center gap-1 overflow-x-auto pb-0.5 sm:hidden"
         aria-label="Student mobile navigation"
       >
-        <StudentNavItem to="/student/dashboard" label="Home" active={homeActive} />
-        <StudentNavItem to="/student/chapters" label="Chapters" active={chaptersActive} />
-        <span className="ml-auto whitespace-nowrap rounded-full bg-[#EAF4EF] px-3 py-2 text-[11px] font-extrabold uppercase tracking-[0.1em] text-[#52625B]">
+        <StudentNavItem to="/student/dashboard" label="Home" active={homeActive} night={isChapter4Landing} />
+        <StudentNavItem to="/student/chapters" label="Chapters" active={chaptersActive} night={isChapter4Landing} />
+        <span
+          className="ml-auto whitespace-nowrap rounded-full px-3 py-2 text-[11px] font-extrabold uppercase tracking-[0.1em]"
+          style={
+            isChapter4Landing
+              ? { backgroundColor: theme.badgeBg, color: theme.badgeText }
+              : { backgroundColor: "#EAF4EF", color: "#52625B" }
+          }
+        >
           {profile?.class_name ?? "Student"}
         </span>
       </nav>

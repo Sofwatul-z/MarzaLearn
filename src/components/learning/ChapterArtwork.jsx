@@ -1,17 +1,18 @@
 import { motion } from "framer-motion";
 import { getChapterTheme } from "../../data/chapterThemes";
+import { CHAPTER4_ASSETS } from "../../data/chapter4Assets";
+import DreamDecor from "./DreamDecor";
 
 import ch1Hero from "../../assets/chapter 1/step 1/assets/card-character.png";
 import ch2Hero from "../../assets/chapter 2/step 1/assets/card-friends-group.png";
 import ch3Hero from "../../assets/chapter 3/step 1/assets/card-healthy-girl.png";
-import ch4Hero from "../../assets/chapter 1/step 6/assets/card-medalist.png";
 import ch5Hero from "../../assets/chapter 1/step 4/assets/card-handshake-pair.png";
 
 const chapterImages = {
   1: ch1Hero,
   2: ch2Hero,
   3: ch3Hero,
-  4: ch4Hero,
+  4: CHAPTER4_ASSETS.orang,
   5: ch5Hero,
 };
 
@@ -28,6 +29,10 @@ export default function ChapterArtwork({ chapterId, title }) {
   const heroImage = chapterImages[chapterId] ?? ch1Hero;
   const orbitWords = words[chapterId] ?? ["learn", "practice", "grow"];
 
+  if (Number(chapterId) === 4) {
+    return <NightHeroScene title={title} theme={theme} orbitWords={orbitWords} />;
+  }
+
   return (
     <div className="relative mx-auto h-[320px] w-full max-w-[470px] sm:h-[370px]">
       <motion.div
@@ -43,7 +48,6 @@ export default function ChapterArtwork({ chapterId, title }) {
         className="absolute left-1/2 top-1/2 h-[190px] w-[190px] -translate-x-1/2 -translate-y-1/2 rounded-full border sm:h-[220px] sm:w-[220px]"
       />
 
-      {/* Floating Center Artwork with Chapter Theme Background Glow */}
       <motion.div
         animate={{ y: [0, -8, 0], rotate: [0, 1.2, 0] }}
         transition={{ duration: 5.2, ease: "easeInOut", repeat: Infinity }}
@@ -92,6 +96,85 @@ export default function ChapterArtwork({ chapterId, title }) {
         style={{ backgroundColor: theme?.primary || "#9FCFBB" }}
         className="absolute right-[12%] top-[49%] h-2.5 w-2.5 rounded-full opacity-80"
       />
+      <span className="sr-only">Visual motif for {title}</span>
+    </div>
+  );
+}
+
+function NightHeroScene({ title, theme, orbitWords }) {
+  const positions = [
+    "left-0 top-[8%]",
+    "right-0 top-[12%]",
+    "bottom-[2%] left-1/2 -translate-x-1/2",
+  ];
+
+  return (
+    <div className="relative mx-auto h-[360px] w-full max-w-[520px] sm:h-[420px]">
+      <div
+        className="absolute left-1/2 top-[56%] h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl sm:h-64 sm:w-64"
+        style={{ backgroundColor: theme.primary }}
+      />
+      <span className="absolute left-[8%] top-[22%] h-24 w-24 rounded-[42%] bg-pink-200/50 blur-2xl" />
+      <span className="absolute right-[10%] bottom-[18%] h-20 w-20 rounded-full bg-violet-200/50 blur-2xl" />
+
+      <DreamDecor
+        src={CHAPTER4_ASSETS.bulan}
+        className="absolute left-0 top-2 z-20 w-20 sm:w-24"
+        blob="cream"
+        duration={6.4}
+      />
+      <DreamDecor
+        src={CHAPTER4_ASSETS.awan}
+        className="absolute -right-2 top-6 z-10 w-24 sm:w-28"
+        blob="pink"
+        duration={7.6}
+        delay={0.4}
+      />
+      <DreamDecor
+        src={CHAPTER4_ASSETS.bintang}
+        className="absolute right-[18%] top-0 z-20 w-14 sm:w-16"
+        blob="cream"
+        duration={5.2}
+      />
+      <DreamDecor
+        src={CHAPTER4_ASSETS.alarm}
+        className="absolute bottom-6 left-1 z-20 w-16 sm:bottom-8 sm:w-20"
+        blob="violet"
+        duration={5.6}
+        delay={0.3}
+      />
+      <DreamDecor
+        src={CHAPTER4_ASSETS.bintang}
+        className="absolute bottom-10 right-2 z-20 w-12 sm:w-14"
+        blob="pink"
+        duration={6.8}
+        delay={0.8}
+      />
+
+      <motion.div
+        animate={{ y: [0, -10, 0] }}
+        transition={{ duration: 5.4, ease: "easeInOut", repeat: Infinity }}
+        className="absolute left-1/2 top-[54%] z-10 w-[220px] -translate-x-1/2 -translate-y-1/2 sm:w-[260px]"
+      >
+        <span className="absolute left-1/2 top-[62%] h-16 w-40 -translate-x-1/2 rounded-full bg-violet-300/50 blur-2xl" />
+        <img
+          src={CHAPTER4_ASSETS.orang}
+          alt=""
+          className="relative z-10 h-auto w-full object-contain drop-shadow-[0_22px_40px_rgba(91,33,182,0.22)] select-none pointer-events-none"
+        />
+      </motion.div>
+
+      {orbitWords.map((word, index) => (
+        <motion.span
+          key={word}
+          animate={{ y: [0, index % 2 === 0 ? -6 : 6, 0] }}
+          transition={{ duration: 4.2 + index * 0.4, repeat: Infinity, ease: "easeInOut", delay: index * 0.15 }}
+          className={`absolute ${positions[index]} z-20 rounded-full border border-violet-200 bg-white/95 px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#5B21B6] shadow-[0_10px_26px_rgba(91,33,182,0.12)] select-none pointer-events-none`}
+        >
+          {word}
+        </motion.span>
+      ))}
+
       <span className="sr-only">Visual motif for {title}</span>
     </div>
   );

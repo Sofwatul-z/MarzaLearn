@@ -5,7 +5,7 @@
  *  - Chapter 1: #EAC3D5 (Soft Rose Pastel)
  *  - Chapter 2: #809CCE (Soft Periwinkle Blue Pastel)
  *  - Chapter 3: #D6EADF (Soft Mint Sage Pastel)
- *  - Chapter 4: #94B8D0 (Sky Steel Pastel Blue)
+ *  - Chapter 4: #C4B5FD (Lavender Night Pastel)
  *  - Chapter 5: #B7E0D2 (Seafoam Aqua Pastel)
  */
 
@@ -67,18 +67,18 @@ export const CHAPTER_THEMES = {
   4: {
     id: "analytical-exposition",
     label: "Analytical Exposition · Screen Time & Wellness",
-    primary: "#94B8D0",
-    primaryDark: "#1C364A",
-    primaryMuted: "#456B86",
-    bgLight: "rgba(148, 184, 208, 0.22)",
-    bgSurface: "rgba(148, 184, 208, 0.12)",
-    border: "rgba(148, 184, 208, 0.85)",
-    borderSoft: "rgba(148, 184, 208, 0.45)",
-    badgeBg: "#ECF4F9",
-    badgeText: "#1F4A6A",
-    accent: "#6CA3C7",
-    glowColors: ["from-[#94B8D0]/35", "from-[#809CCE]/25"],
-    heroBg: "#F5F8FA",
+    primary: "#C4B5FD",
+    primaryDark: "#5B21B6",
+    primaryMuted: "#7C3AED",
+    bgLight: "rgba(252, 231, 243, 0.55)",
+    bgSurface: "rgba(245, 243, 255, 0.82)",
+    border: "rgba(167, 139, 250, 0.85)",
+    borderSoft: "rgba(196, 181, 253, 0.55)",
+    badgeBg: "#F5F3FF",
+    badgeText: "#5B21B6",
+    accent: "#F9A8D4",
+    glowColors: ["from-[#C4B5FD]/45", "from-[#FBCFE8]/35"],
+    heroBg: "#F8F0FF",
     completionEmoji: "🌙",
     completionText: "Rest well! A balanced mind is a sharp one.",
   },

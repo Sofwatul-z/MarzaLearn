@@ -1,5 +1,5 @@
 // =============================================================================
-// MarzaLearn Step Assets Engine (Chapters 1 - 3, Steps 1 - 6)
+// MarzaLearn Step Assets Engine (Chapters 1 - 4, Steps 1 - 6)
 // Provides flanking images for the Left Gutter (Blue) and Right Gutter (Red)
 // =============================================================================
 
@@ -114,6 +114,8 @@ import ch3S6Nightstand from "../assets/chapter 3/step 6/assets/card-nightstand.p
 import ch3S6Plant from "../assets/chapter 3/step 6/assets/decoration-plant.png";
 import ch3S6WallArt from "../assets/chapter 3/step 6/assets/decoration-wall-art.png";
 import ch3S6Moon from "../assets/chapter 3/step 6/assets/decoration-window-moon.png";
+
+import { CHAPTER4_ASSETS } from "./chapter4Assets";
 
 export const STEP_ASSETS = {
   1: {
@@ -246,6 +248,50 @@ export const STEP_ASSETS = {
       rightTop: ch3S6Nightstand,
       rightBottom: ch3S6Moon,
       mobile: [ch3S6Girl, ch3S6Nightstand, ch3S6Moon],
+    },
+  },
+  4: {
+    1: {
+      leftTop: CHAPTER4_ASSETS.bulan,
+      leftBottom: CHAPTER4_ASSETS.alarm,
+      rightTop: CHAPTER4_ASSETS.awan,
+      rightBottom: CHAPTER4_ASSETS.bintang,
+      mobile: [CHAPTER4_ASSETS.orang, CHAPTER4_ASSETS.bulan, CHAPTER4_ASSETS.alarm],
+    },
+    2: {
+      leftTop: CHAPTER4_ASSETS.orang,
+      leftBottom: CHAPTER4_ASSETS.awan,
+      rightTop: CHAPTER4_ASSETS.bintang,
+      rightBottom: CHAPTER4_ASSETS.alarm,
+      mobile: [CHAPTER4_ASSETS.orang, CHAPTER4_ASSETS.awan, CHAPTER4_ASSETS.bintang],
+    },
+    3: {
+      leftTop: CHAPTER4_ASSETS.awan,
+      leftBottom: CHAPTER4_ASSETS.bulan,
+      rightTop: CHAPTER4_ASSETS.orang,
+      rightBottom: CHAPTER4_ASSETS.bintang,
+      mobile: [CHAPTER4_ASSETS.awan, CHAPTER4_ASSETS.orang, CHAPTER4_ASSETS.bulan],
+    },
+    4: {
+      leftTop: CHAPTER4_ASSETS.bintang,
+      leftBottom: CHAPTER4_ASSETS.alarm,
+      rightTop: CHAPTER4_ASSETS.bulan,
+      rightBottom: CHAPTER4_ASSETS.awan,
+      mobile: [CHAPTER4_ASSETS.bintang, CHAPTER4_ASSETS.bulan, CHAPTER4_ASSETS.alarm],
+    },
+    5: {
+      leftTop: CHAPTER4_ASSETS.alarm,
+      leftBottom: CHAPTER4_ASSETS.orang,
+      rightTop: CHAPTER4_ASSETS.awan,
+      rightBottom: CHAPTER4_ASSETS.bulan,
+      mobile: [CHAPTER4_ASSETS.alarm, CHAPTER4_ASSETS.orang, CHAPTER4_ASSETS.awan],
+    },
+    6: {
+      leftTop: CHAPTER4_ASSETS.bulan,
+      leftBottom: CHAPTER4_ASSETS.bintang,
+      rightTop: CHAPTER4_ASSETS.orang,
+      rightBottom: CHAPTER4_ASSETS.alarm,
+      mobile: [CHAPTER4_ASSETS.orang, CHAPTER4_ASSETS.bulan, CHAPTER4_ASSETS.bintang],
     },
   },
 };

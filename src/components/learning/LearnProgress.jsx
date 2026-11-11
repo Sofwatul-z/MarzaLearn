@@ -2,6 +2,7 @@ import { BookOpenText, Headphones, Shapes, BookOpen } from "lucide-react";
 
 export default function LearnProgress({ active, completed = [], onSelect, theme, chapterId }) {
   const isAudioOnly = chapterId === 2 || chapterId === 4;
+  const night = Number(chapterId) === 4;
 
   const steps = [
     { id: "introduction", label: "Introduction", icon: BookOpenText },
@@ -19,8 +20,12 @@ export default function LearnProgress({ active, completed = [], onSelect, theme,
       aria-label="Chapter learn sections"
     >
       <div
-        style={{ borderColor: theme?.borderSoft || "#DDE5E0" }}
-        className="mx-auto flex min-w-max items-center gap-1 rounded-full border bg-[#FBFCF8]/90 p-1.5 shadow-[0_10px_30px_rgba(36,51,45,0.06)] backdrop-blur-xl"
+        style={{ borderColor: night ? "rgba(196,181,253,0.65)" : theme?.borderSoft || "#DDE5E0" }}
+        className={`mx-auto flex min-w-max items-center gap-1 rounded-full border p-1.5 backdrop-blur-xl ${
+          night
+            ? "bg-white/85 shadow-[0_12px_32px_rgba(91,33,182,0.12)]"
+            : "bg-[#FBFCF8]/90 shadow-[0_10px_30px_rgba(36,51,45,0.06)]"
+        }`}
       >
         {steps.map((step, index) => {
           const Icon = step.icon;
@@ -35,8 +40,12 @@ export default function LearnProgress({ active, completed = [], onSelect, theme,
               style={isActive ? { backgroundColor: theme?.primaryDark || "#24332D", color: "#FFFFFF" } : {}}
               className={`group flex items-center gap-2 rounded-full px-3.5 py-2.5 text-xs font-extrabold transition-all sm:px-4 ${
                 isActive
-                  ? "shadow-[0_8px_20px_rgba(36,51,45,0.14)]"
-                  : "text-[#6C7973] hover:bg-white hover:text-[#24332D]"
+                  ? night
+                    ? "shadow-[0_8px_20px_rgba(91,33,182,0.28)]"
+                    : "shadow-[0_8px_20px_rgba(36,51,45,0.14)]"
+                  : night
+                    ? "text-[#7C6A99] hover:bg-violet-50 hover:text-[#5B21B6]"
+                    : "text-[#6C7973] hover:bg-white hover:text-[#24332D]"
               }`}
               aria-current={isActive ? "step" : undefined}
             >
@@ -50,8 +59,12 @@ export default function LearnProgress({ active, completed = [], onSelect, theme,
                   isActive
                     ? "bg-white/12 text-white"
                     : isComplete
-                      ? "bg-[#CFE8DD] text-[#315C49]"
-                      : "bg-[#EEF2EF] text-[#7B8882]"
+                      ? night
+                        ? "bg-[#EDE9FE] text-[#5B21B6]"
+                        : "bg-[#CFE8DD] text-[#315C49]"
+                      : night
+                        ? "bg-[#F5F3FF] text-[#8B7AA8]"
+                        : "bg-[#EEF2EF] text-[#7B8882]"
                 }`}
               >
                 {index + 1}

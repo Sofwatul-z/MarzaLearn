@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
+  BookOpen,
   BookOpenText,
   CheckCircle2,
   Clock3,
@@ -30,24 +31,24 @@ import pjblMedal from "../../assets/chapter 1/step 6/assets/card-medalist.png";
 
 const stageOrder = ["introduction", "listen", "grammar"];
 
-function StructureTimeline({ items, theme }) {
+function StructureTimeline({ items, theme, night = false }) {
   return (
-    <div className="mt-8">
+    <div className={night ? "mt-6" : "mt-8"}>
       {items.map((item, index) => (
         <div key={item.name} className="grid grid-cols-[46px_minmax(0,1fr)] gap-4 sm:grid-cols-[58px_minmax(0,1fr)]">
           <div className="relative flex justify-center">
             {index < items.length - 1 && (
               <span
-                style={{ backgroundColor: theme?.borderSoft || "#DDE5E0" }}
+                style={{ backgroundColor: night ? "rgba(196,181,253,0.7)" : theme?.borderSoft || "#DDE5E0" }}
                 className="absolute bottom-0 top-10 w-px"
                 aria-hidden="true"
               />
             )}
             <span
               style={{
-                backgroundColor: theme?.badgeBg || "#EAF4EF",
-                borderColor: theme?.borderSoft || "#BFD5CA",
-                color: theme?.primaryDark || "#3F6252",
+                backgroundColor: night ? "#5B21B6" : theme?.badgeBg || "#EAF4EF",
+                borderColor: night ? "#5B21B6" : theme?.borderSoft || "#BFD5CA",
+                color: night ? "#FFFFFF" : theme?.primaryDark || "#3F6252",
               }}
               className="relative z-10 grid h-9 w-9 place-items-center rounded-full border text-xs font-extrabold shadow-xs"
             >
@@ -55,8 +56,15 @@ function StructureTimeline({ items, theme }) {
             </span>
           </div>
           <div className="pb-7">
-            <h3 className="font-extrabold tracking-[-0.02em] text-[#24332D]">{item.name}</h3>
-            <p className="mt-1.5 max-w-2xl text-sm leading-6 text-[#69776F]">{item.description}</p>
+            <h3
+              style={night ? { color: theme?.primaryDark } : undefined}
+              className="font-extrabold tracking-[-0.02em] text-[#24332D]"
+            >
+              {item.name}
+            </h3>
+            <p className={`mt-1.5 max-w-2xl text-sm leading-6 ${night ? "text-[#6B5A86]" : "text-[#69776F]"}`}>
+              {item.description}
+            </p>
           </div>
         </div>
       ))}
@@ -65,6 +73,8 @@ function StructureTimeline({ items, theme }) {
 }
 
 function IntroductionSection({ chapter, theme }) {
+  const night = Number(chapter.id) === 4;
+
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.72fr)] lg:gap-16">
       <div>
@@ -78,45 +88,80 @@ function IntroductionSection({ chapter, theme }) {
         >
           <BookOpenText size={14} /> Introduction
         </span>
-        <h2 className="mt-4 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl">
+        <h2
+          style={night ? { color: theme?.primaryDark } : undefined}
+          className="mt-4 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl"
+        >
           What is {chapter.title}?
         </h2>
-        <p className="mt-5 max-w-3xl text-lg leading-8 text-[#53635B]">{chapter.overview.definition}</p>
+        <p className={`mt-5 max-w-3xl text-lg leading-8 ${night ? "text-[#5B4B73]" : "text-[#53635B]"}`}>
+          {chapter.overview.definition}
+        </p>
 
-        <div
-          style={{ borderColor: theme?.primary || "#B8D7C8" }}
-          className="mt-9 border-l-4 pl-5 sm:pl-7"
-        >
-          <p
-            style={{ color: theme?.primaryMuted }}
-            className="text-[10px] font-extrabold uppercase tracking-[0.15em]"
+        {night ? (
+          <div className="mt-9 max-w-2xl">
+            <span
+              style={{ backgroundColor: theme.primaryDark, color: "#fff" }}
+              className="inline-flex items-center rounded-full px-3.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] shadow-[0_8px_18px_rgba(91,33,182,0.22)]"
+            >
+              Purpose
+            </span>
+            <p className="mt-3 text-sm leading-7 text-[#5B4B73] sm:text-base">{chapter.overview.purpose}</p>
+          </div>
+        ) : (
+          <div
+            style={{ borderColor: theme?.primary || "#B8D7C8" }}
+            className="mt-9 border-l-4 pl-5 sm:pl-7"
           >
-            Purpose
-          </p>
-          <p className="mt-2 max-w-2xl text-sm leading-7 text-[#64736C] sm:text-base">{chapter.overview.purpose}</p>
-        </div>
+            <p
+              style={{ color: theme?.primaryMuted }}
+              className="text-[10px] font-extrabold uppercase tracking-[0.15em]"
+            >
+              Purpose
+            </p>
+            <p className="mt-2 max-w-2xl text-sm leading-7 text-[#64736C] sm:text-base">{chapter.overview.purpose}</p>
+          </div>
+        )}
       </div>
 
       <div
         style={{
-          borderColor: theme?.borderSoft || "#DDE5E0",
-          backgroundColor: theme?.bgSurface || "rgba(255,255,255,0.7)",
+          borderColor: night ? "rgba(167,139,250,0.55)" : theme?.borderSoft || "#DDE5E0",
+          backgroundColor: night ? "#FFFFFF" : theme?.bgSurface || "rgba(255,255,255,0.7)",
         }}
-        className="rounded-[28px] border p-6 sm:p-7 shadow-xs"
+        className={`overflow-hidden rounded-[28px] border shadow-xs ${
+          night ? "shadow-[0_18px_40px_rgba(91,33,182,0.12)]" : ""
+        }`}
       >
-        <div className="flex items-center justify-between gap-4">
+        <div
+          className={`flex items-center justify-between gap-4 ${night ? "px-6 py-5 sm:px-7" : "p-6 sm:p-7 pb-0"}`}
+          style={
+            night
+              ? {
+                  background: "linear-gradient(135deg, #7C3AED 0%, #6D28D9 58%, #5B21B6 100%)",
+                  color: "#fff",
+                }
+              : undefined
+          }
+        >
           <div>
             <p
-              style={{ color: theme?.primaryMuted }}
+              style={night ? { color: "rgba(255,255,255,0.82)" } : { color: theme?.primaryMuted }}
               className="text-[10px] font-extrabold uppercase tracking-[0.14em]"
             >
               Text structure
             </p>
-            <h3 className="mt-2 text-xl font-extrabold tracking-[-0.03em] text-[#24332D]">Build it in order.</h3>
+            <h3
+              className={`mt-2 text-xl font-extrabold tracking-[-0.03em] ${night ? "text-white" : "text-[#24332D]"}`}
+            >
+              Build it in order.
+            </h3>
           </div>
-          <Layers3 size={22} style={{ color: theme?.primaryDark }} />
+          <Layers3 size={22} style={{ color: night ? "#FDE68A" : theme?.primaryDark }} />
         </div>
-        <StructureTimeline items={chapter.overview.structure} theme={theme} />
+        <div className={night ? "px-6 pt-2 sm:px-7" : "px-6 sm:px-7 pb-6 sm:pb-7"}>
+          <StructureTimeline items={chapter.overview.structure} theme={theme} night={night} />
+        </div>
       </div>
       
       <div className="lg:col-span-2">
@@ -129,6 +174,7 @@ function IntroductionSection({ chapter, theme }) {
 function ListenSection({ chapter, theme }) {
   const isAudioOnly = chapter.id === 2 || chapter.id === 4;
   const isReadingOnly = chapter.id === 1 || chapter.id === 3 || chapter.id === 5;
+  const night = Number(chapter.id) === 4;
 
   return (
     <div>
@@ -151,10 +197,13 @@ function ListenSection({ chapter, theme }) {
             </>
           )}
         </span>
-        <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl">
+        <h2
+          style={night ? { color: theme?.primaryDark } : undefined}
+          className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl"
+        >
           {isAudioOnly ? "Listen to the Audio Recording" : "Read and Understand the Text"}
         </h2>
-        <p className="mt-3.5 text-sm leading-7 text-[#65736D] sm:text-base">
+        <p className={`mt-3.5 text-sm leading-7 sm:text-base ${night ? "text-[#5B4B73]" : "text-[#65736D]"}`}>
           {isAudioOnly
             ? "Play the narration carefully to catch pronunciation, rhythm, and key information. Listen actively before moving on."
             : "Read the story carefully to understand the context, main ideas, and vocabulary. Take your time to absorb the meaning."}
@@ -286,8 +335,12 @@ function PjblHandoff({ chapter, onStartProject, isComplete, theme }) {
       style={isComplete ? { borderColor: theme?.borderSoft, backgroundColor: theme?.bgSurface || "rgba(234,244,239,0.5)" } : {}}
       className={`mt-8 overflow-hidden rounded-[34px] border p-7 sm:p-9 shadow-[0_16px_40px_rgba(36,51,45,0.06)] transition-all ${
         isComplete
-          ? "border-[#CDE1D6] bg-gradient-to-br from-[#EAF4EF] via-white to-[#F4F8F6]"
-          : "border-[#E2E8E4] bg-[#F7F9F8] opacity-85"
+          ? Number(chapter.id) === 4
+            ? "border-violet-200 bg-gradient-to-br from-[#F5F3FF] via-white to-[#FCE7F3]"
+            : "border-[#CDE1D6] bg-gradient-to-br from-[#EAF4EF] via-white to-[#F4F8F6]"
+          : Number(chapter.id) === 4
+            ? "border-violet-100 bg-[#F8F5FF] opacity-85"
+            : "border-[#E2E8E4] bg-[#F7F9F8] opacity-85"
       }`}
     >
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center">
@@ -492,32 +545,44 @@ export default function Chapter() {
   }
 
   const isGrammar = activeStage === "grammar";
+  const night = Number(chapter.id) === 4;
 
   return (
     <div className="relative">
       {/* Dynamic ambient page glow matching chapter theme */}
       <div
         style={{ backgroundColor: theme?.primary }}
-        className="pointer-events-none fixed inset-0 opacity-[0.05] blur-3xl -z-10"
+        className={`pointer-events-none fixed inset-0 blur-3xl -z-10 ${night ? "opacity-[0.18]" : "opacity-[0.05]"}`}
       />
 
-      <section className="relative overflow-hidden border-b border-[#E3E9E5] pb-8 pt-2 sm:pb-10 sm:pt-5">
+      <section className={`relative overflow-hidden pb-8 pt-2 sm:pb-10 sm:pt-5 ${night ? "border-b border-violet-200/70" : "border-b border-[#E3E9E5]"}`}>
         <button
           type="button"
           onClick={() => navigate("/student/chapters")}
-          className="mb-7 inline-flex items-center gap-2 text-xs font-extrabold text-[#6B7972] transition-colors hover:text-[#24332D]"
+          className={`mb-7 inline-flex items-center gap-2 text-xs font-extrabold transition-colors ${
+            night ? "text-violet-400 hover:text-[#5B21B6]" : "text-[#6B7972] hover:text-[#24332D]"
+          }`}
         >
           <ArrowLeft size={15} /> All chapters
         </button>
 
         <div className="grid items-center gap-5 lg:grid-cols-[minmax(0,1.04fr)_minmax(360px,0.8fr)] lg:gap-10">
           <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-            <span className="ml-eyebrow">Semester {chapter.semester} · Chapter {String(chapter.id).padStart(2, "0")}</span>
-            <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-[-0.055em] text-[#24332D] sm:text-5xl lg:text-6xl">
+            <span
+              className={night ? "ml-eyebrow rounded-full border border-violet-200 bg-white/80 px-3 py-1 text-[#7C3AED]" : "ml-eyebrow"}
+            >
+              Semester {chapter.semester} · Chapter {String(chapter.id).padStart(2, "0")}
+            </span>
+            <h1
+              style={night ? { color: theme?.primaryDark } : undefined}
+              className="mt-4 max-w-3xl text-4xl font-extrabold tracking-[-0.055em] text-[#24332D] sm:text-5xl lg:text-6xl"
+            >
               {chapter.title}
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-[#5D6D65] sm:text-lg">{chapter.heroLine}</p>
-            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs font-bold text-[#738079]">
+            <p className={`mt-5 max-w-2xl text-base leading-8 sm:text-lg ${night ? "text-[#5B4B73]" : "text-[#5D6D65]"}`}>
+              {chapter.heroLine}
+            </p>
+            <div className={`mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs font-bold ${night ? "text-[#7C6A99]" : "text-[#738079]"}`}>
               <span>{chapter.focus}</span>
               <span>•</span>
               <span>{chapter.duration}</span>
@@ -547,12 +612,17 @@ export default function Chapter() {
         </AnimatePresence>
       </section>
 
-      <div className="mb-9 flex items-center justify-between border-t border-[#E2E8E4] pt-6">
-        <Button variant="ghost" onClick={previous} disabled={activeStage === stageOrder[0]}>
+      <div className={`mb-9 flex items-center justify-between pt-6 ${night ? "border-t border-violet-200/70" : "border-t border-[#E2E8E4]"}`}>
+        <Button
+          variant="ghost"
+          onClick={previous}
+          disabled={activeStage === stageOrder[0]}
+          className={night ? "rounded-full text-violet-500 hover:bg-violet-50 hover:text-[#5B21B6]" : ""}
+        >
           <ArrowLeft size={16} /> Previous
         </Button>
         {!isGrammar && (
-          <Button theme={theme} variant="primary" onClick={next}>
+          <Button theme={theme} variant="primary" onClick={next} className={night ? "rounded-full px-6 shadow-[0_12px_28px_rgba(91,33,182,0.28)]" : ""}>
             Next: {activeStage === "introduction" ? (chapter.id === 2 || chapter.id === 4 ? "Listening Audio" : "Reading Text") : "Grammar Corner"} <ArrowRight size={16} />
           </Button>
         )}

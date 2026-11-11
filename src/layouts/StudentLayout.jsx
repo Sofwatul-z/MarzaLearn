@@ -4,10 +4,18 @@ import StudentHeader from "../components/student/StudentHeader";
 import ChapterDecorations from "../components/learning/ChapterDecorations";
 import { getChapterTheme } from "../data/chapterThemes";
 
+function getChapter4DecorVariant(pathname) {
+  if (/^\/student\/chapter\/4\/session\/?$/.test(pathname)) return "session";
+  if (/^\/student\/chapter\/4\/?$/.test(pathname)) return "landing";
+  return "default";
+}
+
 export default function StudentLayout() {
   const location = useLocation();
   const match = location.pathname.match(/\/student\/chapter\/(\d+)/);
   const chapterId = match ? Number(match[1]) : 1;
+  const decorVariant = getChapter4DecorVariant(location.pathname);
+  const isChapter4Dream = decorVariant !== "default";
   const theme = getChapterTheme(chapterId);
 
   return (
@@ -19,20 +27,29 @@ export default function StudentLayout() {
         Skip to content
       </a>
 
-      {/* Grid Background */}
-      <ChapterDecorations />
+      <ChapterDecorations chapterId={chapterId} variant={decorVariant} />
+
+      {isChapter4Dream && (
+        <div
+          className="pointer-events-none fixed inset-0 -z-10"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(252,231,243,0.55) 0%, rgba(237,233,254,0.5) 42%, rgba(245,243,255,0.55) 100%)",
+          }}
+        />
+      )}
 
       <GradientBlob
-        color={theme?.primary || "#EAC3D5"}
+        color={isChapter4Dream ? theme.primary : theme?.primary || "#EAC3D5"}
         size={460}
         className="-right-44 top-16 -z-20 sm:-right-28"
-        opacity={0.42}
+        opacity={isChapter4Dream ? 0.55 : 0.42}
       />
       <GradientBlob
-        color={theme?.accent || "#F4D7C5"}
+        color={isChapter4Dream ? "#F9A8D4" : theme?.accent || "#F4D7C5"}
         size={350}
         className="-left-48 bottom-8 -z-20"
-        opacity={0.30}
+        opacity={isChapter4Dream ? 0.4 : 0.3}
         delay={1.5}
       />
 

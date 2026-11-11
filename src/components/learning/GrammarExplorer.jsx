@@ -3,20 +3,22 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Check, MessageSquareQuote } from "lucide-react";
 import SourceNote from "../common/SourceNote";
 
-function FormulaRows({ rows = [] }) {
+function FormulaRows({ rows = [], night = false }) {
   return (
-    <div className="mt-7 border-y border-[#DDE5E0]">
+    <div className={`mt-7 border-y ${night ? "border-violet-200/80" : "border-[#DDE5E0]"}`}>
       {rows.map((row, index) => (
         <div
           key={`${row.type}-${index}`}
-          className="grid gap-3 border-b border-[#E6ECE8] py-5 last:border-b-0 md:grid-cols-[118px_minmax(0,1fr)_minmax(0,0.9fr)] md:items-center md:gap-5"
+          className={`grid gap-3 border-b py-5 last:border-b-0 md:grid-cols-[118px_minmax(0,1fr)_minmax(0,0.9fr)] md:items-center md:gap-5 ${
+            night ? "border-violet-100" : "border-[#E6ECE8]"
+          }`}
         >
-          <span className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#7D8B84]">
+          <span className={`text-[10px] font-extrabold uppercase tracking-[0.14em] ${night ? "text-[#8B7AA8]" : "text-[#7D8B84]"}`}>
             {row.type}
           </span>
-          <p className="font-extrabold tracking-[-0.02em] text-[#24332D]">{row.formula}</p>
-          <p className="text-sm leading-6 text-[#66756E]">
-            <span className="mr-2 text-[#A0AAA5]">→</span>
+          <p className={`font-extrabold tracking-[-0.02em] ${night ? "text-[#5B21B6]" : "text-[#24332D]"}`}>{row.formula}</p>
+          <p className={`text-sm leading-6 ${night ? "text-[#6B5A86]" : "text-[#66756E]"}`}>
+            <span className={`mr-2 ${night ? "text-violet-300" : "text-[#A0AAA5]"}`}>→</span>
             {row.example}
           </p>
         </div>
@@ -25,13 +27,13 @@ function FormulaRows({ rows = [] }) {
   );
 }
 
-function ExpressionRows({ rows = [] }) {
+function ExpressionRows({ rows = [], night = false }) {
   return (
-    <div className="mt-7 divide-y divide-[#E4EAE6] border-y border-[#DDE5E0]">
+    <div className={`mt-7 divide-y border-y ${night ? "divide-violet-100 border-violet-200/80" : "divide-[#E4EAE6] border-[#DDE5E0]"}`}>
       {rows.map(([expression, example]) => (
         <div key={expression} className="grid gap-2 py-5 md:grid-cols-[minmax(0,0.65fr)_minmax(0,1fr)] md:gap-8">
-          <p className="font-extrabold tracking-[-0.02em] text-[#24332D]">{expression}</p>
-          <p className="text-sm leading-6 text-[#66756E]">{example}</p>
+          <p className={`font-extrabold tracking-[-0.02em] ${night ? "text-[#5B21B6]" : "text-[#24332D]"}`}>{expression}</p>
+          <p className={`text-sm leading-6 ${night ? "text-[#6B5A86]" : "text-[#66756E]"}`}>{example}</p>
         </div>
       ))}
     </div>
@@ -46,6 +48,7 @@ export default function GrammarExplorer({ grammar, theme }) {
   }, [grammar]);
 
   const active = grammar.tabs.find((tab) => tab.id === activeTab) ?? grammar.tabs[0];
+  const night = theme?.id === "analytical-exposition";
 
   return (
     <div>
@@ -60,10 +63,13 @@ export default function GrammarExplorer({ grammar, theme }) {
         >
           Grammar corner
         </span>
-        <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl">
+        <h2
+          style={theme?.id === "analytical-exposition" ? { color: theme.primaryDark } : undefined}
+          className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D] sm:text-4xl"
+        >
           {grammar.title}
         </h2>
-        <p className="mt-4 text-sm leading-7 text-[#65736D] sm:text-base">{grammar.intro}</p>
+        <p className={`mt-4 text-sm leading-7 sm:text-base ${theme?.id === "analytical-exposition" ? "text-[#5B4B73]" : "text-[#65736D]"}`}>{grammar.intro}</p>
       </div>
 
       <div className="mt-8 flex gap-2 overflow-x-auto pb-2">
@@ -83,8 +89,12 @@ export default function GrammarExplorer({ grammar, theme }) {
             }
             className={`whitespace-nowrap rounded-full border px-4 py-2.5 text-xs font-extrabold transition-all ${
               activeTab === tab.id
-                ? "shadow-sm"
-                : "border-[#DCE4DF] bg-white/70 text-[#66756E] hover:border-[#B9CBC1] hover:text-[#24332D]"
+                ? night
+                  ? "shadow-[0_8px_20px_rgba(91,33,182,0.22)]"
+                  : "shadow-sm"
+                : night
+                  ? "border-violet-200 bg-white/80 text-[#7C6A99] hover:border-violet-300 hover:text-[#5B21B6]"
+                  : "border-[#DCE4DF] bg-white/70 text-[#66756E] hover:border-[#B9CBC1] hover:text-[#24332D]"
             }`}
             aria-pressed={activeTab === tab.id}
           >
@@ -101,7 +111,11 @@ export default function GrammarExplorer({ grammar, theme }) {
           exit={{ opacity: 0, y: -6 }}
           transition={{ duration: 0.24 }}
           style={{ borderColor: theme?.borderSoft || "#DDE5E0" }}
-          className="mt-5 overflow-hidden rounded-[30px] border bg-white/[0.88] p-6 shadow-[0_16px_45px_rgba(36,51,45,0.055)] sm:p-8"
+          className={`mt-5 overflow-hidden rounded-[30px] border p-6 sm:p-8 ${
+            night
+              ? "bg-white/90 shadow-[0_16px_45px_rgba(91,33,182,0.1)]"
+              : "bg-white/[0.88] shadow-[0_16px_45px_rgba(36,51,45,0.055)]"
+          }`}
         >
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_220px]">
             <div>
@@ -111,10 +125,10 @@ export default function GrammarExplorer({ grammar, theme }) {
               >
                 Focus
               </p>
-              <h3 className="mt-2 text-2xl font-extrabold tracking-[-0.035em] text-[#24332D]">
+              <h3 className={`mt-2 text-2xl font-extrabold tracking-[-0.035em] ${night ? "text-[#5B21B6]" : "text-[#24332D]"}`}>
                 {active.title}
               </h3>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-[#66756E]">{active.description}</p>
+              <p className={`mt-3 max-w-2xl text-sm leading-7 ${night ? "text-[#6B5A86]" : "text-[#66756E]"}`}>{active.description}</p>
             </div>
 
             <div
@@ -161,7 +175,7 @@ export default function GrammarExplorer({ grammar, theme }) {
           {active.notes?.length > 0 && (
             <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {active.notes.map((note) => (
-                <div key={note} className="flex gap-2.5 text-sm leading-6 text-[#5F6E67]">
+                <div key={note} className={`flex gap-2.5 text-sm leading-6 ${night ? "text-[#6B5A86]" : "text-[#5F6E67]"}`}>
                   <span
                     style={{
                       backgroundColor: theme?.badgeBg || "#CFE8DD",
@@ -177,8 +191,8 @@ export default function GrammarExplorer({ grammar, theme }) {
             </div>
           )}
 
-          {active.formulas?.length > 0 && <FormulaRows rows={active.formulas} />}
-          {active.expressionExamples?.length > 0 && <ExpressionRows rows={active.expressionExamples} />}
+          {active.formulas?.length > 0 && <FormulaRows rows={active.formulas} night={night} />}
+          {active.expressionExamples?.length > 0 && <ExpressionRows rows={active.expressionExamples} night={night} />}
 
           {active.callout && (
             <div

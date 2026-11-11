@@ -139,13 +139,16 @@ function SaveIndicator({ state }) {
 
 function MissionIntro({ chapter, recovered, onStart, onBack, theme }) {
   const introAsset = getStepAssets(chapter?.id, 1);
+  const night = Number(chapter?.id) === 4;
 
   return (
     <div className="pb-8">
       <button
         type="button"
         onClick={onBack}
-        className="mb-7 inline-flex items-center gap-2 text-xs font-extrabold text-[#6B7972] transition-colors hover:text-[#24332D]"
+        className={`mb-7 inline-flex items-center gap-2 text-xs font-extrabold transition-colors ${
+          night ? "text-violet-400 hover:text-[#5B21B6]" : "text-[#6B7972] hover:text-[#24332D]"
+        }`}
       >
         <ArrowLeft size={15} /> Back to chapter learning
       </button>
@@ -212,7 +215,7 @@ function MissionIntro({ chapter, recovered, onStart, onBack, theme }) {
           >
             Mission roadmap
           </span>
-          <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.045em] text-[#24332D]">Six steps, one learning flow.</h2>
+          <h2 className={`mt-3 text-3xl font-extrabold tracking-[-0.045em] ${night ? "text-[#5B21B6]" : "text-[#24332D]"}`}>Six steps, one learning flow.</h2>
         </div>
 
         <div className="relative">
@@ -228,7 +231,9 @@ function MissionIntro({ chapter, recovered, onStart, onBack, theme }) {
                 className="grid grid-cols-[52px_minmax(0,1fr)] gap-4 sm:grid-cols-[68px_minmax(0,1fr)] sm:gap-6"
               >
                 <div className="relative flex justify-center">
-                  {index < steps.length - 1 && <span className="absolute bottom-0 top-12 w-px bg-[#DDE5E0]" />}
+                  {index < steps.length - 1 && (
+                    <span className={`absolute bottom-0 top-12 w-px ${night ? "bg-violet-200" : "bg-[#DDE5E0]"}`} />
+                  )}
                   <span
                     style={index === 0 ? { backgroundColor: theme?.primaryDark || "#24332D", borderColor: theme?.primaryDark || "#24332D" } : {}}
                     className={`relative z-10 grid h-11 w-11 place-items-center rounded-full border ${index === 0 ? "text-white" : "border-[#D7E1DC] bg-[#FBFCF8] text-[#6F7D76]"}`}
@@ -236,13 +241,13 @@ function MissionIntro({ chapter, recovered, onStart, onBack, theme }) {
                     <Icon size={17} />
                   </span>
                 </div>
-                <div className="border-b border-[#E3E9E5] pb-7 pt-0.5 last:border-b-0 sm:pb-8">
+                <div className={`border-b pb-7 pt-0.5 last:border-b-0 sm:pb-8 ${night ? "border-violet-200/70" : "border-[#E3E9E5]"}`}>
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#8A9690]">Step {String(index + 1).padStart(2, "0")}</span>
-                    <h3 className="text-xl font-extrabold tracking-[-0.03em] text-[#24332D]">{step.label}</h3>
+                    <span className={`text-[10px] font-extrabold uppercase tracking-[0.14em] ${night ? "text-[#8B7AA8]" : "text-[#8A9690]"}`}>Step {String(index + 1).padStart(2, "0")}</span>
+                    <h3 className={`text-xl font-extrabold tracking-[-0.03em] ${night ? "text-[#5B21B6]" : "text-[#24332D]"}`}>{step.label}</h3>
                   </div>
-                  <p className="mt-2 text-sm font-bold leading-6 text-[#53645B]">{content?.title}</p>
-                  <p className="mt-1 text-xs leading-5 text-[#8A9690]">{step.note}</p>
+                  <p className={`mt-2 text-sm font-bold leading-6 ${night ? "text-[#5B4B73]" : "text-[#53645B]"}`}>{content?.title}</p>
+                  <p className={`mt-1 text-xs leading-5 ${night ? "text-[#8B7AA8]" : "text-[#8A9690]"}`}>{step.note}</p>
                 </div>
               </motion.div>
             );
@@ -257,10 +262,10 @@ function MissionIntro({ chapter, recovered, onStart, onBack, theme }) {
             <p className="text-[10px] font-extrabold uppercase tracking-[0.14em]" style={{ color: theme?.primaryDark || "#688075" }}>
               Ready when you are
             </p>
-            <p className="mt-1 font-extrabold tracking-[-0.02em] text-[#24332D]">
+            <p className={`mt-1 font-extrabold tracking-[-0.02em] ${night ? "text-[#5B21B6]" : "text-[#24332D]"}`}>
               {recovered ? "A previous in-progress session was recovered." : `Provide begins with ${chapter.marzano.provide.vocabulary.length} target words.`}
             </p>
-            <p className="mt-1 text-xs leading-5 text-[#75827C]">
+            <p className={`mt-1 text-xs leading-5 ${night ? "text-[#7C6A99]" : "text-[#75827C]"}`}>
               {recovered ? "Continue from the last autosaved step." : "Starting creates your learning session and enables recovery autosave."}
             </p>
           </div>
@@ -274,6 +279,7 @@ function MissionIntro({ chapter, recovered, onStart, onBack, theme }) {
 }
 
 function MissionComplete({ chapter, session, saveState, theme, onBackToChapter, onDashboard, onPjbl }) {
+  const night = Number(chapter?.id) === 4;
   const engagePairs = chapter.marzano.engage.pairs;
   const matched = session.data.engage?.matched ?? [];
   const mistakes = session.data.engage?.mistakeTerms ?? {};
@@ -303,13 +309,15 @@ function MissionComplete({ chapter, session, saveState, theme, onBackToChapter, 
           >
             6 / 6 steps completed
           </span>
-          <h1 className="mt-3 text-4xl font-extrabold tracking-[-0.055em] text-[#24332D] sm:text-5xl">Mission Complete! 🏆</h1>
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[#64736C] sm:text-base">
+          <h1 className={`mt-3 text-4xl font-extrabold tracking-[-0.055em] sm:text-5xl ${night ? "text-[#5B21B6]" : "text-[#24332D]"}`}>Mission Complete! 🏆</h1>
+          <p className={`mx-auto mt-4 max-w-xl text-sm leading-7 sm:text-base ${night ? "text-[#6B5A86]" : "text-[#64736C]"}`}>
             Your {chapter.title} learning mission is completed. Now you are ready to unleash your creativity in the Ultimate Project-Based Learning (PjBL) video project!
           </p>
         </div>
 
-        <div className="mx-auto mt-9 grid max-w-4xl gap-px overflow-hidden rounded-[24px] border border-[#D4E1DA] bg-[#D4E1DA] sm:grid-cols-3">
+        <div className={`mx-auto mt-9 grid max-w-4xl gap-px overflow-hidden rounded-[24px] border sm:grid-cols-3 ${
+          night ? "border-violet-200 bg-violet-200" : "border-[#D4E1DA] bg-[#D4E1DA]"
+        }`}>
           <div className="bg-white/85 p-5 text-center">
             <p className="text-[10px] font-extrabold uppercase tracking-[0.13em] text-[#849089]">Engage</p>
             <p className="mt-2 text-2xl font-extrabold text-[#24332D]">{engageScore}/{engagePairs.length}</p>
@@ -454,6 +462,7 @@ export default function LearningFlow() {
   const stepIndex = Math.max(0, Math.min(steps.length - 1, (currentStep || 1) - 1));
   const step = steps[stepIndex] || steps[0];
   const ready = isStepReady(chapter, session, currentStep);
+  const night = Number(chapter.id) === 4;
 
   function nextStep() {
     if (!ready) return;
@@ -576,7 +585,7 @@ export default function LearningFlow() {
         </aside>
       )}
 
-      <section className="border-b border-[#E2E8E4] pb-3">
+      <section className={`border-b pb-3 ${night ? "border-violet-200/70" : "border-[#E2E8E4]"}`}>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <span
@@ -589,7 +598,7 @@ export default function LearningFlow() {
             >
               Chapter {String(chapter.id).padStart(2, "0")} · Focus session
             </span>
-            <h1 className="mt-2 text-2xl font-extrabold tracking-[-0.04em] text-[#24332D] sm:text-3xl">
+            <h1 className={`mt-2 text-2xl font-extrabold tracking-[-0.04em] sm:text-3xl ${night ? "text-[#5B21B6]" : "text-[#24332D]"}`}>
               {chapter.title} · 6-Step Mission
             </h1>
           </div>
@@ -608,7 +617,11 @@ export default function LearningFlow() {
       </section>
 
       {recovered && (
-        <div className="mt-5 flex items-start gap-3 rounded-[18px] border border-[#D2E0D8] bg-[#EAF4EF]/75 px-4 py-3 text-xs leading-5 text-[#597065]">
+        <div className={`mt-5 flex items-start gap-3 rounded-[18px] border px-4 py-3 text-xs leading-5 ${
+          night
+            ? "border-violet-200 bg-violet-50/80 text-[#5B4B73]"
+            : "border-[#D2E0D8] bg-[#EAF4EF]/75 text-[#597065]"
+        }`}>
           <RefreshCw size={15} className="mt-0.5 shrink-0" />
           <span><strong>Session recovered.</strong> We restored your latest autosaved work so an accidental refresh does not erase your answers.</span>
         </div>
@@ -682,15 +695,24 @@ export default function LearningFlow() {
         </AnimatePresence>
       </section>
 
-      <footer className="sticky bottom-3 z-30 rounded-[24px] border border-[#DDE5E0] bg-[#FBFCF8]/95 p-3.5 shadow-[0_16px_45px_rgba(36,51,45,0.12)] backdrop-blur-xl sm:p-4">
+      <footer className={`sticky bottom-3 z-30 rounded-[24px] border p-3.5 backdrop-blur-xl sm:p-4 ${
+        night
+          ? "border-violet-200 bg-[#F5F3FF]/95 shadow-[0_16px_45px_rgba(91,33,182,0.14)]"
+          : "border-[#DDE5E0] bg-[#FBFCF8]/95 shadow-[0_16px_45px_rgba(36,51,45,0.12)]"
+      }`}>
         <div className="flex items-center justify-between gap-3">
-          <Button variant="ghost" onClick={previousStep} disabled={currentStep === 1}>
+          <Button
+            variant="ghost"
+            onClick={previousStep}
+            disabled={currentStep === 1}
+            className={night ? "rounded-full text-violet-500 hover:bg-violet-50 hover:text-[#5B21B6]" : ""}
+          >
             <ArrowLeft size={16} /> <span className="hidden sm:inline">Back</span>
           </Button>
 
           <div className="hidden text-center sm:block">
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#8A9690]">{step.label}</p>
-            <p className={`mt-0.5 text-xs font-black ${ready ? "text-emerald-700" : "text-[#8A9690]"}`}>
+            <p className={`text-[10px] font-extrabold uppercase tracking-[0.14em] ${night ? "text-[#8B7AA8]" : "text-[#8A9690]"}`}>{step.label}</p>
+            <p className={`mt-0.5 text-xs font-black ${ready ? (night ? "text-[#5B21B6]" : "text-emerald-700") : night ? "text-[#8B7AA8]" : "text-[#8A9690]"}`}>
               {ready ? "✨ Activity completed! Ready to advance now!" : "Complete the activity above to unlock the next step"}
             </p>
           </div>
